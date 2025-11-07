@@ -1,0 +1,17 @@
+package com.poc.crud.modules.group.dto
+
+import com.poc.crud.model.Group
+
+open class GroupDTO(
+    open val id: Long?,
+    open val name: String,
+    open val description: String,
+    open val cover: String,
+) {
+    constructor(group: Group) : this(
+        id = group.id,
+        name = group.name,
+        description = group.description,
+        cover = group.cover,
+    )
+}

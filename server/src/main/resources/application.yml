@@ -1,0 +1,39 @@
+spring:
+  application:
+    name: demo
+  datasource:
+    url: jdbc:postgresql://db:5432/mydatabase
+    username: myuser
+    password: secret
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    show-sql: true
+
+logging:
+  level:
+    org.springframework.security: DEBUG
+
+server:
+  servlet:
+    context-path: /api
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+
+jwt:
+  key: a9c986ede938a8b4f8721737c62efd8568ba43e976e2b77cdd90d0b2c4f66e97
+  accessTokenExpiration: 3600
+
+
+filestorage:
+  accesskey: minioadmin
+  secretkey: minioadmin
+  bucketname: musics
+  endpoint: http://minio:9000
+  region: us-east-1

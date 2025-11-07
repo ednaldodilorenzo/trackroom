@@ -1,0 +1,112 @@
+databaseChangeLog:
+  - changeSet:
+      id: V1_002
+      author: Ednaldo Dilorenzo
+      changes:
+        - createTable:
+            tableName: groups
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    unique: true
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(50)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: active
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: cover
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable:
+        - createTable:
+            tableName: user_group
+            columns:
+              - column:
+                  name: user_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: group_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: admin
+                  type: BOOLEAN
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - primaryKey:
+                columns:
+                  - column: user_id
+                  - column: group_id
+                name: pk_user_group
+  - changeSet:
+      id: add-composite-fk-to-group
+      author: Ednaldo Dilorenzo
+      changes:
+        - addForeignKeyConstraint:
+            baseTableName: user_group
+            baseColumnNames: user_id
+            referencedTableName: users
+            referencedColumnNames: id
+            constraintName: fk_user_group_user
+            onUpdate: CASCADE
+            onDelete: CASCADE
+        - addForeignKeyConstraint:
+            baseTableName: user_group
+            baseColumnNames: group_id
+            referencedTableName: groups
+            referencedColumnNames: id
+            constraintName: fk_user_group_group
+            onUpdate: CASCADE
+            onDelete: CASCADE
+        - addDefaultValue:
+            tableName: groups
+            columnName: active
+            defaultValueBoolean: true # or false
+        - addDefaultValue:
+            tableName: groups
+            columnName: created_date
+            defaultValueDate: "CURRENT_TIMESTAMP"
+        - addDefaultValue:
+            tableName: user_group
+            columnName: created_date
+            defaultValueDate: "CURRENT_TIMESTAMP"
+

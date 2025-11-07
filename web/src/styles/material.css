@@ -1,0 +1,21 @@
+/* Root variables and global resets */
+:root {
+  --md-primary: #6200ee;
+  --md-on-primary: #ffffff;
+  --md-surface: #f5f5f5;
+  --md-on-surface: #333333;
+  --md-border: #ccc;
+  --md-radius: 6px;
+  --md-font: "Roboto", sans-serif;
+  --md-secondary: #018786;
+  --md-on-secondary: #ffffff;
+
+  --md-success: #2e7d32;
+  --md-on-success: #ffffff;
+
+  --md-danger: #c62828;
+  --md-on-danger: #ffffff;
+
+  --md-warning: #f9a825;
+  --md-on-warning: #000000;
+}

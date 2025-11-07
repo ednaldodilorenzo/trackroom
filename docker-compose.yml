@@ -1,0 +1,49 @@
+services:
+  app:
+    build: ./server
+    expose:
+      - "8080"      
+    environment:
+      SPRING_DEVTOOLS_RESTART_ENABLED: "true"
+      SPRING_LIQUIBASE_ENABLED: "true"
+      JAVA_OPTS: >
+        -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+        -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0
+        -Djava.security.egd=file:/dev/./urandom
+    volumes:
+      - ./server/src:/app/src
+
+  web:
+    build:
+      context: ./trackroom-web
+      target: ${BUILD_TARGET:-development}
+    ports:
+      - "80:80" # Usado apenas em produção, pois em testes automatizados utilizado na rede interna.
+    depends_on:
+      - app
+
+  db:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=mydatabase'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USER=myuser'
+    expose:
+      - "5432"
+
+  minio:
+    image: minio/minio:latest
+    command: server /data --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: ${FS_USERNAME}
+      MINIO_ROOT_PASSWORD: ${FS_PASSWORD}
+    volumes:
+      - minio_data:/data
+    expose:    
+      - "9001"
+      - "9000"
+    restart: always
+
+volumes:
+  minio_data:
+#  db_data:

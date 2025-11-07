@@ -1,0 +1,50 @@
+.md-text-field {
+  position: relative;
+  margin-top: 24px;
+  font-family: var(--md-font);
+}
+
+.md-text-field input {
+  width: 100%;
+  padding: 18px 12px 6px 12px;
+  border: 1px solid var(--md-border);
+  border-radius: var(--md-radius);
+  background: transparent;
+  font-size: 16px;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.md-text-field input:focus {
+  border: 2px solid var(--md-primary);
+}
+
+.md-text-field label {
+  position: absolute;
+  left: 12px;
+  top: 16px;
+  color: #666;
+  background: white;
+  padding: 0 4px;
+  font-size: 16px;
+  transition: 0.2s ease all;
+  pointer-events: none;
+}
+
+.md-text-field input:focus + label,
+.md-text-field input:not(:placeholder-shown) + label {
+  top: -8px;
+  font-size: 12px;
+  color: var(--md-primary);
+}
+
+.md-text-field .invalid {
+  border: 2px solid red;
+}
+
+.md-error {
+  color: red;
+  font-size: 12px;
+  margin-top: 4px;
+  display: block;
+}

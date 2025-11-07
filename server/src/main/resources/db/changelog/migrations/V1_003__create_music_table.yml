@@ -1,0 +1,83 @@
+databaseChangeLog:
+  - changeSet:
+      id: V1_003
+      author: Ednaldo Dilorenzo
+      changes:
+        - createTable:
+            tableName: musics
+            columns:
+              - column:
+                  name: id
+                  type: bigint
+                  autoIncrement: true
+                  constraints:
+                    unique: true
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: name
+                  type: VARCHAR(55)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: description
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: file
+                  type: VARCHAR(255)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+              - column:
+                  name: updated_date
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true
+        - createTable:
+            tableName: group_music
+            columns:
+              - column:
+                  name: group_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - column:
+                  name: music_id
+                  type: bigint
+                  constraints:
+                    nullable: false
+              - primaryKey:
+                columns:
+                  - column: music_id
+                  - column: group_id
+                name: pk_group_music
+        - addForeignKeyConstraint:
+            baseTableName: group_music
+            baseColumnNames: group_id
+            constraintName: fk_group_music_group_id
+            referencedTableName: groups
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: group_music
+            baseColumnNames: music_id
+            constraintName: fk_group_music_music_id
+            referencedTableName: musics
+            referencedColumnNames: id
+        - addUniqueConstraint:
+            columnNames: name
+            constraintName: music_name_unique
+            tableName: musics
+        - addUniqueConstraint:
+            columnNames: file
+            constraintName: music_file_unique
+            tableName: musics
+        - addDefaultValue:
+            tableName: musics
+            columnName: created_date
+            defaultValueDate: "CURRENT_TIMESTAMP"

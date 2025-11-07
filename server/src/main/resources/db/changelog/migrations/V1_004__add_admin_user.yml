@@ -1,0 +1,7 @@
+databaseChangeLog:
+  - changeSet:
+      id: V1_004
+      author: Ednaldo Dilorenzo
+      changes:
+        - sql:
+            sql: INSERT INTO users (name, email, cpf, active, phone_number, password) VALUES ('Ednaldo', 'ed@teste.com', '32145678978', true, '11999999999', '$2a$10$nOX4DKFI9sK/DVGHkzntIe5IEdbn7ZQ3AGhxAVRrlF.P9AJ7puCaK');

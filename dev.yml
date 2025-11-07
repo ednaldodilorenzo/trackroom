@@ -1,0 +1,21 @@
+services:
+  app:
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+
+  web:
+    volumes:
+      - ./trackroom-web:/app
+      - /app/node_modules
+    ports:
+      - "5173:5173"
+
+  db:
+    ports:
+      - "5432:5432"
+
+  minio:
+    ports:
+      - "9000:9000"
+      - "9001:9001"
