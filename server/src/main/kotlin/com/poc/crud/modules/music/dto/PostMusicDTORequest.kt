@@ -19,4 +19,12 @@ data class PostMusicDTORequest(
 
     @NotNull
     val groupId: Long,
-)
+) {
+    constructor() : this(
+        id = null,
+        name = "",
+        description = "",
+        file = "",
+        groupId = 0L
+    )
+}

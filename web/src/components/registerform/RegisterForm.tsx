@@ -12,11 +12,12 @@ export default function RegisterForm({
   title,
   formSubmit,
   cancelHandler,
+  ...rest
 }: RegisterFormProps) {
   return (
     <>
       <h2>{title}</h2>
-      <Form onSubmit={formSubmit}>
+      <Form onSubmit={formSubmit} {...rest}>
         {children}
         <div className="bottom-controls">
           <Button onClick={cancelHandler} variant="secondary">

@@ -1,5 +1,6 @@
 package com.poc.crud.modules.music
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.music.dto.PostMusicDTORequest
 import com.poc.crud.modules.music.service.MusicService
@@ -24,10 +25,14 @@ class MusicController(
 
     @PostMapping("", consumes = [MediaType.MULTIPART_FORM_DATA_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun post(
-        @RequestPart("music") music: PostMusicDTORequest,
-        @RequestPart("file") file: MultipartFile
-    ): Long? = musicService.insertMusic(
-        music,
-        file
-    )
+        @RequestPart("music") musicJson: String,
+        @RequestParam("file") file: MultipartFile
+    ): Long? {
+        val music = ObjectMapper().readValue(musicJson, PostMusicDTORequest::class.java)
+        val x = musicService.insertMusic(
+            music,
+            file
+        )
+        return x
+    }
 }

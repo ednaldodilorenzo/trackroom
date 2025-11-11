@@ -20,13 +20,7 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-//        val path = request.requestURI
-//        if (path.startsWith("/auth/")) {
-//            filterChain.doFilter(request, response)
-//            return
-//        }
-
-        val token = extractToken(request)
+        val token = extractJwtFromHeaderOrCookie(request)
 
         if (token != null && SecurityContextHolder.getContext().authentication == null) {
             val preAuth = UsernamePasswordAuthenticationToken(null, token)
@@ -45,8 +39,16 @@ class JwtAuthenticationFilter(
         filterChain.doFilter(request, response)
     }
 
-    private fun extractToken(request: HttpServletRequest): String? {
-        val header = request.getHeader("Authorization") ?: return null
-        return if (header.startsWith("Bearer ")) header.substring(7) else null
+    private fun extractJwtFromHeaderOrCookie(request: HttpServletRequest): String? {
+        // 1️⃣ Try the Authorization header first
+        val header = request.getHeader("Authorization")
+        if (!header.isNullOrEmpty() && header.startsWith("Bearer ")) {
+            return header.substring(7)
+        }
+
+        // 2️⃣ Otherwise, try the "X-Auth" cookie
+        val cookies = request.cookies ?: return null
+        val cookie = cookies.firstOrNull { it.name == "X-Auth" }
+        return cookie?.value
     }
 }

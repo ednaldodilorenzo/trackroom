@@ -11,7 +11,11 @@ class MusicService extends Requester {
     this.get<Music[]>("", params).then((resp) => resp.data);
 
   save = (data: Music): Promise<Music> =>
-    this.post<Music, Music>(data).then((resp) => resp.data);
+    this.post<Music, Music>(data, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    }).then((resp) => resp.data);
 }
 
 export const musicService = new MusicService(request);

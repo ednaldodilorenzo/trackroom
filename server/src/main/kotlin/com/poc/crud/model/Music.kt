@@ -9,6 +9,11 @@ import jakarta.persistence.ManyToMany
 import jakarta.persistence.Table
 
 
+enum class MusicUploadStatus(val code: String) {
+    PENDING("P"),
+    COMPLETED("C"),
+}
+
 @Entity
 @Table(name = "musics")
 data class Music(
@@ -20,4 +25,5 @@ data class Music(
     val file: String,
     @ManyToMany(mappedBy = "musics")
     val groups: Set<Group>,
+    val uploadStatus: MusicUploadStatus = MusicUploadStatus.PENDING,
 )

@@ -2,7 +2,7 @@ services:
   app:
     build: ./server
     expose:
-      - "8080"      
+      - "8080"
     environment:
       SPRING_DEVTOOLS_RESTART_ENABLED: "true"
       SPRING_LIQUIBASE_ENABLED: "true"
@@ -15,7 +15,7 @@ services:
 
   web:
     build:
-      context: ./trackroom-web
+      context: ./web
       target: ${BUILD_TARGET:-development}
     ports:
       - "80:80" # Usado apenas em produção, pois em testes automatizados utilizado na rede interna.

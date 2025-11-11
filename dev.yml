@@ -6,7 +6,7 @@ services:
 
   web:
     volumes:
-      - ./trackroom-web:/app
+      - ./web:/app
       - /app/node_modules
     ports:
       - "5173:5173"

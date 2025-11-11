@@ -14,9 +14,7 @@ import * as yup from "yup";
 const schema = yup
   .object({
     name: yup.string().required("Nome é obrigatório"),
-    album: yup.string().required("Álbum é requerido"),
-    author: yup.string().required("Autor é obrigatório"),
-    cipher: yup.string().required(),
+    description: yup.string().required("Álbum é requerido"),
   })
   .required();
 
@@ -33,14 +31,19 @@ export default function MusicAdd() {
 
   return (
     <RegisterForm
+      encType="multipart/form-data"
       title="Nova Música"
-      formSubmit={handleSubmit((data) => submit(data, { method: "post" }))}
+      formSubmit={handleSubmit((_, e) => {
+        const form = e?.target as HTMLFormElement;
+        const formData = new FormData(form);
+        submit(formData, { method: "post", encType: "multipart/form-data" });
+      })}
       cancelHandler={() => navigate(`/home/groups/${id}/musics`)}
     >
       <TextField label="Nome" name="name" control={control} />
-      <TextField label="Álbum" name="album" control={control} />
-      <TextField label="Autor" name="author" control={control} />
-      <TextField label="Cifra" name="cipher" control={control} />
+      <TextField label="Álbum" name="description" control={control} />
+      <label>Arquivo</label>
+      <input name="file" accept="audio/*" type="file" />
     </RegisterForm>
   );
 }
@@ -50,13 +53,27 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const id = params.id;
   const payload = {
     name: data.get("name")?.toString(),
-    description: data.get("album")?.toString(),
-    file: data.get("cipher")?.toString(),
+    description: data.get("description")?.toString(),
+    file: "teset",
     groupId: id,
   };
 
+  // Aqui o retorno pode ser File | string | null
+  const fileEntry = data.get("file") as File | null;
+
+  if (!(fileEntry instanceof File)) {
+    throw new Error("Arquivo inválido ou ausente");
+  }
+
+  const multipart = new FormData();
+  multipart.append(
+    "music",
+    JSON.stringify(payload)
+  );
+  multipart.append("file", fileEntry);
+
   try {
-    await musicService.post(payload);
+    await musicService.post(multipart);
   } catch (err: any) {
     if (err.status === 401) {
       return err;

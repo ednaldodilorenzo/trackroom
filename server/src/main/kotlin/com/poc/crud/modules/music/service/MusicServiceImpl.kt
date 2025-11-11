@@ -44,7 +44,7 @@ class MusicServiceImpl(
 
         musicFileStorage.storeMusicFile(savedMusic.id.toString(), file)
 
-        return music.id!!
+        return savedMusic.id!!
     }
 
     override fun getMusicUrl(musicId: Long): String {
