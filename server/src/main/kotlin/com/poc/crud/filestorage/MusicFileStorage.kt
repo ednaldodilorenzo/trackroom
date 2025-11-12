@@ -17,7 +17,10 @@ class MusicFileStorage(
     }
 
     fun getMusicFileUrl(fileName: String): String {
-        val bucketName = "musics"
-        return fileStorage.getFileUrl(bucketName, fileName)
+        return fileStorage.getFileUrl("musics", fileName)
+    }
+
+    fun getMusicUploadUrl(fileName: String, contentType: String): String {
+        return fileStorage.getUploadUrl("musics", fileName, contentType)
     }
 }

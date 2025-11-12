@@ -1,11 +1,9 @@
 interface Music {
   id?: number;
   name: string;
-  artist: string;
-  album: string;
-  duration: string;
-  active: boolean;
-  avatar: string;
+  description: string;
+  file: string;
+  groupId: number;
 }
 
 export type { Music };

@@ -34,6 +34,6 @@ jwt:
 filestorage:
   accesskey: minioadmin
   secretkey: minioadmin
-  bucketname: musics
+  #bucketname: musics
   endpoint: http://minio:9000
   region: us-east-1

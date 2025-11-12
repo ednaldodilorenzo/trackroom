@@ -4,7 +4,10 @@ export const request: AxiosInstance = axios.create({
   baseURL: "/api",
 });
 
-export type Params = Record<string, string | number | boolean | null | undefined | Object>;
+export type Params = Record<
+  string,
+  string | number | boolean | null | undefined | Object
+>;
 
 export class Requester {
   private instance: AxiosInstance;
@@ -20,8 +23,20 @@ export class Requester {
     return this.instance.get<T>(`${this.baseUri}${uri}`, { params });
   }
 
-  post<T, D>(data?: D, params: Params = {}): Promise<AxiosResponse<T>> {
-    return this.instance.post<T>(this.baseUri, data, params);
+  post<T, D>(
+    data?: D,
+    params: Params = {},
+    uri: String = ""
+  ): Promise<AxiosResponse<T>> {
+    return this.instance.post<T>(`${this.baseUri}${uri}`, data, params);
+  }
+
+  postData<T, D>(
+    url: string,
+    data?: D,
+    params: Params = {}
+  ): Promise<AxiosResponse<T>> {
+    return this.instance.post<T>(url, data, params);
   }
 
   patch<T, D>(data?: D): Promise<AxiosResponse<T>> {
@@ -30,6 +45,14 @@ export class Requester {
 
   put<T, D>(data?: D): Promise<AxiosResponse<T>> {
     return this.instance.put<T>(this.baseUri, data);
+  }
+
+  putData<T, D>(
+    url: string,
+    data?: D,
+    params: Params = {}
+  ): Promise<AxiosResponse<T>> {
+    return this.instance.put<T>(url, data, params);
   }
 
   delete<T>(): Promise<AxiosResponse<T>> {

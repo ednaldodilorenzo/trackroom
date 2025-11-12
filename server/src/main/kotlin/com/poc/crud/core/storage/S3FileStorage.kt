@@ -7,6 +7,7 @@ import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
 import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest
+import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest
 import java.time.Duration
 
 @Component
@@ -36,5 +37,25 @@ class S3FileStorage(
 
         val presignedGetObject = s3Presigner.presignGetObject(presignRequest)
         return presignedGetObject.url().toString()
+    }
+
+    override fun getUploadUrl(
+        bucketName: String,
+        fileName: String,
+        contentType: String
+    ): String {
+        val putObjectRequest = PutObjectRequest.builder()
+            .bucket(bucketName)
+            .key("music-$fileName.mp3")
+            .contentType(contentType)
+            .build()
+
+        val presignRequest = PutObjectPresignRequest.builder()
+            .signatureDuration(Duration.ofMinutes(1)) // URL valid for 10 minutes
+            .putObjectRequest(putObjectRequest)
+            .build()
+
+        val presignedPutObject = s3Presigner.presignPutObject(presignRequest)
+        return presignedPutObject.url().toString()
     }
 }

@@ -31,7 +31,7 @@ databaseChangeLog:
                     nullable: false
               - column:
                   name: upload_status
-                  type: CHAR(1)
+                  type: VARCHAR(10)
                   constraints:
                     nullable: false
               - column:

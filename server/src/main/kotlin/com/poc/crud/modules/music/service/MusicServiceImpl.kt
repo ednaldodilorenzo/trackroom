@@ -4,13 +4,16 @@ import com.poc.crud.core.exception.APIException
 import com.poc.crud.core.exception.ExceptionType
 import com.poc.crud.filestorage.MusicFileStorage
 import com.poc.crud.model.Music
+import com.poc.crud.model.MusicUploadStatus
 import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.music.dto.PostMusicDTORequest
+import com.poc.crud.modules.music.dto.PostMusicDTOResponse
 import com.poc.crud.repository.GroupRepository
 import com.poc.crud.repository.MusicRepository
 import jakarta.transaction.Transactional
+import jdk.jfr.ContentType
 import org.springframework.stereotype.Service
-import org.springframework.web.multipart.MultipartFile
+
 
 @Service
 class MusicServiceImpl(
@@ -22,7 +25,7 @@ class MusicServiceImpl(
         musicRepository.findAllByGroupId(groupId ?: 0L).map { MusicDTO(it) }.toSet()
 
     @Transactional
-    override fun insertMusic(dto: PostMusicDTORequest, file: MultipartFile): Long {
+    override fun insertMusic(dto: PostMusicDTORequest): PostMusicDTOResponse {
         val group = groupRepository.findById(dto.groupId)
             .orElseThrow {
                 APIException(
@@ -42,12 +45,30 @@ class MusicServiceImpl(
 
         val savedMusic = musicRepository.save(music)
 
-        musicFileStorage.storeMusicFile(savedMusic.id.toString(), file)
+        group.musics.add(savedMusic)
 
-        return savedMusic.id!!
+        val uploadUrl = musicFileStorage.getMusicUploadUrl(savedMusic.id.toString(), "audio/mpeg")
+
+        return PostMusicDTOResponse(
+            id = savedMusic.id!!,
+            uploadUrl = uploadUrl,
+        )
     }
 
     override fun getMusicUrl(musicId: Long): String {
         return musicFileStorage.getMusicFileUrl(musicId.toString())
+    }
+
+    @Transactional
+    override fun confirmMusicUpload(musicId: Long) {
+        val uploadedMusic = musicRepository.findById(musicId)
+            .orElseThrow {
+                APIException(
+                    ExceptionType.NOT_FOUND,
+                    "Music not found with id: $musicId",
+                    RuntimeException("")
+                )
+            }
+        uploadedMusic.uploadStatus = MusicUploadStatus.COMPLETED
     }
 }

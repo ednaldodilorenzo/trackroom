@@ -2,6 +2,8 @@ package com.poc.crud.model
 
 
 import jakarta.persistence.Entity
+import jakarta.persistence.EnumType
+import jakarta.persistence.Enumerated
 import jakarta.persistence.GeneratedValue
 import jakarta.persistence.GenerationType
 import jakarta.persistence.Id
@@ -25,5 +27,6 @@ data class Music(
     val file: String,
     @ManyToMany(mappedBy = "musics")
     val groups: Set<Group>,
-    val uploadStatus: MusicUploadStatus = MusicUploadStatus.PENDING,
+    @Enumerated(EnumType.STRING)
+    var uploadStatus: MusicUploadStatus = MusicUploadStatus.PENDING,
 )

@@ -6,7 +6,7 @@ import com.poc.crud.model.Group
 import com.poc.crud.model.UserGroup
 import com.poc.crud.model.UserGroupId
 import com.poc.crud.modules.group.dto.GroupDTO
-import com.poc.crud.modules.group.dto.GroupWithMusicsDTO
+import com.poc.crud.modules.group.dto.GroupWithMusicsNotPendingDTO
 import com.poc.crud.modules.group.dto.PostGroupDTO
 import com.poc.crud.repository.GroupRepository
 import com.poc.crud.repository.UserGroupRepository
@@ -63,6 +63,6 @@ class GroupServiceImpl(
                 ExceptionType.NOT_FOUND, "Group not found", RuntimeException("")
             )
         }
-        return if (withDependencies) GroupWithMusicsDTO(group) else GroupDTO(group)
+        return if (withDependencies) GroupWithMusicsNotPendingDTO(group) else GroupDTO(group)
     }
 }

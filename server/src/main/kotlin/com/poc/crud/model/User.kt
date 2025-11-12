@@ -1,14 +1,7 @@
 package com.poc.crud.model
 
 
-import jakarta.persistence.Entity
-import jakarta.persistence.FetchType
-import jakarta.persistence.GeneratedValue
-import jakarta.persistence.GenerationType
-import jakarta.persistence.Id
-import jakarta.persistence.OneToMany
-import jakarta.persistence.Table
-
+import jakarta.persistence.*
 
 
 @Entity
@@ -26,4 +19,9 @@ data class User(
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     val groups: Set<UserGroup>?,
-)
+) {
+    override fun equals(other: Any?): Boolean =
+        this === other || (other is User && id != null && id == other.id)
+
+    override fun hashCode(): Int = id?.hashCode() ?: 0
+}

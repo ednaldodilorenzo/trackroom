@@ -2,6 +2,7 @@ import { RegisterForm, TextField } from "@/components";
 import { musicService } from "./music.service";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
+import type { Music } from "@/model";
 import {
   useParams,
   redirect,
@@ -51,11 +52,11 @@ export default function MusicAdd() {
 export async function action({ request, params }: ActionFunctionArgs) {
   const data = await request.formData();
   const id = params.id;
-  const payload = {
-    name: data.get("name")?.toString(),
-    description: data.get("description")?.toString(),
+  const payload: Music = {
+    name: data.get("name")?.toString()!!,
+    description: data.get("description")?.toString()!!,
     file: "teset",
-    groupId: id,
+    groupId: parseInt(id!!),
   };
 
   // Aqui o retorno pode ser File | string | null
@@ -65,6 +66,16 @@ export async function action({ request, params }: ActionFunctionArgs) {
     throw new Error("Arquivo inválido ou ausente");
   }
 
+  try {
+    const musicResp = await musicService.save(payload);
+    await musicService.uploadFile(musicResp.uploadUrl, fileEntry);
+    await musicService.confirmFileUpload(musicResp.id);
+  } catch (err: any) {
+    if (err.status === 401) {
+      return err;
+    }
+  }
+
   const multipart = new FormData();
   multipart.append(
     "music",
@@ -72,13 +83,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   );
   multipart.append("file", fileEntry);
 
-  try {
-    await musicService.post(multipart);
-  } catch (err: any) {
-    if (err.status === 401) {
-      return err;
-    }
-  }
+  
 
   return redirect(`/home/groups/${id}/musics`);
 }

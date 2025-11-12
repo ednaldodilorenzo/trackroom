@@ -1,4 +1,18 @@
 services:
+  db:
+    image: 'postgres:latest'
+    environment:
+      - 'POSTGRES_DB=mydatabase'
+      - 'POSTGRES_PASSWORD=secret'
+      - 'POSTGRES_USER=myuser'
+    expose:
+      - "5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d bioaccess"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   app:
     build: ./server
     expose:
@@ -12,6 +26,9 @@ services:
         -Djava.security.egd=file:/dev/./urandom
     volumes:
       - ./server/src:/app/src
+    depends_on:
+      db:
+        condition: service_healthy
 
   web:
     build:
@@ -20,16 +37,7 @@ services:
     ports:
       - "80:80" # Usado apenas em produção, pois em testes automatizados utilizado na rede interna.
     depends_on:
-      - app
-
-  db:
-    image: 'postgres:latest'
-    environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
-    expose:
-      - "5432"
+      - app  
 
   minio:
     image: minio/minio:latest
@@ -37,6 +45,7 @@ services:
     environment:
       MINIO_ROOT_USER: ${FS_USERNAME}
       MINIO_ROOT_PASSWORD: ${FS_PASSWORD}
+      S3_ENDPOINT: http://localhost:9000
     volumes:
       - minio_data:/data
     expose:    

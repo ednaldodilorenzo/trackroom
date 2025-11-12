@@ -8,4 +8,6 @@ interface FileStorage {
     fun saveFile(bucketName: String, contentType: String, fileName: String, file: ByteArray)
 
     fun getFileUrl(bucketName: String, fileName: String): String
+
+    fun getUploadUrl(bucketName: String, fileName: String, contentType: String): String
 }

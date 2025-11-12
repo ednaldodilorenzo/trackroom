@@ -1,5 +1,6 @@
 package com.poc.crud.modules.music.dto
 
+import com.poc.crud.model.Music
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 
@@ -20,7 +21,7 @@ data class PostMusicDTORequest(
     @NotNull
     val groupId: Long,
 ) {
-    constructor() : this(
+    constructor(music: Music, ) : this(
         id = null,
         name = "",
         description = "",
