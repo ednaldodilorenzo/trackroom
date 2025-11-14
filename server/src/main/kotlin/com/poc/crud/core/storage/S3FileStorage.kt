@@ -46,7 +46,7 @@ class S3FileStorage(
     ): String {
         val putObjectRequest = PutObjectRequest.builder()
             .bucket(bucketName)
-            .key("music-$fileName.mp3")
+            .key(fileName)
             .contentType(contentType)
             .build()
 

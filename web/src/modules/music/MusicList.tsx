@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, useState, useRef } from "react";
 import { type LoaderFunctionArgs } from "react-router-dom";
 import Button from "@/components/button/Button";
 import TrackItem from "@/components/trackitem/TrackItem";
@@ -6,11 +6,24 @@ import { useLoaderData, Await, useNavigate, useParams } from "react-router-dom";
 import { groupService } from "@/modules/group/group.service";
 import FallbackOverlay from "@/components/fallbackoverlay/FallBackOverlay";
 import type { Group } from "@/model";
+import { musicService } from "./music.service";
 
 export default function MusicList() {
   const { group } = useLoaderData<{ group: Promise<Group> }>();
+  const [activeId, setActiveId] = useState<number | null>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const navigate = useNavigate();
   const { id } = useParams();
+
+  async function handlePlay(id: number) {
+    setActiveId(id);
+    const url = await musicService.getFileUrl(id);
+
+    if (audioRef.current) {
+      audioRef.current.src = url;
+      audioRef.current.play();
+    }
+  }
 
   return (
     <>
@@ -21,7 +34,12 @@ export default function MusicList() {
               <h2>{loadedGroup.name}</h2>
               <ul>
                 {loadedGroup.musics?.map((item) => (
-                  <TrackItem key={item.id} {...item} />
+                  <TrackItem
+                    active={activeId == item.id}
+                    key={item.id}
+                    onClick={handlePlay}
+                    {...item}
+                  />
                 ))}
               </ul>
             </>
@@ -34,6 +52,8 @@ export default function MusicList() {
       >
         + Nova Música
       </Button>
+      {/* global audio player */}
+      <audio ref={audioRef} controls style={{ width: "100%" }} />
     </>
   );
 }

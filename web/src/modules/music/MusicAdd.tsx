@@ -55,7 +55,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   const payload: Music = {
     name: data.get("name")?.toString()!!,
     description: data.get("description")?.toString()!!,
-    file: "teset",
+    file: data.get("name")?.toString()!!,
     groupId: parseInt(id!!),
   };
 

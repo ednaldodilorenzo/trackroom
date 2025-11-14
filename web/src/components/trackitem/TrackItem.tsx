@@ -1,24 +1,29 @@
 import "./TrackItem.css";
 import type { Music } from "@/model";
 
+type TrackItemProps = Music & {
+  active: boolean;
+  onClick: (id: number) => void;
+};
+
 export default function TrackItem({
+  id,
   name,
-  artist,
-  album,
-  duration,
+  description,
+  file,
   active,
-  avatar,
-}: Music) {
+  onClick,
+}: TrackItemProps) {
   return (
     <div className={`track-item ${active ? "active" : ""}`}>
-      <img src={avatar} alt="" className="track-avatar" />
+      {id && (
+        <img onClick={() => onClick(id)} alt="" className="track-avatar" />
+      )}
       <div className="track-meta">
         <div className="track-title">{name}</div>
-        <div className="track-sub">
-          {artist} - {album}
-        </div>
+        <div className="track-sub">{description}</div>
       </div>
-      <div className="track-duration">{duration}</div>
+      <div className="track-duration">10</div>
     </div>
   );
 }

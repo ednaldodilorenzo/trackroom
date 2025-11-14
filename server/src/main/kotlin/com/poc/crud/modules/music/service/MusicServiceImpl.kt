@@ -11,7 +11,6 @@ import com.poc.crud.modules.music.dto.PostMusicDTOResponse
 import com.poc.crud.repository.GroupRepository
 import com.poc.crud.repository.MusicRepository
 import jakarta.transaction.Transactional
-import jdk.jfr.ContentType
 import org.springframework.stereotype.Service
 
 
@@ -47,7 +46,7 @@ class MusicServiceImpl(
 
         group.musics.add(savedMusic)
 
-        val uploadUrl = musicFileStorage.getMusicUploadUrl(savedMusic.id.toString(), "audio/mpeg")
+        val uploadUrl = musicFileStorage.getMusicUploadUrl(savedMusic.id!!, "audio/mpeg")
 
         return PostMusicDTOResponse(
             id = savedMusic.id!!,
@@ -56,7 +55,7 @@ class MusicServiceImpl(
     }
 
     override fun getMusicUrl(musicId: Long): String {
-        return musicFileStorage.getMusicFileUrl(musicId.toString())
+        return musicFileStorage.getMusicFileUrl(musicId)
     }
 
     @Transactional

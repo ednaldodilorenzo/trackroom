@@ -16,6 +16,9 @@ logging:
 server:
   servlet:
     context-path: /api
+    multipart:
+      max-file-size: 50MB
+      max-request-size: 50MB
 
 management:
   endpoints:
@@ -34,6 +37,5 @@ jwt:
 filestorage:
   accesskey: minioadmin
   secretkey: minioadmin
-  #bucketname: musics
   endpoint: http://minio:9000
   region: us-east-1

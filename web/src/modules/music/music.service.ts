@@ -15,17 +15,20 @@ class MusicService extends Requester {
       (resp) => resp.data
     );
 
-  uploadFile = (url: string, file: File): Promise<String> =>
-    this.putData<String, File>(url, file, {
+  uploadFile = (url: string, file: File): Promise<string> =>
+    this.putData<string, File>(url, file, {
       headers: {
         "Content-Type": file.type,
       },
     }).then((resp) => resp.data);
 
-  confirmFileUpload = (id: number): Promise<String> =>
-    this.post<String, any>(null, {}, `/confirm/${id}`).then(
+  confirmFileUpload = (id: number): Promise<string> =>
+    this.post<string, any>(null, {}, `/confirm/${id}`).then(
       (resp) => resp.data
     );
+
+  getFileUrl = (id: number): Promise<string> =>
+    this.get<string>(`/${id}/url`).then((resp) => resp.data);
 }
 
 export const musicService = new MusicService(request);
