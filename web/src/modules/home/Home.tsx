@@ -4,40 +4,15 @@ import type { Group, Music } from "@/model";
 import "./Home.css";
 import { useNavigate, Await, useLoaderData } from "react-router-dom"; // useLoaderData not used in this snippet
 import homeService from "./home.service";
+import AudioPlayer from "@/components/player/AudioPlayer";
 
 export default function Home() {
   const allTracks: Music[] = [
     {
       name: "02 - What's My Name (Feat. Drake)",
-      artist: "Rihanna",
-      album: "Loud [2010]",
-      duration: "4:56",
-      avatar: "/img/rihanna1.jpg",
-      active: true,
-    },
-    {
-      name: "Fading",
-      artist: "Rihanna",
-      album: "Loud [2010]",
-      duration: "4:56",
-      avatar: "/img/rihanna2.jpg",
-      active: true,
-    },
-    {
-      name: "Hold My Hand (Duet With Akon)",
-      artist: "Michael Jackson",
-      album: "Michael [2010]",
-      duration: "4:56",
-      avatar: "/img/mj.jpg",
-      active: true,
-    },
-    {
-      name: "On the Floor (Feat. Pitbull)",
-      artist: "Jennifer Lopez",
-      album: "Love? [2011]",
-      duration: "4:56",
-      avatar: "/img/jlo.jpg",
-      active: true,
+      description: "Rihanna",
+      file: "Loud [2010]",
+      groupId: 1,
     },
   ];
 
@@ -64,7 +39,14 @@ export default function Home() {
       <h2 className="section-title">All Tracks</h2>
       <div className="track-list">
         {allTracks.map((track, idx) => (
-          <TrackItem key={idx} {...track} />
+          <TrackItem
+            active={false}
+            onClick={function (id: number): void {
+              throw new Error("Function not implemented.");
+            }}
+            key={idx}
+            {...track}
+          />
         ))}
       </div>
 
@@ -74,6 +56,7 @@ export default function Home() {
       >
         + Novo Grupo
       </Button>
+      <AudioPlayer />
     </>
   );
 }
