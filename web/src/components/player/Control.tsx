@@ -12,22 +12,22 @@ import {
 import { useAudioPlayerContext } from "./AudioPlayerContext";
 
 export default function Controls() {
-  const { currentTrack, audioRef } = useAudioPlayerContext();
+  const { currentTrack, audioRef, isPlaying, setIsPlaying } =
+    useAudioPlayerContext();
   const [isShuffle, setIsShuffle] = useState<boolean>(false);
   const [isRepeat, setIsRepeat] = useState<boolean>(false);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
   useEffect(() => {
     if (isPlaying) {
-        audioRef.current?.play();
+      audioRef.current?.play();
     } else {
-        audioRef.current?.pause();
+      audioRef.current?.pause();
     }
-  },[isPlaying, audioRef]);
+  }, [isPlaying, audioRef]);
 
   return (
     <div className="flex gap-4 items-center">
-      <audio src={currentTrack.src} ref={audioRef}/>
+      <audio src={currentTrack.src} ref={audioRef} />
       <button onClick={() => {}}>
         <BsSkipStartFill size={20} />
       </button>

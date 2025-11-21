@@ -1,0 +1,8 @@
+.musics-header {
+  display: flex;
+  align-items: center;
+}
+
+.musics-header h2 {
+    padding-left: 10px;
+}

@@ -12,6 +12,8 @@ interface AudioPlayerContextType {
   currentTrack: Track;
   setCurrentTrack: Dispatch<SetStateAction<Track>>;
   audioRef: React.RefObject<HTMLAudioElement | null>;
+  isPlaying: boolean;
+  setIsPlaying: Dispatch<SetStateAction<boolean>>;
 }
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(
@@ -24,11 +26,14 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     src: "",
     author: "",
   });
+  const [isPlaying, setIsPlaying] = useState<boolean>(false);
   const audioRef = useRef<HTMLAudioElement>(null);
   const contextValue = {
     currentTrack,
     setCurrentTrack,
     audioRef,
+    isPlaying,
+    setIsPlaying,
   };
 
   return (

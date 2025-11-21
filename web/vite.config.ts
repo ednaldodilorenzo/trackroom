@@ -4,12 +4,13 @@ import react from "@vitejs/plugin-react";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import million from "million/compiler";
+import tailwindcss from "@tailwindcss/vite";
 
 const rootDir = fileURLToPath(new URL(".", import.meta.url));
 
 // https://vite.dev/config/
-export default defineConfig({  
-  plugins: [million.vite({}), react()],
+export default defineConfig({
+  plugins: [million.vite({}), react(), tailwindcss()],
   resolve: {
     alias: {
       "@": path.resolve(rootDir, "./src"),
@@ -23,7 +24,7 @@ export default defineConfig({
         changeOrigin: false,
       },
     },
-  },  
+  },
   test: {
     globals: true,
     environment: "jsdom", // simulate browser environment

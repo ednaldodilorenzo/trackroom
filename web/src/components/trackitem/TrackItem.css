@@ -27,6 +27,7 @@
 .track-meta {
   flex: 1;
   overflow: hidden;
+  padding-left: 10px;
 }
 
 .track-meta .track-title {
