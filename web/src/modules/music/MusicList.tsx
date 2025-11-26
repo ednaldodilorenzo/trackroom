@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from "react";
+import { Suspense, useEffect, useState } from "react";
 import {
   Link,
   useOutletContext,
@@ -15,19 +15,20 @@ import {
   useAudioPlayerContext,
   type Track,
 } from "@/components/player/AudioPlayerContext";
-import { BsArrowLeftSquare } from "react-icons/bs";
 import "./MusicList.css";
 import type { HeaderConfig } from "@/components/main/Header";
 
 export default function MusicList() {
   const { group } = useLoaderData<{ group: Promise<Group> }>();
-  const { setCurrentTrack, setIsPlaying } = useAudioPlayerContext();
+  const { setCurrentTrack, setIsPlaying, currentTrack } =
+    useAudioPlayerContext();
   const navigate = useNavigate();
   const { id } = useParams();
 
   async function handlePlay(music: Music) {
     const url = await musicService.getFileUrl(music.id!!);
     const track: Track = {
+      id: music.id,
       title: music.name,
       src: url,
       author: music.description,
@@ -60,7 +61,7 @@ export default function MusicList() {
                 loadedGroup.musics?.map((item) => (
                   <div className="track-list">
                     <TrackItem
-                      active={false}
+                      active={currentTrack.id === item.id}
                       key={item.id}
                       onClick={() => handlePlay(item)}
                       {...item}

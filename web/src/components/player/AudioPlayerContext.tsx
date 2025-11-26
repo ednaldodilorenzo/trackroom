@@ -2,6 +2,7 @@ import type { Dispatch, SetStateAction, ReactNode } from "react";
 import { createContext, useState, useContext, useRef } from "react";
 
 export interface Track {
+  id?: number;
   title: string;
   src: string;
   author: string;
