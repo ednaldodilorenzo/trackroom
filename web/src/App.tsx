@@ -10,9 +10,6 @@ function App() {
   return (
     <Provider store={store}>
       <PersistGate
-        onBeforeLift={() => {
-          console.log("Rehydrated auth:", store.getState().auth);
-        }}
         loading={null}
         persistor={persistor}
       >

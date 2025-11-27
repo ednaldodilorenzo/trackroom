@@ -12,7 +12,7 @@ import {
 } from "react-router-dom";
 import { useLoading } from "../../hooks/useLoading";
 import { store } from "../../store";
-import { login } from "../../store/authSlice";
+import { authService } from "./authSevice";
 
 const schema = yup.object({
   email: yup.string().required("Email obrigatório").email("Email inválido"),
@@ -41,12 +41,11 @@ export default function Login() {
     <div className="login-container">
       <Form
         className="login-form"
-        onSubmit={handleSubmit((data: FormData) =>{
+        onSubmit={handleSubmit((data: FormData) => {
           console.log("Entrou");
-          
+
           return submit(data, { method: "post" });
-        }
-        )}
+        })}
       >
         {actionData && (
           <ul>
@@ -95,14 +94,13 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const email = formData.get("email")?.toString() ?? "";
   const password = formData.get("password")?.toString() ?? "";
-  const res = await store.dispatch(login({ email, password }));
+  const result = await authService.login(email, password);
 
-  if (login.fulfilled.match(res)) {
+  if (result) {
     const url = new URL(request.url);
     const from = url.searchParams.get("from") || "/home";
     return redirect(from); // go back where the user tried to go
   }
 
-  const message = res.payload || "Login failed";
-  return { error: message, status: 400 };
+  return { error: "Login failed", status: 400 };
 }

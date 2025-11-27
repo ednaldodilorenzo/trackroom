@@ -1,4 +1,6 @@
 import axios, { type AxiosInstance, type AxiosResponse } from "axios";
+import { store } from "@/store";
+import { logout } from "@/store/authSlice";
 
 export const request: AxiosInstance = axios.create({
   baseURL: "/api",
@@ -7,7 +9,13 @@ export const request: AxiosInstance = axios.create({
 request.interceptors.response.use(
   (response) => response,
   (error) => {
-    // You can handle global errors here
+    if (
+      (error.response && error.response.status === 401) ||
+      error.response.status === 403
+    ) {
+      // Unauthorized, dispatch logout action
+      store.dispatch(logout());
+    }
     return Promise.reject(error);
   }
 );
@@ -34,9 +42,10 @@ export class Requester {
   post<T, D>(
     data?: D,
     params: Params = {},
-    uri: String = ""
+    url: string = this.baseUri,
+    uri: string = ""
   ): Promise<AxiosResponse<T>> {
-    return this.instance.post<T>(`${this.baseUri}${uri}`, data, params);
+    return this.instance.post<T>(`${url}${uri}`, data, params);
   }
 
   postData<T, D>(

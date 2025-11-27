@@ -1,5 +1,5 @@
-// store.ts
-import { configureStore, combineReducers } from "@reduxjs/toolkit";
+// src/store/index.js
+import { configureStore, combineReducers } from '@reduxjs/toolkit';
 import {
   persistStore,
   persistReducer,
@@ -9,38 +9,31 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
-  type PersistConfig,
-} from "redux-persist";
-import storage from "redux-persist/lib/storage"; // localStorage
-import authReducer from "./authSlice";
+} from 'redux-persist';
+import storage from 'redux-persist/lib/storage'; // defaults to localStorage for web
+import authReducer from './authSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  // add other reducers here (e.g., notes: notesReducer, etc.)
 });
 
-export type RootState = ReturnType<typeof rootReducer>;
-
-const persistConfig: PersistConfig<RootState> = {
-  key: "root",
+const persistConfig = {
+  key: 'root',
   storage,
-  whitelist: ["auth"] as Array<keyof RootState>, // persist only auth
+  whitelist: ['auth'], // Only persist the 'auth' state
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
 
 export const store = configureStore({
   reducer: persistedReducer,
-  middleware: (getDefault) =>
-    getDefault({
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
       serializableCheck: {
-        // ignore redux-persist actions
         ignoredActions: [FLUSH, REHYDRATE, PAUSE, PERSIST, PURGE, REGISTER],
       },
     }),
 });
 
 export const persistor = persistStore(store);
-
-// Inferred types for usage with hooks, thunks, etc.
-export type AppDispatch = typeof store.dispatch;
-export type AppStore = typeof store;

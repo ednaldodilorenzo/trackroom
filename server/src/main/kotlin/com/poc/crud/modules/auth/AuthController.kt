@@ -29,4 +29,15 @@ class AuthController(val authService: AuthService) {
         response.addHeader("Set-Cookie", cookie.toString())
         return ResponseEntity.ok(result)
     }
+
+    @PostMapping("/logout")
+    fun logout(response: HttpServletResponse): ResponseEntity<String> {
+        val cookie = ResponseCookie.from("X-Auth", "").httpOnly(true)
+            .secure(false) // Set to true in production with HTTPS
+            .path("/")
+            .maxAge(0) // Expire immediately
+            .build()
+        response.addHeader("Set-Cookie", cookie.toString())
+        return ResponseEntity.ok("Logged out successfully.")
+    }
 }
