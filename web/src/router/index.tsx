@@ -2,13 +2,13 @@ import { lazy, Suspense } from "react";
 import { Main, FallbackOverlay } from "@/components";
 import { createBrowserRouter } from "react-router-dom";
 import { requireAuthLoader } from "@/modules/auth/requireAuthLoader";
-import { authMiddleware } from "./auth.middleware";
 
 const Login = lazy(() => import("@/modules/auth/Login"));
 const Home = lazy(() => import("@/modules/home/Home"));
 const GroupAdd = lazy(() => import("@/modules/group/GroupAdd"));
 const MusicList = lazy(() => import("@/modules/music/MusicList"));
 const MusicAdd = lazy(() => import("@/modules/music/MusicAdd"));
+const MusicCipher = lazy(() => import("@/modules/music/MusicCipher"));
 
 export const router = createBrowserRouter(
   [
@@ -25,7 +25,6 @@ export const router = createBrowserRouter(
       element: <Main />,
       //errorElement: <Error />,
       loader: requireAuthLoader,
-      middleware: authMiddleware,
       children: [
         {
           index: true,
@@ -62,6 +61,10 @@ export const router = createBrowserRouter(
             const mod = await import("@/modules/music/MusicAdd");
             return mod.action(args);
           },
+        },
+        {
+          path: "groups/:id/musics/:musicId/cipher",
+          element: <MusicCipher />,          
         },
       ],
     },

@@ -31,21 +31,23 @@ export default function MusicAdd() {
   const navigate = useNavigate();
 
   return (
-    <RegisterForm
-      encType="multipart/form-data"
-      title="Nova Música"
-      formSubmit={handleSubmit((_, e) => {
-        const form = e?.target as HTMLFormElement;
-        const formData = new FormData(form);
-        submit(formData, { method: "post", encType: "multipart/form-data" });
-      })}
-      cancelHandler={() => navigate(`/home/groups/${id}/musics`)}
-    >
-      <TextField label="Nome" name="name" control={control} />
-      <TextField label="Álbum" name="description" control={control} />
-      <label>Arquivo</label>
-      <input name="file" accept="audio/*" type="file" />
-    </RegisterForm>
+    <>
+      <RegisterForm
+        encType="multipart/form-data"
+        title="Nova Música"
+        formSubmit={handleSubmit((_, e) => {
+          const form = e?.target as HTMLFormElement;
+          const formData = new FormData(form);
+          submit(formData, { method: "post", encType: "multipart/form-data" });
+        })}
+        cancelHandler={() => navigate(`/home/groups/${id}/musics`)}
+      >
+        <TextField label="Nome" name="name" control={control} />
+        <TextField label="Álbum" name="description" control={control} />
+        <label>Arquivo</label>
+        <input name="file" accept="audio/*" type="file" />
+      </RegisterForm>
+    </>
   );
 }
 
@@ -77,13 +79,8 @@ export async function action({ request, params }: ActionFunctionArgs) {
   }
 
   const multipart = new FormData();
-  multipart.append(
-    "music",
-    JSON.stringify(payload)
-  );
+  multipart.append("music", JSON.stringify(payload));
   multipart.append("file", fileEntry);
-
-  
 
   return redirect(`/home/groups/${id}/musics`);
 }

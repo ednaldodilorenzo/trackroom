@@ -4,6 +4,14 @@ export const request: AxiosInstance = axios.create({
   baseURL: "/api",
 });
 
+request.interceptors.response.use(
+  (response) => response,
+  (error) => {
+    // You can handle global errors here
+    return Promise.reject(error);
+  }
+);
+
 export type Params = Record<
   string,
   string | number | boolean | null | undefined | Object

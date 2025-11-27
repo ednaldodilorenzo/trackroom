@@ -23,7 +23,7 @@ export default function Controls() {
     } else {
       audioRef.current?.pause();
     }
-  }, [isPlaying, audioRef]);
+  }, [isPlaying, audioRef, currentTrack]);
 
   return (
     <div className="flex gap-4 items-center">
