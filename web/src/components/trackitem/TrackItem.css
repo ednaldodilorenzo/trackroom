@@ -4,8 +4,16 @@
   padding: 8px 12px;
   background: var(--md-surface);
   border-radius: var(--md-radius);
-  transition: background-color 0.2s;
+  transition: background-color 0.2s;  
+}
+
+.track-item button {
+  background: none;
+  border: none;
+  padding: 0;
+  margin-right: 12px;
   cursor: pointer;
+  color: var(--md-primary);
 }
 
 .track-item:hover {

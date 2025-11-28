@@ -64,7 +64,11 @@ export const router = createBrowserRouter(
         },
         {
           path: "groups/:id/musics/:musicId/cipher",
-          element: <MusicCipher />,          
+          element: <MusicCipher />,
+          loader: async (args) => {
+            const mod = await import("@/modules/music/MusicCipher");
+            return mod.cipherLoader(args);
+          },
         },
       ],
     },

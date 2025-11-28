@@ -1,10 +1,12 @@
 import { BsPlayCircle } from "react-icons/bs";
 import "./TrackItem.css";
 import type { Music } from "@/model";
+import { Link } from "react-router-dom";
 
 type TrackItemProps = Music & {
   active: boolean;
   onClick: () => void;
+  cipherLink?: string;
 };
 
 export default function TrackItem({
@@ -13,16 +15,25 @@ export default function TrackItem({
   description,
   file,
   active,
+  cipherLink,
   onClick,
 }: TrackItemProps) {
   return (
     <div className={`track-item ${active ? "active" : ""}`}>
-      {id && <BsPlayCircle onClick={onClick} size="2em" />}
+      {id && (
+        <button>
+          <BsPlayCircle onClick={onClick} size="2em" />
+        </button>
+      )}
       <div className="track-meta">
         <div className="track-title">{name}</div>
         <div className="track-sub">{description}</div>
       </div>
-      <div className="track-duration">10</div>
+      {cipherLink && (
+        <Link to={cipherLink} className="track-duration">
+          Ver cifra
+        </Link>
+      )}
     </div>
   );
 }

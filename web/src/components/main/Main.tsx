@@ -18,7 +18,6 @@ export default function Main() {
 
   const logout = () => {
     authService.logout().then(() => {
-      console.log("Executou no logut");
       navigate("/login");
     });
   };

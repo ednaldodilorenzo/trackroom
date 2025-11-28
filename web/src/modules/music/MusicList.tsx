@@ -1,6 +1,5 @@
-import { Suspense, useEffect, useState } from "react";
-import {
-  Link,
+import { Suspense, useEffect } from "react";
+import {  
   useOutletContext,
   type LoaderFunctionArgs,
 } from "react-router-dom";
@@ -64,6 +63,7 @@ export default function MusicList() {
                       active={currentTrack.id === item.id}
                       key={item.id}
                       onClick={() => handlePlay(item)}
+                      cipherLink={`/home/groups/${id}/musics/${item.id}/cipher`}
                       {...item}
                     />
                   </div>

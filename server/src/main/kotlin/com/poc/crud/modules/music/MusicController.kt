@@ -22,6 +22,28 @@ class MusicController(
     @GetMapping("/{id}/url")
     fun getMusicUrl(@PathVariable id: Long): ResponseEntity<String> = ResponseEntity.ok(musicService.getMusicUrl(id))
 
+    @GetMapping("/{id}/cipher")
+    fun getMusicCipher(@PathVariable id: Long): ResponseEntity<String> {
+        // Placeholder implementation for cipher retrieval
+        val cipher = """
+            D            A
+            This is a placeholder cipher value.
+            Em                A
+            Replace this with the actual cipher retrieval logic.
+            D             G
+            Testing multi-line string handling.
+        """.trimMargin() // Replace with actual cipher retrieval logic
+        return ResponseEntity.ok(cipher)
+    }
+
+    @PostMapping("/{id}/cipher")
+    fun postMusicCipher(@PathVariable id: Long, @RequestBody cipher: String): ResponseEntity<String> {
+        println("Received cipher for music ID $id: $cipher")
+        // Placeholder implementation for cipher storage
+        // Replace this with the actual cipher storage logic
+        return ResponseEntity.ok("Cipher for music ID $id has been stored.")
+    }
+
     @PostMapping("", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun post(
         @RequestBody music: PostMusicDTORequest,

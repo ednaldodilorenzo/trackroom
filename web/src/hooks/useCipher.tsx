@@ -61,12 +61,13 @@ function transposeCipher(cipher: string, steps: number): string {
 
 export function useCipher(original: string) {
   const [steps, setSteps] = useState<number>(0);
+  const [principal, setPrincipal] = useState<string>(original);
 
   const up = () => setSteps((prev) => prev + 1);
   const down = () => setSteps((prev) => prev - 1);
   const reset = () => setSteps(0);
 
-  const transposedCipher = transposeCipher(original, steps);
+  const transposedCipher = transposeCipher(principal, steps);
 
-  return { transposedCipher, up, down, reset, steps };
+  return { transposedCipher, up, down, reset, setPrincipal, steps };
 }

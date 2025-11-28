@@ -23,12 +23,20 @@ class MusicService extends Requester {
     }).then((resp) => resp.data);
 
   confirmFileUpload = (id: number): Promise<string> =>
-    this.post<string, any>(null, {}, `/confirm/${id}`).then(
+    this.post<string, any>(null, {}, "/v1/musics", `/confirm/${id}`).then(
       (resp) => resp.data
     );
 
   getFileUrl = (id: number): Promise<string> =>
     this.get<string>(`/${id}/url`).then((resp) => resp.data);
+
+  getMusicCipher = (id: number): Promise<string> =>
+    this.get<string>(`/${id}/cipher`).then((resp) => resp.data);
+
+  postMusicCipher = (id: number, cipher: string): Promise<void> =>
+    this.post<void, string>(cipher, {}, "/v1/musics", `/${id}/cipher`).then(
+      (resp) => resp.data
+    );
 }
 
 export const musicService = new MusicService(request);
