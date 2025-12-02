@@ -1,5 +1,6 @@
 package com.poc.crud.modules.music
 
+import com.poc.crud.modules.music.dto.MusicCipherResponseDTO
 import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.music.dto.PostMusicDTORequest
 import com.poc.crud.modules.music.dto.PostMusicDTOResponse
@@ -23,24 +24,15 @@ class MusicController(
     fun getMusicUrl(@PathVariable id: Long): ResponseEntity<String> = ResponseEntity.ok(musicService.getMusicUrl(id))
 
     @GetMapping("/{id}/cipher")
-    fun getMusicCipher(@PathVariable id: Long): ResponseEntity<String> {
+    fun getMusicCipherData(@PathVariable id: Long): ResponseEntity<MusicCipherResponseDTO> {
         // Placeholder implementation for cipher retrieval
-        val cipher = """
-            D            A
-            This is a placeholder cipher value.
-            Em                A
-            Replace this with the actual cipher retrieval logic.
-            D             G
-            Testing multi-line string handling.
-        """.trimMargin() // Replace with actual cipher retrieval logic
-        return ResponseEntity.ok(cipher)
+        val cipherData = musicService.getMusicCipherData(id)
+        return ResponseEntity.ok(cipherData)
     }
 
-    @PostMapping("/{id}/cipher")
+    @PutMapping("/{id}/cipher")
     fun postMusicCipher(@PathVariable id: Long, @RequestBody cipher: String): ResponseEntity<String> {
-        println("Received cipher for music ID $id: $cipher")
-        // Placeholder implementation for cipher storage
-        // Replace this with the actual cipher storage logic
+        musicService.updateMusicCipherFile(id, cipher)
         return ResponseEntity.ok("Cipher for music ID $id has been stored.")
     }
 

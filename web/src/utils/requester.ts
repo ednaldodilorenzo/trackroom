@@ -34,9 +34,13 @@ export class Requester {
     this.baseUri = baseUri;
   }
 
-  get<T>(uri: string = "", params: Params = {}): Promise<AxiosResponse<T>> {
+  get<T>(
+    uri: string = "",
+    params: Params = {},
+    url: string = this.baseUri
+  ): Promise<AxiosResponse<T>> {
     // Let axios handle query-string encoding
-    return this.instance.get<T>(`${this.baseUri}${uri}`, { params });
+    return this.instance.get<T>(`${url}${uri}`, { params });
   }
 
   post<T, D>(
@@ -60,8 +64,13 @@ export class Requester {
     return this.instance.patch<T>(this.baseUri, data);
   }
 
-  put<T, D>(data?: D): Promise<AxiosResponse<T>> {
-    return this.instance.put<T>(this.baseUri, data);
+  put<T, D>(
+    data?: D,
+    uri: string = "",
+    params: Params = {},
+    url: string = this.baseUri
+  ): Promise<AxiosResponse<T>> {
+    return this.instance.put<T>(`${url}/${uri}`, data, params);
   }
 
   putData<T, D>(

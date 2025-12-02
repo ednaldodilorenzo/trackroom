@@ -3,9 +3,9 @@ package com.poc.crud.core.storage
 import org.springframework.stereotype.Component
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
 import software.amazon.awssdk.services.s3.presigner.S3Presigner
-import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignRequest
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest
 import java.time.Duration
@@ -14,7 +14,7 @@ import java.time.Duration
 class S3FileStorage(
     val s3Client: S3Client,
     val s3Presigner: S3Presigner,
-): FileStorage {
+) : FileStorage {
     override fun saveFile(bucketName: String, contentType: String, fileName: String, file: ByteArray) {
         val request = PutObjectRequest.builder()
             .bucket(bucketName)
@@ -22,6 +22,14 @@ class S3FileStorage(
             .key(fileName)
             .build()
         s3Client.putObject(request, RequestBody.fromBytes(file))
+    }
+
+    override fun getFile(bucketName: String, fileName: String): ByteArray {
+        val request = GetObjectRequest.builder()
+            .bucket(bucketName)
+            .key(fileName)
+            .build()
+        return s3Client.getObject(request).readAllBytes()
     }
 
     override fun getFileUrl(bucketName: String, fileName: String): String {

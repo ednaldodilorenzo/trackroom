@@ -1,6 +1,6 @@
 import { Requester, request, type Params } from "@/utils/requester";
 import { type AxiosInstance } from "axios";
-import type { Music } from "@/model";
+import type { Music, MusicMetaData } from "@/model";
 
 class MusicService extends Requester {
   constructor(instance: AxiosInstance) {
@@ -30,13 +30,18 @@ class MusicService extends Requester {
   getFileUrl = (id: number): Promise<string> =>
     this.get<string>(`/${id}/url`).then((resp) => resp.data);
 
-  getMusicCipher = (id: number): Promise<string> =>
-    this.get<string>(`/${id}/cipher`).then((resp) => resp.data);
+  getMusicCipher = (url: string): Promise<string> =>
+    this.get<string>("", {}, url).then((resp) => resp.data);
 
-  postMusicCipher = (id: number, cipher: string): Promise<void> =>
-    this.post<void, string>(cipher, {}, "/v1/musics", `/${id}/cipher`).then(
-      (resp) => resp.data
-    );
+  getMusicMetaData = (id: number): Promise<MusicMetaData> =>
+    this.get<MusicMetaData>(`/${id}/cipher`).then((resp) => resp.data);
+
+  uploadCipher = (id:number, file: string): Promise<void> =>
+    this.put<void, string>(file, `${id}/cipher`, {
+      headers: {
+        "Content-Type": "text/plain",
+      },
+    }).then((resp) => resp.data);
 }
 
 export const musicService = new MusicService(request);

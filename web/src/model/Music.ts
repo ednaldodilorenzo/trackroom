@@ -6,4 +6,11 @@ interface Music {
   groupId: number;
 }
 
-export type { Music };
+interface MusicMetaData {
+  name: string;
+  description: string;
+  cipherUrl: string;
+  uploadUrl: string;
+}
+
+export type { Music, MusicMetaData };

@@ -2,9 +2,11 @@ package com.poc.crud.modules.music.service
 
 import com.poc.crud.core.exception.APIException
 import com.poc.crud.core.exception.ExceptionType
+import com.poc.crud.filestorage.CipherFileStorage
 import com.poc.crud.filestorage.MusicFileStorage
 import com.poc.crud.model.Music
 import com.poc.crud.model.MusicUploadStatus
+import com.poc.crud.modules.music.dto.MusicCipherResponseDTO
 import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.music.dto.PostMusicDTORequest
 import com.poc.crud.modules.music.dto.PostMusicDTOResponse
@@ -19,6 +21,7 @@ class MusicServiceImpl(
     private val musicRepository: MusicRepository,
     private val groupRepository: GroupRepository,
     private val musicFileStorage: MusicFileStorage,
+    private val cipherFileStorage: CipherFileStorage,
 ) : MusicService {
     override fun getAllMusic(groupId: Long?): Set<MusicDTO> =
         musicRepository.findAllByGroupId(groupId ?: 0L).map { MusicDTO(it) }.toSet()
@@ -56,6 +59,25 @@ class MusicServiceImpl(
 
     override fun getMusicUrl(musicId: Long): String {
         return musicFileStorage.getMusicFileUrl(musicId)
+    }
+
+    override fun getMusicCipherData(musicId: Long): MusicCipherResponseDTO {
+        val music = musicRepository.findById(musicId)
+            .orElseThrow {
+                APIException(
+                    ExceptionType.NOT_FOUND,
+                    "Music not found with id: $musicId",
+                    RuntimeException("")
+                )
+            }
+        val downloadUrl = cipherFileStorage.getCipherFileUrl(musicId)
+        val uploadUrl = cipherFileStorage.getCipherUploadUrl(musicId)
+
+        return MusicCipherResponseDTO(music, downloadUrl, uploadUrl)
+    }
+
+    override fun updateMusicCipherFile(musicId: Long, cipherFile: String) {
+        cipherFileStorage.updateCipherFile(musicId, cipherFile)
     }
 
     @Transactional

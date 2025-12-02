@@ -24,7 +24,7 @@ export const router = createBrowserRouter(
       path: "/home",
       element: <Main />,
       //errorElement: <Error />,
-      loader: requireAuthLoader,
+      //loader: requireAuthLoader,
       children: [
         {
           index: true,
@@ -68,6 +68,10 @@ export const router = createBrowserRouter(
           loader: async (args) => {
             const mod = await import("@/modules/music/MusicCipher");
             return mod.cipherLoader(args);
+          },
+          action: async (args) => {
+            const mod = await import("@/modules/music/MusicCipher");
+            return mod.action(args);
           },
         },
       ],

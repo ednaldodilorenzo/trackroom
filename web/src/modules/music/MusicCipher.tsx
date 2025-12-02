@@ -1,87 +1,113 @@
 import { useCipher } from "@/hooks/useCipher";
 import TransposeControls from "@/components/cipher/TransposeControls";
 import {
+  Await,
   useLoaderData,
   useNavigate,
   useParams,
+  useSubmit,
+  type ActionFunctionArgs,
   type LoaderFunctionArgs,
 } from "react-router-dom";
 import { BsCheckLg, BsFillPencilFill } from "react-icons/bs";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { musicService } from "./music.service";
-
-const CHORD_REGEX =
-  /([A-G][#b]?m?(?:maj7|m7|7|sus4|sus2|dim|aug|°|º|add9|6|9|11|13)?(?:\/[A-G][#b]?)?)/g;
+import { FallbackOverlay } from "@/components";
+import type { MusicMetaData } from "@/model";
+import CipherContent from "./CipherContent";
 
 export default function MusicCipher() {
   const [toggleEditMode, setToggleEditMode] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
-  const title = "Exemplo de Cifra";
-  const { cipher } = useLoaderData<{ cipher: string }>();
+
+  const { musicMetaData } = useLoaderData<{ musicMetaData: MusicMetaData }>();
 
   ("D Uma vela se acende Em Pra acesa ficar\n A7 Iluminando a  D escuridão");
   const { transposedCipher, up, down, reset, setPrincipal } = useCipher("");
 
   useEffect(() => {
-    cipher.then((c) => {
-      setPrincipal(c);
-    });
-  }, []);
+    async function loadCipher() {
+      try {
+        const data = await musicMetaData;
+        const response = await musicService.getMusicCipher(data.cipherUrl);
+        setPrincipal(response); // ⬅️ Load into hook
+      } catch (err) {
+        console.error("Failed to load cipher:", err);
+      }
+    }
 
-  function parseCifraToHTML(cifra: string): string {
-    return cifra.replace(/\n/g, "<br/>").replace(CHORD_REGEX, (_, chord) => {
-      return `<span class="text-primary font-bold">${chord}</span>`;
-    });
-  }
+    loadCipher();
+  }, [musicMetaData, setPrincipal]);
+
+  const submit = useSubmit();
 
   return (
-    <div className="fixed inset-0 w-full h-full bg-white z-50 flex flex-col">
-      {/* Header */}
-      <div className="bg-surface text-on-surface p-4 flex justify-between items-center shadow-medium border-b border-border">
-        <h2 className="text-xl font-bold">{title}</h2>
-        <button onClick={() => setToggleEditMode(!toggleEditMode)}>
-          {toggleEditMode ? <BsCheckLg /> : <BsFillPencilFill />}
-        </button>
+    <Suspense fallback={<FallbackOverlay />}>
+      <Await resolve={musicMetaData}>
+        {(loadedMeta) => (
+          <div className="fixed inset-0 w-full h-full bg-white z-50 flex flex-col">
+            {/* Header */}
+            <div className="bg-surface text-on-surface p-4 flex justify-between items-center shadow-medium border-b border-border">
+              <h2 className="text-xl font-bold">{loadedMeta.name}</h2>
+              <button onClick={() => setToggleEditMode(!toggleEditMode)}>
+                {toggleEditMode ? <BsCheckLg /> : <BsFillPencilFill />}
+              </button>
+              <button
+                onClick={() => {
+                  submit({ cipher: transposedCipher }, { method: "post" });
+                }}
+              >
+                Save
+              </button>
+              <button
+                className="text-on-surface hover:text-primary transition"
+                onClick={() => navigate(`/home/groups/${id}/musics`)}
+              >
+                ✕
+              </button>
+            </div>
 
-        <button
-          className="text-on-surface hover:text-primary transition"
-          onClick={() => navigate(`/home/groups/${id}/musics`)}
-        >
-          ✕
-        </button>
-      </div>
-
-      {!toggleEditMode && (
-        <>
-          <TransposeControls up={up} down={down} reset={reset} />
-          <div className="flex-1 overflow-y-auto bg-white text-on-surface p-4">
-            <div
-              className="font-mono whitespace-pre-wrap leading-relaxed text-[15px]"
-              dangerouslySetInnerHTML={{
-                __html: parseCifraToHTML(transposedCipher),
-              }}
-            />
+            {!toggleEditMode && (
+              <CipherContent
+                loadedMeta={loadedMeta}
+                setPrincipal={setPrincipal}
+                transposedCipher={transposedCipher}
+                up={up}
+                down={down}
+                reset={reset}
+              />
+            )}
+            {toggleEditMode && (
+              <>
+                <textarea
+                  onChange={(e) => setPrincipal(e.target.value)}
+                  className="min-h-full p-2"
+                >
+                  {transposedCipher}
+                </textarea>
+              </>
+            )}
           </div>
-        </>
-      )}
-      {toggleEditMode && (
-        <textarea
-          onChange={(e) => setPrincipal(e.target.value)}
-          className="min-h-full p-2"
-        >
-          {transposedCipher}
-        </textarea>
-      )}
-    </div>
+        )}
+      </Await>
+    </Suspense>
   );
 }
 
 export const cipherLoader = ({
   params,
-}: LoaderFunctionArgs): { cipher: Promise<string> } => {
+}: LoaderFunctionArgs): { musicMetaData: Promise<MusicMetaData> } => {
   const id = params.musicId;
   return {
-    cipher: musicService.getMusicCipher(Number(id!)),
+    musicMetaData: musicService.getMusicMetaData(Number(id!)),
   };
 };
+
+export async function action({ request, params }: ActionFunctionArgs) {
+  const data = await request.formData();
+  const id = params.musicId;
+  const payload = data.get("cipher")?.toString();
+  await musicService.uploadCipher(Number(id), payload!!);
+  return null;
+}

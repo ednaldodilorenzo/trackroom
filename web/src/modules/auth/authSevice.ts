@@ -25,7 +25,7 @@ class AuthService extends Requester {
     })
       .then((res) => {
         const usuario = res.data;
-        store.dispatch(setCredentials({ user: usuario }));
+        store.dispatch(setCredentials(usuario));
         return true;
       })
       .catch((err) => {

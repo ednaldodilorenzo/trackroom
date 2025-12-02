@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component
 interface FileStorage {
     fun saveFile(bucketName: String, contentType: String, fileName: String, file: ByteArray)
 
+    fun getFile(bucketName: String, fileName: String): ByteArray
+
     fun getFileUrl(bucketName: String, fileName: String): String
 
     fun getUploadUrl(bucketName: String, fileName: String, contentType: String): String

@@ -1,5 +1,6 @@
 package com.poc.crud.modules.music.service
 
+import com.poc.crud.modules.music.dto.MusicCipherResponseDTO
 import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.music.dto.PostMusicDTORequest
 import com.poc.crud.modules.music.dto.PostMusicDTOResponse
@@ -11,6 +12,10 @@ interface MusicService {
     fun insertMusic(dto: PostMusicDTORequest): PostMusicDTOResponse
 
     fun getMusicUrl(musicId: Long): String
+
+    fun getMusicCipherData(musicId: Long): MusicCipherResponseDTO
+
+    fun updateMusicCipherFile(musicId: Long, cipherFile: String)
 
     fun confirmMusicUpload(musicId: Long)
 }

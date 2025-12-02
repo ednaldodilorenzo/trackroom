@@ -4,6 +4,8 @@ import { store } from "@/store";
 
 export async function requireAuthLoader({ request }: any) {
   const { user } = store.getState().auth || {};
+  console.log(user);
+  
   if (!user) {
     const url = new URL(request.url);
     const from = url.pathname + url.search;
