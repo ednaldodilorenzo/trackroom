@@ -9,5 +9,5 @@ interface GroupService {
 
     fun insertGroup(userId: Long, groupData: PostGroupDTO): Long?
 
-    fun findById(id: Long, withDependencies: Boolean = false): GroupDTO
+    fun findById(id: Long, withDependencies: Boolean = false, userId: Long): GroupDTO
 }

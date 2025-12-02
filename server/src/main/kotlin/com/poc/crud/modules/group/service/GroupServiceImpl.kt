@@ -56,13 +56,17 @@ class GroupServiceImpl(
 
     override fun findById(
         id: Long,
-        withDependencies: Boolean
+        withDependencies: Boolean,
+        userId: Long
     ): GroupDTO {
-        val group = groupRepository.findById(id).orElseThrow {
+        val group = groupRepository.findByIdAndUserGroups_User_Id(id, userId).orElseThrow {
             APIException(
                 ExceptionType.NOT_FOUND, "Group not found", RuntimeException("")
             )
         }
-        return if (withDependencies) GroupWithMusicsNotPendingDTO(group) else GroupDTO(group)
+        return if (withDependencies) GroupWithMusicsNotPendingDTO(
+            group,
+            group.userGroups.first().isAdmin
+        ) else GroupDTO(group)
     }
 }

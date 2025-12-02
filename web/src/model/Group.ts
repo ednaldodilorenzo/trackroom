@@ -7,6 +7,7 @@ interface Group {
   cover: string;
   active: boolean;
   musics?: Music[];
+  isAdmin?: boolean;
 }
 
 export type { Group };

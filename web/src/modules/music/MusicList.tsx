@@ -1,8 +1,5 @@
-import { Suspense, useEffect } from "react";
-import {  
-  useOutletContext,
-  type LoaderFunctionArgs,
-} from "react-router-dom";
+import { Suspense, useEffect, useState } from "react";
+import { useOutletContext, type LoaderFunctionArgs } from "react-router-dom";
 import Button from "@/components/button/Button";
 import TrackItem from "@/components/trackitem/TrackItem";
 import { useLoaderData, Await, useNavigate, useParams } from "react-router-dom";
@@ -22,6 +19,7 @@ export default function MusicList() {
   const { setCurrentTrack, setIsPlaying, currentTrack } =
     useAudioPlayerContext();
   const navigate = useNavigate();
+  const [isAdmin, setIsAdmin] = useState(false);
   const { id } = useParams();
 
   async function handlePlay(music: Music) {
@@ -47,6 +45,7 @@ export default function MusicList() {
         enableBackButton: true,
         backButtonLink: "/home",
       });
+      setIsAdmin(g.isAdmin ?? false);
     });
   }, []);
 
@@ -77,12 +76,14 @@ export default function MusicList() {
           )}
         </Await>
       </Suspense>
-      <Button
-        className="suspended-button"
-        onClick={() => navigate(`/home/groups/${id}/musics/add`)}
-      >
-        + Nova Música
-      </Button>
+      {isAdmin && (
+        <Button
+          className="suspended-button"
+          onClick={() => navigate(`/home/groups/${id}/musics/add`)}
+        >
+          + Nova Música
+        </Button>
+      )}
     </>
   );
 }

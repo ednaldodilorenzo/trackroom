@@ -10,12 +10,14 @@ data class GroupWithMusicsNotPendingDTO(
     override val name: String,
     override val description: String,
     override val cover: String,
+    val isAdmin: Boolean = false,
 ) : GroupDTO(id, name, description, cover) {
-    constructor(group: Group) : this(
+    constructor(group: Group, isAdmin: Boolean = false) : this(
         id = group.id,
         name = group.name,
         description = group.description,
         cover = group.cover,
-        musics = group.musics.filter { it.uploadStatus != MusicUploadStatus.PENDING }.map { MusicDTO(it) }.toSet()
+        musics = group.musics.filter { it.uploadStatus != MusicUploadStatus.PENDING }.map { MusicDTO(it) }.toSet(),
+        isAdmin = isAdmin
     )
 }

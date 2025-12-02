@@ -18,4 +18,9 @@ interface GroupRepository : JpaRepository<Group, Long> {
     """
     )
     fun findGroupsByUserId(userId: Long): List<Group>
+
+    fun findByIdAndUserGroups_User_Id(
+        id: Long,
+        userId: Long
+    ): Optional<Group>
 }

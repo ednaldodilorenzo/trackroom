@@ -18,7 +18,7 @@ class MusicController(
 
     @GetMapping("")
     fun getAll(@RequestParam(required = false) groupId: Long?): ResponseEntity<Set<MusicDTO>> =
-        ResponseEntity(musicService.getAllMusic(groupId), HttpStatus.CREATED)
+        ResponseEntity(musicService.getAllMusic(groupId), HttpStatus.OK)
 
     @GetMapping("/{id}/url")
     fun getMusicUrl(@PathVariable id: Long): ResponseEntity<String> = ResponseEntity.ok(musicService.getMusicUrl(id))

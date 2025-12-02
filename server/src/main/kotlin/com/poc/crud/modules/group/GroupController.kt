@@ -19,9 +19,11 @@ class GroupController(
 
     @GetMapping("/{id}")
     fun getById(
+        principal: Principal,
         @PathVariable id: Long,
         @RequestParam(required = false, defaultValue = "false") withDependencies: Boolean
-    ): ResponseEntity<GroupDTO> = ResponseEntity.ok(groupService.findById(id, withDependencies))
+    ): ResponseEntity<GroupDTO> =
+        ResponseEntity.ok(groupService.findById(id, withDependencies, principal.name.toLong()))
 
     @PostMapping("")
     fun post(principal: Principal, @RequestBody @Valid groupData: PostGroupDTO): Long? =
