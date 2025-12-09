@@ -7,11 +7,13 @@ open class GroupDTO(
     open val name: String,
     open val description: String,
     open val cover: String,
+    open val isAdmin: Boolean = false,
 ) {
-    constructor(group: Group) : this(
+    constructor(group: Group, isAdmin: Boolean) : this(
         id = group.id,
         name = group.name,
         description = group.description,
         cover = group.cover,
+        isAdmin = isAdmin
     )
 }

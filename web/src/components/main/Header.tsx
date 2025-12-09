@@ -1,19 +1,22 @@
 import { Link } from "react-router-dom";
 import "./Header.css";
-import { BsArrowLeftSquare, BsBoxArrowInRight } from "react-icons/bs";
+import { BsArrowLeftSquare, BsThreeDotsVertical } from "react-icons/bs";
+import SuspendedMenu, {
+  type SuspendedMenuProps,
+} from "../suspendedmenu/SuspendedMenu";
 
 type HeaderConfig = {
   title: string;
   enableBackButton?: boolean;
   backButtonLink?: string;
-  logout?: () => void;
+  suspendedMenuProps?: SuspendedMenuProps;
 };
 
 export default function Header({
   title,
   enableBackButton,
   backButtonLink,
-  logout,
+  suspendedMenuProps,
 }: HeaderConfig) {
   return (
     <header className="header flex justify-between align-center p-2">
@@ -27,9 +30,9 @@ export default function Header({
         )}
         <h1>{title}</h1>
       </div>
-      <button onClick={logout}>
-        <BsBoxArrowInRight size="1.7em" className="logout-icon" />
-      </button>
+      {suspendedMenuProps && (
+        <SuspendedMenu items={suspendedMenuProps.items}></SuspendedMenu>
+      )}
     </header>
   );
 }

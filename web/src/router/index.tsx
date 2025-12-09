@@ -1,14 +1,16 @@
 import { lazy, Suspense } from "react";
 import { Main, FallbackOverlay } from "@/components";
 import { createBrowserRouter } from "react-router-dom";
-import { requireAuthLoader } from "@/modules/auth/requireAuthLoader";
+import { GroupProvider } from "@/modules/group/GroupContext";
 
 const Login = lazy(() => import("@/modules/auth/Login"));
 const Home = lazy(() => import("@/modules/home/Home"));
 const GroupAdd = lazy(() => import("@/modules/group/GroupAdd"));
+const GroupData = lazy(() => import("@/modules/group/GroupData"));
 const MusicList = lazy(() => import("@/modules/music/MusicList"));
 const MusicAdd = lazy(() => import("@/modules/music/MusicAdd"));
 const MusicCipher = lazy(() => import("@/modules/music/MusicCipher"));
+const GroupMembers = lazy(() => import("@/modules/group/GroupMembers"));
 
 export const router = createBrowserRouter(
   [
@@ -47,32 +49,54 @@ export const router = createBrowserRouter(
           },
         },
         {
-          path: "groups/:id/musics",
-          element: <MusicList />,
+          path: "groups/:id",
+          element: (
+            <GroupProvider>
+              <GroupData />
+            </GroupProvider>
+          ),
           loader: async (args) => {
-            const mod = await import("@/modules/music/MusicList");
-            return mod.musicsLoader(args);
+            const mod = await import("@/modules/group/GroupData");
+            return mod.groupLoader(args);
           },
-        },
-        {
-          path: "groups/:id/musics/add",
-          element: <MusicAdd />,
-          action: async (args) => {
-            const mod = await import("@/modules/music/MusicAdd");
-            return mod.action(args);
-          },
-        },
-        {
-          path: "groups/:id/musics/:musicId/cipher",
-          element: <MusicCipher />,
-          loader: async (args) => {
-            const mod = await import("@/modules/music/MusicCipher");
-            return mod.cipherLoader(args);
-          },
-          action: async (args) => {
-            const mod = await import("@/modules/music/MusicCipher");
-            return mod.action(args);
-          },
+          children: [
+            {
+              path: "musics",
+              element: <MusicList />,
+              loader: async (args) => {
+                const mod = await import("@/modules/music/MusicList");
+                return mod.musicsLoader(args);
+              },
+            },
+            {
+              path: "musics/add",
+              element: <MusicAdd />,
+              action: async (args) => {
+                const mod = await import("@/modules/music/MusicAdd");
+                return mod.action(args);
+              },
+            },
+            {
+              path: "musics/:musicId/cipher",
+              element: <MusicCipher />,
+              loader: async (args) => {
+                const mod = await import("@/modules/music/MusicCipher");
+                return mod.cipherLoader(args);
+              },
+              action: async (args) => {
+                const mod = await import("@/modules/music/MusicCipher");
+                return mod.action(args);
+              },
+            },
+            {
+              path: "members",
+              element: <GroupMembers />,
+              loader: async (args) => {
+                const mod = await import("@/modules/group/GroupMembers");
+                return mod.loader(args);
+              },
+            },
+          ],
         },
       ],
     },

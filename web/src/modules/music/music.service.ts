@@ -7,7 +7,7 @@ class MusicService extends Requester {
     super(instance, "/v1/musics");
   }
 
-  getByGroup = (params: Params): Promise<Music[]> =>
+  getAll = (params: Params): Promise<Music[]> =>
     this.get<Music[]>("", params).then((resp) => resp.data);
 
   save = (data: Music): Promise<{ id: number; uploadUrl: string }> =>

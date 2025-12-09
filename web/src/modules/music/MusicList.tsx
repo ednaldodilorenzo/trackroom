@@ -1,26 +1,25 @@
-import { Suspense, useEffect, useState } from "react";
-import { useOutletContext, type LoaderFunctionArgs } from "react-router-dom";
+import { Suspense } from "react";
+import { type LoaderFunctionArgs } from "react-router-dom";
 import Button from "@/components/button/Button";
 import TrackItem from "@/components/trackitem/TrackItem";
 import { useLoaderData, Await, useNavigate, useParams } from "react-router-dom";
-import { groupService } from "@/modules/group/group.service";
 import FallbackOverlay from "@/components/fallbackoverlay/FallBackOverlay";
-import type { Group, Music } from "@/model";
+import type { Music } from "@/model";
 import { musicService } from "./music.service";
 import {
   useAudioPlayerContext,
   type Track,
 } from "@/components/player/AudioPlayerContext";
 import "./MusicList.css";
-import type { HeaderConfig } from "@/components/main/Header";
+import { useGroupContext } from "../group/GroupContext";
 
 export default function MusicList() {
-  const { group } = useLoaderData<{ group: Promise<Group> }>();
+  const { musics } = useLoaderData<{ musics: Promise<Music[]> }>();
   const { setCurrentTrack, setIsPlaying, currentTrack } =
     useAudioPlayerContext();
   const navigate = useNavigate();
-  const [isAdmin, setIsAdmin] = useState(false);
   const { id } = useParams();
+  const { currentGroup } = useGroupContext();
 
   async function handlePlay(music: Music) {
     const url = await musicService.getFileUrl(music.id!!);
@@ -34,29 +33,15 @@ export default function MusicList() {
     setIsPlaying(true);
   }
 
-  const { setHeaderConfig } = useOutletContext<{
-    setHeaderConfig: (config: HeaderConfig) => void;
-  }>();
-
-  useEffect(() => {
-    group.then((g) => {
-      setHeaderConfig({
-        title: g.name,
-        enableBackButton: true,
-        backButtonLink: "/home",
-      });
-      setIsAdmin(g.isAdmin ?? false);
-    });
-  }, []);
-
   return (
     <>
+      <h2 className="section-title">Músicas</h2>
       <Suspense fallback={<FallbackOverlay />}>
-        <Await resolve={group}>
-          {(loadedGroup) => (
+        <Await resolve={musics}>
+          {(loadedMusics) => (
             <>
-              {loadedGroup.musics && loadedGroup.musics.length > 0 ? (
-                loadedGroup.musics?.map((item) => (
+              {loadedMusics && loadedMusics.length > 0 ? (
+                loadedMusics.map((item) => (
                   <div className="track-list">
                     <TrackItem
                       active={currentTrack.id === item.id}
@@ -76,7 +61,7 @@ export default function MusicList() {
           )}
         </Await>
       </Suspense>
-      {isAdmin && (
+      {currentGroup.isAdmin && (
         <Button
           className="suspended-button"
           onClick={() => navigate(`/home/groups/${id}/musics/add`)}
@@ -90,9 +75,9 @@ export default function MusicList() {
 
 export const musicsLoader = ({
   params,
-}: LoaderFunctionArgs): { group: Promise<Group> } => {
+}: LoaderFunctionArgs): { musics: Promise<Music[]> } => {
   const id = params.id;
   return {
-    group: groupService.findByIdWithDependencies(id!!),
+    musics: musicService.getAll({ groupId: id }),
   };
 };

@@ -2,6 +2,7 @@ import type { Group } from "@/model";
 import {
   Outlet,
   useLoaderData,
+  useNavigate,
   useOutletContext,
   type LoaderFunctionArgs,
 } from "react-router-dom";
@@ -16,6 +17,7 @@ export default function GroupData() {
     setHeaderConfig: (config: HeaderConfig) => void;
   }>();
   const { setCurrentGroup } = useGroupContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     group.then((g) => {
@@ -23,16 +25,21 @@ export default function GroupData() {
         title: g.name,
         enableBackButton: true,
         backButtonLink: "/home",
+        suspendedMenuProps: {
+          items: [
+            {
+              label: "Members",
+              onClick: () => navigate(`/home/groups/${g.id}/members`),
+            },
+            { label: "Teste2", onClick: () => null },
+          ],
+        },
       });
       setCurrentGroup(g);
     });
   }, []);
 
-  return (
-    <GroupProvider>
-      <Outlet />
-    </GroupProvider>
-  );
+  return <Outlet />;
 }
 
 export const groupLoader = ({

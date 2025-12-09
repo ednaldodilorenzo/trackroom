@@ -1,4 +1,4 @@
-import type { Group } from "@/model";
+import type { Group, User } from "@/model";
 import { Requester, request } from "@/utils/requester";
 import { type AxiosInstance } from "axios";
 
@@ -16,6 +16,9 @@ class GroupService extends Requester {
 
   findById = (id: string) =>
     this.get<Group>(`/${id}`).then((resp) => resp.data);
+
+  findUsersByGroupId = (id: string) =>
+    this.get<User[]>(`/${id}/users`).then((resp) => resp.data);
 }
 
 export const groupService = new GroupService(request);

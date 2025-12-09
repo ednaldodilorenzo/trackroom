@@ -42,6 +42,16 @@ export default function MusicCipher() {
 
   const submit = useSubmit();
 
+  function handleSaveCipher() {
+    setToggleEditMode(!toggleEditMode);
+
+    if (!toggleEditMode) {
+      return;
+    }
+
+    submit({ cipher: transposedCipher }, { method: "post" });
+  }
+
   return (
     <Suspense fallback={<FallbackOverlay />}>
       <Await resolve={musicMetaData}>
@@ -50,15 +60,8 @@ export default function MusicCipher() {
             {/* Header */}
             <div className="bg-surface text-on-surface p-4 flex justify-between items-center shadow-medium border-b border-border">
               <h2 className="text-xl font-bold">{loadedMeta.name}</h2>
-              <button onClick={() => setToggleEditMode(!toggleEditMode)}>
+              <button onClick={handleSaveCipher}>
                 {toggleEditMode ? <BsCheckLg /> : <BsFillPencilFill />}
-              </button>
-              <button
-                onClick={() => {
-                  submit({ cipher: transposedCipher }, { method: "post" });
-                }}
-              >
-                Save
               </button>
               <button
                 className="text-on-surface hover:text-primary transition"

@@ -4,27 +4,28 @@ import "./Header";
 import Header, { type HeaderConfig } from "./Header";
 import AudioPlayer from "../player/AudioPlayer";
 import { useState } from "react";
-import { store } from "../../store";
-import { useNavigate } from "react-router-dom";
-import { authService } from "@/modules/auth/authSevice";
+import { useSelector } from "react-redux";
+// import { useNavigate } from "react-router-dom";
+// import { authService } from "@/modules/auth/authSevice";
 
 export default function Main() {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
   const [headerConfig, setHeaderConfig] = useState<HeaderConfig>({
     title: "Music App",
   });
 
-  const { user } = store.getState().auth || {};
+  //const { user } = store.getState().auth || {};
+  const { user } = useSelector((state: any) => state.auth);
 
-  const logout = () => {
-    authService.logout().then(() => {
-      navigate("/login");
-    });
-  };
+  // const logout = () => {
+  //   authService.logout().then(() => {
+  //     navigate("/login");
+  //   });
+  // };
 
   return (
     <>
-      <Header {...headerConfig} logout={logout} />
+      <Header {...headerConfig} />
       <div className="main-page">
         {user ? (
           <Outlet context={{ setHeaderConfig }} />

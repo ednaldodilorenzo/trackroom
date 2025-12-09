@@ -5,5 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.stereotype.Repository
 
 @Repository
-interface UserGroupRepository: JpaRepository<UserGroup, Long> {
+interface UserGroupRepository : JpaRepository<UserGroup, Long> {
+
+    fun findByGroup_Id(groupId: Long): List<UserGroup>
 }

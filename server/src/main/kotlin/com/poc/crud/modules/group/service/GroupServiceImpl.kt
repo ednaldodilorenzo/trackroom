@@ -8,6 +8,7 @@ import com.poc.crud.model.UserGroupId
 import com.poc.crud.modules.group.dto.GroupDTO
 import com.poc.crud.modules.group.dto.GroupWithMusicsNotPendingDTO
 import com.poc.crud.modules.group.dto.PostGroupDTO
+import com.poc.crud.modules.group.dto.UserDTO
 import com.poc.crud.repository.GroupRepository
 import com.poc.crud.repository.UserGroupRepository
 import com.poc.crud.repository.UserRepository
@@ -21,7 +22,7 @@ class GroupServiceImpl(
     private val userGroupRepository: UserGroupRepository,
 ) : GroupService {
     override fun findGroupsByUserId(userId: Long): List<GroupDTO> {
-        return groupRepository.findGroupsByUserId(userId).map { GroupDTO(it) }
+        return groupRepository.findGroupsByUserId(userId).map { GroupDTO(it, false) }
     }
 
     @Transactional
@@ -67,6 +68,13 @@ class GroupServiceImpl(
         return if (withDependencies) GroupWithMusicsNotPendingDTO(
             group,
             group.userGroups.first().isAdmin
-        ) else GroupDTO(group)
+        ) else GroupDTO(group, group.userGroups.first().isAdmin)
     }
+
+    override fun findUsersByGroupId(
+        userId: Long,
+        id: Long
+    ): List<UserDTO> =
+        userGroupRepository.findByGroup_Id(id).map { UserDTO(it.user.id!!, it.user.name, it.isAdmin) }
+
 }
