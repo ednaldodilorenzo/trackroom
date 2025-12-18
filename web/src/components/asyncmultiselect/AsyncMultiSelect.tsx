@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+
 
 export type AsyncSelectItem = {
     id: string | number;
@@ -19,7 +20,7 @@ export default function AsyncMultiSelect({
     value,
     onChange,
     fetchOptions,
-    debounceMs = 400,
+    debounceMs = 1000,
     placeholder = "Digite para buscar...",
 }: Props) {
     const [input, setInput] = useState("");
@@ -28,7 +29,10 @@ export default function AsyncMultiSelect({
     const [loading, setLoading] = useState(false);
     const debounceRef = useRef<number | undefined>(undefined);
 
-    const selectedIds = new Set(value.map((v) => v.id));
+    const selectedIds = useMemo(
+        () => new Set(value.map((v) => v.id)),
+        [value]
+    );
 
     useEffect(() => {
         if (!input.trim()) {
@@ -50,6 +54,7 @@ export default function AsyncMultiSelect({
 
         return () => window.clearTimeout(debounceRef.current);
     }, [input, fetchOptions, debounceMs, selectedIds]);
+
 
     function handleSelect(item: AsyncSelectItem) {
         onChange([...value, item]);

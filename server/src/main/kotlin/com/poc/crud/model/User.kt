@@ -19,7 +19,7 @@ data class User(
     val username: String,
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
-    val groups: Set<UserGroup>?,
+    val groups: Set<UserGroup> = emptySet(),
 ) {
     override fun equals(other: Any?): Boolean =
         this === other || (other is User && id != null && id == other.id)

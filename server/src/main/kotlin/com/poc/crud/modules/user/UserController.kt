@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.RestController
 class UserController(private val userService: UserService) {
 
     @GetMapping("")
-    fun getUserByUsername(@RequestParam(required = false) username: String): ResponseEntity<List<UserIdNameUsernameDTO>> =
-        ResponseEntity(userService.findAllByUsername(username), HttpStatus.OK)
+    fun getUserNotInGroupByTerm(
+        @RequestParam groupId: Long,
+        @RequestParam(required = false) search: String?
+    ): ResponseEntity<List<UserIdNameUsernameDTO>> =
+        ResponseEntity.ok(userService.findNotInGroupByTerm(groupId, search))
 }

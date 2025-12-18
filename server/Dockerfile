@@ -1,4 +1,4 @@
-FROM eclipse-temurin:21 as development
+FROM eclipse-temurin:21 AS development
 
 WORKDIR /app
 
