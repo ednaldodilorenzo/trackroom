@@ -1,7 +1,8 @@
 //import { useState } from "react";
 import Controls from "./Control";
+import { ProgressBar } from "./ProgressBar";
 import TrackInfo from "./TrackInfo";
-import { VolumeControl } from "./VolumeControl";
+
 
 export default function AudioPlayer() {
   //const [openDrawer, setOpenDrawer] = useState(false);
@@ -11,9 +12,7 @@ export default function AudioPlayer() {
       <TrackInfo />
       <div className="w-full flex flex-col items-center gap-1 m-auto flex-1">
         <Controls />
-      </div>
-      <div className="flex items-center gap-2 text-gray-400">
-        <VolumeControl />
+        <ProgressBar />
       </div>
     </div>
   );

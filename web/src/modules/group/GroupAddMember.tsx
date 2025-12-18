@@ -18,5 +18,8 @@ export default function GroupAddMember() {
                 (q) => userService.findAllNotInGroupByTerm(currentGroup.id!!, q).then((data) => data.map(value => ({ id: value.id!!, label: value.name })))
             }
         />
+        <ul>
+            {selectedMusics && selectedMusics.map(music => (<li>{music.label}</li>))}
+        </ul>
     </>
 }

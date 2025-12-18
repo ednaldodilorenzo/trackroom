@@ -2,6 +2,7 @@ package com.poc.crud.repository
 
 import com.poc.crud.model.Group
 import com.poc.crud.model.MusicUploadStatus
+import com.poc.crud.modules.group.dto.GroupMembershipDTO
 import org.springframework.data.jpa.repository.EntityGraph
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
@@ -18,6 +19,29 @@ interface GroupRepository : JpaRepository<Group, Long> {
     """
     )
     fun findGroupsByUserId(userId: Long): List<Group>
+
+    @Query(
+        """
+    select new com.poc.crud.modules.group.dto.GroupMembershipDTO(
+        g.id,
+        g.name,
+        g.description,
+        g.cover,
+        g.active,
+        case when ug is not null then true else false end,
+        ug.isAdmin
+    )
+    from Group g
+    left join UserGroup ug
+        on ug.group = g and ug.user.id = :userId
+    where g.id = :groupId
+    """
+    )
+    fun findGroupWithMembership(
+        @Param("groupId") groupId: Long,
+        @Param("userId") userId: Long
+    ): Optional<GroupMembershipDTO>
+
 
     fun findByIdAndUserGroups_User_Id(
         id: Long,

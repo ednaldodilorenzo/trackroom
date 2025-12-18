@@ -6,6 +6,7 @@ import com.poc.crud.model.Group
 import com.poc.crud.model.UserGroup
 import com.poc.crud.model.UserGroupId
 import com.poc.crud.modules.group.dto.GroupDTO
+import com.poc.crud.modules.group.dto.GroupMembershipDTO
 import com.poc.crud.modules.group.dto.GroupWithMusicsNotPendingDTO
 import com.poc.crud.modules.group.dto.PostGroupDTO
 import com.poc.crud.modules.group.dto.UserDTO
@@ -22,7 +23,7 @@ class GroupServiceImpl(
     private val userGroupRepository: UserGroupRepository,
 ) : GroupService {
     override fun findGroupsByUserId(userId: Long): List<GroupDTO> {
-        return groupRepository.findGroupsByUserId(userId).map { GroupDTO(it, false) }
+        return groupRepository.findAll().map { GroupDTO(it, false) }
     }
 
     @Transactional
@@ -59,16 +60,21 @@ class GroupServiceImpl(
         id: Long,
         withDependencies: Boolean,
         userId: Long
-    ): GroupDTO {
-        val group = groupRepository.findByIdAndUserGroups_User_Id(id, userId).orElseThrow {
+    ): GroupMembershipDTO {
+        return groupRepository.findGroupWithMembership(id, userId).orElseThrow {
             APIException(
                 ExceptionType.NOT_FOUND, "Group not found", RuntimeException("")
             )
         }
-        return if (withDependencies) GroupWithMusicsNotPendingDTO(
-            group,
-            group.userGroups.first().isAdmin
-        ) else GroupDTO(group, group.userGroups.first().isAdmin)
+//        val group = groupRepository.findById(id).orElseThrow {//findByIdAndUserGroups_User_Id(id, userId).orElseThrow {
+//            APIException(
+//                ExceptionType.NOT_FOUND, "Group not found", RuntimeException("")
+//            )
+//        }
+//        return if (withDependencies) GroupWithMusicsNotPendingDTO(
+//            group,
+//            group.userGroups.first().isAdmin
+//        ) else GroupDTO(group, group.userGroups.first().isAdmin)
     }
 
     override fun findUsersByGroupId(

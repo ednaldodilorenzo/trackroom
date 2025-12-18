@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "ts-debounce": "^4.0.0"
+  }
+}

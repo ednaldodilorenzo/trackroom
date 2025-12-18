@@ -27,7 +27,11 @@ export default function AsyncMultiSelect({
     const [options, setOptions] = useState<AsyncSelectItem[]>([]);
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+    const [highlightedIndex, setHighlightedIndex] = useState(-1);
+
     const debounceRef = useRef<number | undefined>(undefined);
+    const containerRef = useRef<HTMLDivElement | null>(null);
+    const inputRef = useRef<HTMLInputElement | null>(null);
 
     const selectedIds = useMemo(
         () => new Set(value.map((v) => v.id)),
@@ -55,6 +59,61 @@ export default function AsyncMultiSelect({
         return () => window.clearTimeout(debounceRef.current);
     }, [input, fetchOptions, debounceMs, selectedIds]);
 
+    /* =======================
+     Click outside to close
+     ======================= */
+
+    useEffect(() => {
+        function handleClickOutside(event: MouseEvent) {
+            if (
+                containerRef.current &&
+                !containerRef.current.contains(event.target as Node)
+            ) {
+                setOpen(false);
+                setHighlightedIndex(-1);
+            }
+        }
+
+        document.addEventListener("mousedown", handleClickOutside);
+        return () =>
+            document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    /* =======================
+     Keyboard navigation
+     ======================= */
+    function handleKeyDown(e: React.KeyboardEvent<HTMLInputElement>) {
+        if (!open) return;
+
+        switch (e.key) {
+            case "ArrowDown":
+                e.preventDefault();
+                setHighlightedIndex((prev) =>
+                    Math.min(prev + 1, options.length - 1)
+                );
+                break;
+
+            case "ArrowUp":
+                e.preventDefault();
+                setHighlightedIndex((prev) => Math.max(prev - 1, 0));
+                break;
+
+            case "Enter":
+                e.preventDefault();
+                if (options[highlightedIndex]) {
+                    handleSelect(options[highlightedIndex]);
+                }
+                break;
+
+            case "Escape":
+                e.preventDefault();
+                setOpen(false);
+                setHighlightedIndex(-1);
+                inputRef.current?.blur();
+                break;
+        }
+    }
+
 
     function handleSelect(item: AsyncSelectItem) {
         onChange([...value, item]);
@@ -68,7 +127,7 @@ export default function AsyncMultiSelect({
     }
 
     return (
-        <div className="relative w-full">
+        <div ref={containerRef} className="relative w-full">
             {/* Label */}
             <label className="mb-1 block text-sm text-gray-600">
                 {label}
@@ -103,6 +162,7 @@ export default function AsyncMultiSelect({
 
                 {/* Input */}
                 <input
+                    ref={inputRef}
                     value={input}
                     placeholder={placeholder}
                     onChange={(e) => setInput(e.target.value)}
