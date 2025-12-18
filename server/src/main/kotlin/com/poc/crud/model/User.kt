@@ -16,6 +16,7 @@ data class User(
     val active: Boolean,
     val phoneNumber: String,
     val password: String,
+    val username: String,
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
     val groups: Set<UserGroup>?,

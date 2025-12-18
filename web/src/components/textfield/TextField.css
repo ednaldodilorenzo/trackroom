@@ -19,6 +19,14 @@
   border: 2px solid var(--md-primary);
 }
 
+.md-text-field.has-start-icon input {
+  padding-left: 2.5rem;
+}
+
+.md-text-field.has-end-icon input {
+  padding-right: 2.5rem;
+}
+
 .md-text-field label {
   position: absolute;
   left: 12px;
@@ -47,4 +55,22 @@
   font-size: 12px;
   margin-top: 4px;
   display: block;
+}
+
+.md-icon {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--md-on-surface-variant);
+  pointer-events: none;
+  top: 20px;
+}
+
+.md-icon.start {
+  left: 0.75rem;  
+}
+
+.md-icon.end {
+  right: 0.75rem;
 }

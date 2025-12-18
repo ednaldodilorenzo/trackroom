@@ -29,7 +29,7 @@ dependencies {
     implementation(platform("software.amazon.awssdk:bom:2.35.11"))
     implementation("software.amazon.awssdk:s3")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
-	developmentOnly("org.springframework.boot:spring-boot-docker-compose")
+	//developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5") // or jjwt-gson
@@ -40,6 +40,7 @@ dependencies {
     testImplementation("org.junit.jupiter:junit-jupiter-api")
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine")
     testImplementation("io.mockk:mockk:1.13.12")
+	testImplementation("com.ninja-squad:springmockk:4.0.2")
 
 
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
@@ -67,4 +68,19 @@ tasks.named<org.springframework.boot.gradle.tasks.bundling.BootJar>("bootJar") {
 
 tasks.withType<Test> {
 	useJUnitPlatform()
+}
+
+tasks.register<Copy>("getDependencies") {
+	from(sourceSets.main.get().runtimeClasspath)
+	into("runtime/")
+
+	doFirst {
+		val runtimeDir = File("runtime")
+		runtimeDir.deleteRecursively()
+		runtimeDir.mkdir()
+	}
+
+	doLast {
+		File("runtime").deleteRecursively()
+	}
 }

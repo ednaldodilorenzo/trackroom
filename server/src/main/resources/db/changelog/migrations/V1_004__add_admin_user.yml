@@ -4,4 +4,6 @@ databaseChangeLog:
       author: Ednaldo Dilorenzo
       changes:
         - sql:
-            sql: INSERT INTO users (name, email, cpf, active, phone_number, password) VALUES ('Ednaldo', 'ed@teste.com', '32145678978', true, '11999999999', '$2a$10$nOX4DKFI9sK/DVGHkzntIe5IEdbn7ZQ3AGhxAVRrlF.P9AJ7puCaK');
+            sql: INSERT INTO users (name, username, email, cpf, active, phone_number, password) VALUES ('Ednaldo', 'edsf', 'ed@teste.com', '32145678978', true, '11999999999', '$2a$10$nOX4DKFI9sK/DVGHkzntIe5IEdbn7ZQ3AGhxAVRrlF.P9AJ7puCaK');
+        - sql:
+            sql: INSERT INTO users (name, username, email, cpf, active, phone_number, password) VALUES ('John', 'john', 'john@teste.com', '98745632145', true, '78965412365', '$2a$10$nOX4DKFI9sK/DVGHkzntIe5IEdbn7ZQ3AGhxAVRrlF.P9AJ7puCaK');

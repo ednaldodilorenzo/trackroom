@@ -7,7 +7,7 @@ import {
   type LoaderFunctionArgs,
 } from "react-router-dom";
 import { groupService } from "./group.service";
-import { GroupProvider, useGroupContext } from "./GroupContext";
+import { useGroupContext } from "./GroupContext";
 import type { HeaderConfig } from "@/components/main/Header";
 import { useEffect } from "react";
 

@@ -11,6 +11,7 @@ const MusicList = lazy(() => import("@/modules/music/MusicList"));
 const MusicAdd = lazy(() => import("@/modules/music/MusicAdd"));
 const MusicCipher = lazy(() => import("@/modules/music/MusicCipher"));
 const GroupMembers = lazy(() => import("@/modules/group/GroupMembers"));
+const GroupAddMember = lazy(() => import("@/modules/group/GroupAddMember"));
 
 export const router = createBrowserRouter(
   [
@@ -96,6 +97,10 @@ export const router = createBrowserRouter(
                 return mod.loader(args);
               },
             },
+            {
+              path: "members/add",
+              element: <GroupAddMember />,
+            }
           ],
         },
       ],

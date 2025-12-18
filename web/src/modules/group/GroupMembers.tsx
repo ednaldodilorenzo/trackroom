@@ -1,15 +1,20 @@
 import {
   Await,
   useLoaderData,
+  useNavigate,
   type LoaderFunctionArgs,
 } from "react-router-dom";
 import { groupService } from "./group.service";
 import { type User } from "@/model";
 import { Suspense } from "react";
-import { FallbackOverlay } from "@/components";
+import { FallbackOverlay, Button } from "@/components";
+import { useGroupContext } from "./GroupContext";
+
 
 export default function GroupMembers() {
   const { users } = useLoaderData<{ users: Promise<User[]> }>();
+  const { currentGroup } = useGroupContext();
+  const navigate = useNavigate();
   return (
     <>
       <h2 className="section-title">Membros</h2>
@@ -28,6 +33,14 @@ export default function GroupMembers() {
           </Await>
         </Suspense>
       </ul>
+      {currentGroup.isAdmin && (
+        <Button
+          onClick={() => navigate(`/home/groups/${currentGroup.id}/members/add`)}
+          className="suspended-button"
+        >
+          + Novo Membro
+        </Button>
+      )}
     </>
   );
 }
