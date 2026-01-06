@@ -1,0 +1,20 @@
+package com.poc.crud.infrastructure.messaging.subscriber
+
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.poc.crud.core.queue.MessageSubscriber
+import com.poc.crud.core.queue.Task
+import com.poc.crud.core.queue.TaskType
+import com.poc.crud.infrastructure.email.EmailSenderService
+import com.poc.crud.infrastructure.messaging.task.AccountConfirmationTaskPayload
+import org.springframework.stereotype.Component
+
+@Component
+class EmailConfirmationSubscriber(private val objectMapper: ObjectMapper, private val mailService: EmailSenderService) : MessageSubscriber {
+    override val supports: TaskType = TaskType.MESSAGE_EMAIL_CONFIRMATION
+    override fun processMessage(task: Task) {
+        val emailPayload: AccountConfirmationTaskPayload =
+            objectMapper.treeToValue(task.payload, AccountConfirmationTaskPayload::class.java)
+        mailService.sendEmail(emailPayload.email, "Código de validação de email", """Link: http://localhost/confirm/${emailPayload.token} <br> ${emailPayload.code}""")
+        println("Send email ${emailPayload.email} code ${emailPayload.code}")
+    }
+}

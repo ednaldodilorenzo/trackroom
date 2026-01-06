@@ -13,7 +13,7 @@ data class User(
     val name: String,
     val email: String,
     val cpf: String,
-    val active: Boolean,
+    var active: Boolean,
     val phoneNumber: String,
     val password: String,
     val username: String,

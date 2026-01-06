@@ -2,6 +2,7 @@ package com.poc.crud.filestorage
 
 import com.poc.crud.core.storage.FileStorage
 import org.springframework.stereotype.Component
+import java.io.ByteArrayInputStream
 
 @Component
 class CipherFileStorage(private val fileStorage: FileStorage) {
@@ -16,11 +17,13 @@ class CipherFileStorage(private val fileStorage: FileStorage) {
     }
 
     fun updateCipherFile(musicId: Long, cipherFileContent: String) {
+        val bytes = cipherFileContent.toByteArray()
         fileStorage.saveFile(
             BUCKET_NAME,
             "application/octet-stream",
             "cipher-$musicId.dat",
-            cipherFileContent.toByteArray()
+            ByteArrayInputStream(bytes),
+            bytes.size.toLong(),
         )
     }
 }

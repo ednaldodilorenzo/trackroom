@@ -1,4 +1,12 @@
 services:
+  redis:
+    image: redis:latest
+    restart: always
+    volumes:
+      - redis_data:/data
+    expose:
+      - "6379"
+      
   db:
     image: 'postgres:latest'
     environment:
@@ -22,6 +30,7 @@ services:
     environment:
       SPRING_DEVTOOLS_RESTART_ENABLED: "true"
       SPRING_LIQUIBASE_ENABLED: "true"
+      SPRING_PROFILES_ACTIVE: local
 #      JAVA_OPTS: >
 #        -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
 #        -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0
@@ -57,4 +66,5 @@ services:
 
 volumes:
   minio_data:
-#  db_data:
+  redis_data:
+

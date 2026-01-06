@@ -167,6 +167,7 @@ export default function AsyncMultiSelect({
                     placeholder={placeholder}
                     onChange={(e) => setInput(e.target.value)}
                     onFocus={() => setOpen(true)}
+                    onKeyDown={handleKeyDown}
                     className="flex-1 min-w-[120px] border-none outline-none bg-transparent text-sm"
                 />
             </div>

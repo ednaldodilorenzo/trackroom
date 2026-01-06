@@ -21,14 +21,18 @@ repositories {
 
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web")
+	implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.liquibase:liquibase-core")
+	implementation(platform("com.oracle.oci.sdk:oci-java-sdk-bom:3.77.2"))
+	implementation("com.oracle.oci.sdk:oci-java-sdk-objectstorage")
     implementation(platform("software.amazon.awssdk:bom:2.35.11"))
     implementation("software.amazon.awssdk:s3")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
+	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 	//developmentOnly("org.springframework.boot:spring-boot-docker-compose")
 	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
