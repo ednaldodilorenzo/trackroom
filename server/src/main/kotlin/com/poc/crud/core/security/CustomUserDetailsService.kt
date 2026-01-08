@@ -17,7 +17,7 @@ class CustomUserDetailsService(
         val user = userRepository.findById(username?.toLong() ?: 0L).orElse(null)
         return user?.let {
             User.builder()
-                .username(it.email)
+                .username(it.email.toString())
                 .password(it.password) // not used in JWT, but required by interface
                 .authorities(it.id.toString())
                 .build()

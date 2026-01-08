@@ -2,8 +2,8 @@ package com.poc.crud.modules.music.service
 
 import com.poc.crud.core.exception.APIException
 import com.poc.crud.core.exception.ExceptionType
-import com.poc.crud.filestorage.CipherFileStorage
-import com.poc.crud.filestorage.MusicFileStorage
+import com.poc.crud.infrastructure.filestorage.CipherFileStorage
+import com.poc.crud.infrastructure.filestorage.MusicFileStorage
 import com.poc.crud.model.Music
 import com.poc.crud.model.MusicUploadStatus
 import com.poc.crud.modules.music.dto.MusicCipherResponseDTO

@@ -3,7 +3,8 @@ import { Main, FallbackOverlay } from "@/components";
 import { createBrowserRouter } from "react-router-dom";
 import { GroupProvider } from "@/modules/group/GroupContext";
 
-const Login = lazy(() => import("@/modules/auth/Login"));
+const Login = lazy(() => import("@/modules/auth/login/Login"));
+const Signup = lazy(() => import("@/modules/auth/signup/Signup"));
 const Home = lazy(() => import("@/modules/home/Home"));
 const GroupAdd = lazy(() => import("@/modules/group/GroupAdd"));
 const GroupData = lazy(() => import("@/modules/group/GroupData"));
@@ -19,9 +20,17 @@ export const router = createBrowserRouter(
       path: "/login",
       element: <Login />,
       action: async (args) => {
-        const mod = await import("@/modules/auth/Login");
+        const mod = await import("@/modules/auth/login/Login");
         return mod.action(args);
       },
+    },
+    {
+      path: "/signup",
+      element: <Signup />,
+      action: async (args) => {
+        const mod = await import("@/modules/auth/signup/Signup");
+        return mod.action(args);
+      }
     },
     {
       path: "/home",

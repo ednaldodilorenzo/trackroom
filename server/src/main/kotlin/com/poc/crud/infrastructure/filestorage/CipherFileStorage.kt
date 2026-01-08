@@ -1,4 +1,4 @@
-package com.poc.crud.filestorage
+package com.poc.crud.infrastructure.filestorage
 
 import com.poc.crud.core.storage.FileStorage
 import org.springframework.stereotype.Component

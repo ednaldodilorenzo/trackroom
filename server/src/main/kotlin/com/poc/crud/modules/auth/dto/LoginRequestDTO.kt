@@ -1,3 +1,5 @@
 package com.poc.crud.modules.auth.dto
 
-data class LoginRequestDTO(val email: String, val senha: String)
+import com.poc.crud.core.type.Email
+
+data class LoginRequestDTO(val email: Email, val senha: String)

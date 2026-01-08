@@ -13,6 +13,16 @@ export type LoginResponse = {
   token: string;
 };
 
+export type SignupRequest = {
+  name: string;
+  cpf: string;
+  username: string;
+  phoneNumber: string;
+  email: string;
+  password: string;
+  confirmPassword: string;
+};
+
 class AuthService extends Requester {
   constructor(instance: AxiosInstance) {
     super(instance, "/auth/v1/login");
@@ -43,6 +53,40 @@ class AuthService extends Requester {
         console.error("Logout failed:", err);
         return false;
       });
+
+  signup = (data: SignupRequest) =>
+    this.post<void, SignupRequest>(data, {}, "/auth/v1/signup")
+      .then(() => {
+        return true;
+      })
+      .catch((err) => {
+        console.error("Signup failed:", err);
+        return false;
+      })
+
+  emailAvailable = (email: string) =>
+    this.get<boolean>("", {}, `/auth/v1/availability/email/${encodeURIComponent(email)}`)
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Email availability check failed:", err);
+        return false;
+      })
+
+  usernameAvailable = (username: string) =>
+    this.get<boolean>("", {}, `/auth/v1/availability/username/${encodeURIComponent(username)}`)
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("Username availability check failed:", err);
+        return false;
+      })
+
+  cpfAvailable = (cpf: string) =>
+    this.get<boolean>("", {}, `/auth/v1/availability/cpf/${encodeURIComponent(cpf)}`)
+      .then((res) => res.data)
+      .catch((err) => {
+        console.error("CPF availability check failed:", err);
+        return false;
+      })
 }
 
 export const authService = new AuthService(request);

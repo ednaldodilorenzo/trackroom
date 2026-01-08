@@ -63,3 +63,7 @@ databaseChangeLog:
             columnNames: cpf
             constraintName: user_cpf_unique
             tableName: users
+        - addUniqueConstraint:
+            columnNames: username
+            constraintName: user_username_unique
+            tableName: users

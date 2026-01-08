@@ -16,7 +16,7 @@ type TextFieldProps<TFieldValues extends FieldValues = FieldValues> = {
   control?: Control<TFieldValues>;
   type?: InputHTMLAttributes<HTMLInputElement>["type"];
   rules?: RegisterOptions<TFieldValues, Path<TFieldValues>>;
-  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  onChange?: (e: ChangeEvent<HTMLInputElement>) => void;
   startIcon?: ReactNode;
   endIcon?: ReactNode;
 } & Omit<
