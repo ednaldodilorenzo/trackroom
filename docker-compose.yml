@@ -24,7 +24,6 @@ services:
   app:
     build:
       context: ./server
-      target: development
     expose:
       - "8080"
     environment:
@@ -38,11 +37,6 @@ services:
       SPRING_DATASOURCE_URL: ${DB_URL}
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
-    volumes:
-      - ./server/src/main:/app/src/main
-    depends_on:
-      db:
-        condition: service_healthy
 
   web:
     build:
@@ -51,7 +45,7 @@ services:
     ports:
       - "80:80" # Usado apenas em produção, pois em testes automatizados utilizado na rede interna.
     depends_on:
-      - app  
+      - app
 
   minio:
     image: minio/minio:latest
@@ -62,7 +56,7 @@ services:
       S3_ENDPOINT: http://localhost:9000
     volumes:
       - minio_data:/data
-    expose:    
+    expose:
       - "9001"
       - "9000"
     restart: always

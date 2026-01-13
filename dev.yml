@@ -1,10 +1,19 @@
 services:
   app:
+    build:
+      dockerfile: Dockerfile-dev
     ports:
       - "8080:8080"
       - "5005:5005"
+    volumes:
+      - ./server/src/main:/app/src/main
+    depends_on:
+      db:
+        condition: service_healthy
 
   web:
+    build:
+      dockerfile: Dockerfile-dev
     volumes:
       - ./web:/app
       - /app/node_modules

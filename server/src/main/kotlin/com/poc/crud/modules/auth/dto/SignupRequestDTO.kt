@@ -1,5 +1,6 @@
 package com.poc.crud.modules.auth.dto
 
+import com.poc.crud.core.type.CPF
 import com.poc.crud.core.validation.ConfirmPassword
 import com.poc.crud.core.validation.ConfirmPasswordInterface
 import com.poc.crud.core.type.Email
@@ -12,7 +13,7 @@ data class SignupRequestDTO(
     @NotBlank(message = "Email is required")
     val email: Email,
     @NotBlank(message = "CPF is required")
-    val cpf: String,
+    val cpf: CPF,
     @NotBlank(message = "Username is required")
     val username: String,
     @NotBlank(message = "Password is required")

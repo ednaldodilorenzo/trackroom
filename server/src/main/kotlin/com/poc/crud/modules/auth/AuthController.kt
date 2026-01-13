@@ -1,5 +1,6 @@
 package com.poc.crud.modules.auth
 
+import com.poc.crud.core.type.CPF
 import com.poc.crud.core.type.Email
 import com.poc.crud.modules.auth.dto.LoginRequestDTO
 import com.poc.crud.modules.auth.dto.LoginResponseDTO
@@ -57,7 +58,7 @@ class AuthController(private val authService: AuthService, private val userServi
     }
 
     @GetMapping("/availability/cpf/{cpf}")
-    fun availabilityCpf(@PathVariable cpf: String): ResponseEntity<Boolean> {
+    fun availabilityCpf(@PathVariable cpf: CPF): ResponseEntity<Boolean> {
         return ResponseEntity.ok(userService.findCPFAvailability(cpf))
     }
 

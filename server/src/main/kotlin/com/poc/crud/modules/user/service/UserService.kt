@@ -1,5 +1,6 @@
 package com.poc.crud.modules.user.service
 
+import com.poc.crud.core.type.CPF
 import com.poc.crud.core.type.Email
 import com.poc.crud.modules.user.dto.UserIdNameUsernameDTO
 
@@ -11,7 +12,7 @@ interface UserService {
 
     fun findEmailAvailability(email: Email): Boolean
 
-    fun findCPFAvailability(cpf: String): Boolean
+    fun findCPFAvailability(cpf: CPF): Boolean
 
     fun findUsernameAvailability(username: String): Boolean
 }

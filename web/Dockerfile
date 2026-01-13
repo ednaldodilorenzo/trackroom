@@ -1,20 +1,3 @@
-FROM node:25.0-slim AS development
-
-WORKDIR /app
-
-# dependências básicas
-RUN apt-get update && apt-get install -y \
-    curl \
-    ca-certificates \
-    git \
-    && rm -rf /var/lib/apt/lists/*
-
-COPY package*.json ./
-RUN npm ci --legacy-peer-deps
-
-CMD ["npx", "vite", "--host", "0.0.0.0"]
-
-
 FROM node:25-alpine3.22 AS build-env
 
 WORKDIR /app

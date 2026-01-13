@@ -1,7 +1,5 @@
 package com.poc.crud.core.type
 
-import jakarta.persistence.Embeddable
-
 // Define the regex for basic email validation
 private val EMAIL_REGEX = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,4}\$".toRegex()
 

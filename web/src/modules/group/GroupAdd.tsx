@@ -5,10 +5,13 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import {
   useNavigate,
+  useNavigation,
   redirect,
   useSubmit,
   type ActionFunctionArgs,
 } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useLoading } from "@/hooks/useLoading";
 
 const schema = yup.object({
   name: yup.string().required("Nome obrigatório"),
@@ -21,6 +24,12 @@ export default function GroupAdd() {
   });
   const submit = useSubmit();
   const navigate = useNavigate();
+
+  const { show, hide } = useLoading();
+
+  const navigation = useNavigation();
+
+  navigation.state === "submitting" ? show() : hide();
 
   return (
     <RegisterForm
@@ -43,6 +52,7 @@ export async function action({ request }: ActionFunctionArgs) {
   };
   try {
     await groupService.post(payload);
+    toast.success("Grupo cadastrado com sucesso!");
   } catch (err: any) {
     if (err.status === 401) {
       return err;

@@ -1,17 +1,3 @@
-FROM eclipse-temurin:21 AS development
-
-WORKDIR /app
-
-COPY . /app
-
-EXPOSE 8080
-
-# Fetch project dependencies
-RUN chmod +x start.sh && ./gradlew getDependencies
-
-# script which watches source file changes in background and executes bootRun
-CMD ["sh", "start.sh"]
-
 # ==============================
 # 🏗️ 1st Stage: Build the JAR
 # ==============================
@@ -40,9 +26,6 @@ EXPOSE 8080 5005
 # JVM options: enable debug & optimize for containers
 ENV JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 \
                -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
-
-# Enable Spring DevTools remote restart
-ENV SPRING_DEVTOOLS_RESTART_ENABLED=true
 
 RUN ls -al
 

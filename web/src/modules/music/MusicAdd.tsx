@@ -8,9 +8,12 @@ import {
   redirect,
   useSubmit,
   useNavigate,
+  useNavigation,
   type ActionFunctionArgs,
 } from "react-router-dom";
 import * as yup from "yup";
+import toast from "react-hot-toast";
+import { useLoading } from "@/hooks/useLoading";
 
 const schema = yup
   .object({
@@ -29,6 +32,12 @@ export default function MusicAdd() {
   const submit = useSubmit();
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const { show, hide } = useLoading();
+
+  const navigation = useNavigation();
+
+  navigation.state === "submitting" ? show() : hide();
 
   return (
     <>
@@ -72,15 +81,12 @@ export async function action({ request, params }: ActionFunctionArgs) {
     const musicResp = await musicService.save(payload);
     await musicService.uploadFile(musicResp.uploadUrl, fileEntry);
     await musicService.confirmFileUpload(musicResp.id);
+    toast.success("Música cadastrada com sucesso!");
   } catch (err: any) {
     if (err.status === 401) {
       return err;
     }
   }
-
-  const multipart = new FormData();
-  multipart.append("music", JSON.stringify(payload));
-  multipart.append("file", fileEntry);
 
   return redirect(`/home/groups/${id}/musics`);
 }

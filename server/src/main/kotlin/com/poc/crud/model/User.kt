@@ -1,6 +1,7 @@
 package com.poc.crud.model
 
 
+import com.poc.crud.core.type.CPF
 import com.poc.crud.core.type.Email
 import jakarta.persistence.*
 
@@ -13,7 +14,7 @@ data class User(
     val id: Long? = null,
     val name: String,
     val email: Email,
-    val cpf: String,
+    val cpf: CPF,
     var active: Boolean,
     val phoneNumber: String,
     val password: String,

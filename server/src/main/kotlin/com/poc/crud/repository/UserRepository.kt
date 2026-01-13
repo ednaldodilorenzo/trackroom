@@ -1,5 +1,6 @@
 package com.poc.crud.repository
 
+import com.poc.crud.core.type.CPF
 import com.poc.crud.core.type.Email
 import com.poc.crud.model.User
 import org.springframework.data.jpa.repository.JpaRepository
@@ -12,7 +13,7 @@ interface UserRepository : JpaRepository<User, Long> {
 
     fun findByEmail(email: Email): User?
 
-    fun findByCpf(cpf: String): User?
+    fun findByCpf(cpf: CPF): User?
 
     fun findByUsername(username: String): User?
 
