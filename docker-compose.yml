@@ -41,7 +41,6 @@ services:
   web:
     build:
       context: ./web
-      target: ${BUILD_TARGET:-development}
     ports:
       - "80:80" # Usado apenas em produção, pois em testes automatizados utilizado na rede interna.
     depends_on:

@@ -13,7 +13,6 @@ export default function TrackItem({
   id,
   name,
   description,
-  file,
   active,
   cipherLink,
   onClick,

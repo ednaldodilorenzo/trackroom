@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import "./Header.css";
-import { BsArrowLeftSquare, BsThreeDotsVertical } from "react-icons/bs";
+import { BsArrowLeftSquare } from "react-icons/bs";
 import SuspendedMenu, {
   type SuspendedMenuProps,
 } from "../suspendedmenu/SuspendedMenu";

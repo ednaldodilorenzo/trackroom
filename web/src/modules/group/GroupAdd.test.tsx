@@ -1,8 +1,8 @@
-import { render, screen, fireEvent } from "@testing-library/react";
+import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { vi, describe, it, expect } from "vitest";
 import { MemoryRouter } from "react-router-dom";
-import GroupAdd, { action } from "./GroupAdd";
+import GroupAdd from "./GroupAdd";
 
 // --- mocks ---
 const navigateMock = vi.fn();

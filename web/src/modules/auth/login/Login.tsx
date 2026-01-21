@@ -91,9 +91,8 @@ export async function loginLoader() {
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const email = formData.get("email")?.toString() ?? "";
-  const password = formData.get("password")?.toString() ?? "";
-  const result = await authService.login(email, password);
+  const payload = Object.fromEntries(formData.entries());
+  const result = await authService.login(payload.email.toString(), payload.password.toString());
 
   if (result) {
     const url = new URL(request.url);

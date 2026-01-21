@@ -1,5 +1,4 @@
 import { useCipher } from "@/hooks/useCipher";
-import TransposeControls from "@/components/cipher/TransposeControls";
 import {
   Await,
   useLoaderData,

@@ -3,7 +3,7 @@ import type { Group } from "@/model";
 import "./TrackCard.css";
 import { BsFillPeopleFill } from "react-icons/bs";
 
-export default function TrackCard({ name, description, cover, id }: Group) {
+export default function TrackCard({ name, description, id }: Group) {
   return (
     <Link to={`/home/groups/${id}/musics`}>
       <div className="track-card">
