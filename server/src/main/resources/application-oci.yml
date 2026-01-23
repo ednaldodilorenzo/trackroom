@@ -2,12 +2,18 @@ spring:
   application:
     name: trackroom
   datasource:
-    url: jdbc:postgresql://db:5432/mydatabase
-    username: myuser
-    password: secret
     driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: true
+  liquibase:
+    enabled: true
+  mail:
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
 
 logging:
   level:
@@ -34,7 +40,5 @@ jwt:
   accessTokenExpiration: 3600
 
 filestorage:
-  accesskey: minioadmin
-  secretkey: minioadmin
-  endpoint: http://minio:9000
-  region: us-east-1
+  endpoint: https://objectstorage.sa-saopaulo-1.oraclecloud.com
+

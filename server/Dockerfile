@@ -20,9 +20,6 @@ WORKDIR /app
 # Copy the built JAR
 COPY --from=builder /app/build/libs/*.jar app.jar
 
-# Expose both app and debug ports
-EXPOSE 8080 5005
-
 # JVM options: enable debug & optimize for containers
 ENV JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 \
                -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
