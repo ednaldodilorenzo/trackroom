@@ -40,8 +40,8 @@ jobs:
 
     - name: Execute Docker Compose Down
       run: |
-        DOCKER_HOST=${{ secrets.ENVIRONMENT_HOST }} docker compose down --rmi all
+        DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose down --rmi all
 
     - name: Execute Docker Compose Up
       run: |
-        DOCKER_HOST=${{ secrets.ENVIRONMENT_HOST }} docker compose up --build -d
+        DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose up --build -d
