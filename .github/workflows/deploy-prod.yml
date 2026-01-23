@@ -1,0 +1,47 @@
+name: Run Docker Compose Commands
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  execute-docker-compose:
+    runs-on: ubuntu-latest
+    environment: production
+    env:
+      APP_PROFILES_ACTIVE: ${{ secrets.APP_PROFILES_ACTIVE }}
+      CACHE_HOST: ${{ secrets.CACHE_HOST }}
+      CACHE_PORT: ${{ secrets.CACHE_PORT }}
+      MAIL_HOST: ${{ secrets.MAIL_HOST }}
+      MAIL_PORT: ${{ secrets.MAIL_PORT }}
+      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+      DB_URL: ${{ secrets.DB_URL }}
+      DB_USERNAME: ${{ secrets.DB_USERNAME }}
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}     
+
+    steps:
+    - name: Checkout Code
+      uses: actions/checkout@v3
+      
+    - name: Install Docker Compose
+      run: |
+        sudo apt-get update
+        sudo apt install python3-paramiko
+        sudo apt-get install -y docker-compose-V2
+      
+    - name: Set up SSH Key
+      run: |
+        mkdir -p ~/.ssh
+        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+        chmod 600 ~/.ssh/id_rsa
+        ssh-keyscan -H ${{ secrets.ENVIRONMENT_HOST }} >> ~/.ssh/known_hosts
+
+    - name: Execute Docker Compose Down
+      run: |
+        DOCKER_HOST=${{ secrets.ENVIRONMENT_HOST }} docker compose down --rmi all
+
+    - name: Execute Docker Compose Up
+      run: |
+        DOCKER_HOST=${{ secrets.ENVIRONMENT_HOST }} docker compose up --build -d

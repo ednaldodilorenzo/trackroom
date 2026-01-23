@@ -35,8 +35,6 @@ export const router = createBrowserRouter(
     {
       path: "/home",
       element: <Main />,
-      //errorElement: <Error />,
-      //loader: requireAuthLoader,
       children: [
         {
           index: true,

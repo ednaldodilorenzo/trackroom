@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
 	kotlin("jvm") version "2.2.21"
 	kotlin("plugin.spring") version "2.2.21"
@@ -88,4 +90,8 @@ tasks.register<Copy>("getDependencies") {
 	doLast {
 		File("runtime").deleteRecursively()
 	}
+}
+val compileKotlin: KotlinCompile by tasks
+compileKotlin.compilerOptions {
+	freeCompilerArgs.set(listOf("-Xannotation-default-target=param-property=param-property"))
 }
