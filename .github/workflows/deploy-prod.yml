@@ -3,7 +3,7 @@ name: Run Docker Compose Commands
 on:
   push:
     branches:
-      - main
+      - master
 
 jobs:
   execute-docker-compose:
