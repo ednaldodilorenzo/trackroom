@@ -29,7 +29,7 @@ jobs:
       run: |
         sudo apt-get update
         sudo apt install python3-paramiko
-        sudo apt-get install -y docker-compose-V2
+        sudo apt-get install -y docker-compose
       
     - name: Set up SSH Key
       run: |
