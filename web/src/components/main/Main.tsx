@@ -15,7 +15,7 @@ export default function Main() {
   });
 
   //const { user } = store.getState().auth || {};
-  const { user } = useSelector((state: any) => state.auth);
+  const { user } = useSelector((state: any) => state.auth);  
 
   // const logout = () => {
   //   authService.logout().then(() => {

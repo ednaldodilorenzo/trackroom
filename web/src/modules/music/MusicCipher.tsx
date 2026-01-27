@@ -64,7 +64,7 @@ export default function MusicCipher() {
               </button>
               <button
                 className="text-on-surface hover:text-primary transition"
-                onClick={() => navigate(`/home/groups/${id}/musics`)}
+                onClick={() => navigate(`/groups/${id}/musics`)}
               >
                 ✕
               </button>

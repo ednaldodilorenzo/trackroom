@@ -71,6 +71,6 @@ describe("<Home />", () => {
     const button = screen.getByRole("button", { name: "+ Novo Grupo" });
     button.click();
 
-    expect(navigateMock).toHaveBeenCalledWith("/home/groups/add");
+    expect(navigateMock).toHaveBeenCalledWith("/groups/add");
   });
 });

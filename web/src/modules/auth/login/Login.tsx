@@ -96,7 +96,7 @@ export async function action({ request }: ActionFunctionArgs) {
 
   if (result) {
     const url = new URL(request.url);
-    const from = url.searchParams.get("from") || "/home";
+    const from = url.searchParams.get("from") || "/";
     return redirect(from); // go back where the user tried to go
   }
 

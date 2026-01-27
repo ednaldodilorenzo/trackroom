@@ -17,7 +17,7 @@ const GroupAddMember = lazy(() => import("@/modules/group/GroupAddMember"));
 export const router = createBrowserRouter(
   [
     {
-      path: "/login",
+      path: "/login",      
       element: <Login />,
       action: async (args) => {
         const mod = await import("@/modules/auth/login/Login");
@@ -33,7 +33,7 @@ export const router = createBrowserRouter(
       }
     },
     {
-      path: "/home",
+      path: "/",
       element: <Main />,
       children: [
         {

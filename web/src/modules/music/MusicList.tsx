@@ -59,7 +59,7 @@ export default function MusicList() {
                       <TrackItem
                         active={currentTrack.id === item.id}
                         onClick={() => handlePlay(item)}
-                        cipherLink={`/home/groups/${id}/musics/${item.id}/cipher`}
+                        cipherLink={`/groups/${id}/musics/${item.id}/cipher`}
                         {...item}
                       />
                     </div>
@@ -77,7 +77,7 @@ export default function MusicList() {
       {currentGroup.isAdmin && (
         <Button
           className="suspended-button"
-          onClick={() => navigate(`/home/groups/${id}/musics/add`)}
+          onClick={() => navigate(`/groups/${id}/musics/add`)}
         >
           + Nova Música
         </Button>

@@ -56,16 +56,9 @@ export default function Home() {
         </Await>
       </Suspense>
 
-      <h2 className="section-title">All Tracks</h2>
-      <div className="track-list">
-        {allTracks.map((track, idx) => (
-          <TrackItem active={false} onClick={() => null} key={idx} {...track} />
-        ))}
-      </div>
-
       <Button
         className="suspended-button"
-        onClick={() => navigate("/home/groups/add")}
+        onClick={() => navigate("/groups/add")}
       >
         + Novo Grupo
       </Button>

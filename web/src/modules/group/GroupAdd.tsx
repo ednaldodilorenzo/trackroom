@@ -34,7 +34,7 @@ export default function GroupAdd() {
   return (
     <RegisterForm
       title="Novo Grupo"
-      cancelHandler={() => navigate("/home")}
+      cancelHandler={() => navigate("/")}
       formSubmit={handleSubmit((data) => submit(data, { method: "post" }))}
     >
       <TextField data-testid="field-name" name="name" label="Nome" control={control} />
@@ -59,5 +59,5 @@ export async function action({ request }: ActionFunctionArgs) {
     }
   }
 
-  return redirect("/home");
+  return redirect("/");
 }

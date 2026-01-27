@@ -35,7 +35,7 @@ export default function GroupMembers() {
       </ul>
       {currentGroup.isAdmin && (
         <Button
-          onClick={() => navigate(`/home/groups/${currentGroup.id}/members/add`)}
+          onClick={() => navigate(`/groups/${currentGroup.id}/members/add`)}
           className="suspended-button"
         >
           + Novo Membro

@@ -49,7 +49,7 @@ export default function MusicAdd() {
           const formData = new FormData(form);
           submit(formData, { method: "post", encType: "multipart/form-data" });
         })}
-        cancelHandler={() => navigate(`/home/groups/${id}/musics`)}
+        cancelHandler={() => navigate(`/groups/${id}/musics`)}
       >
         <TextField label="Nome" name="name" control={control} />
         <TextField label="Álbum" name="description" control={control} />
@@ -88,5 +88,5 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
   }
 
-  return redirect(`/home/groups/${id}/musics`);
+  return redirect(`/groups/${id}/musics`);
 }

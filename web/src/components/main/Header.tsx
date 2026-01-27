@@ -22,7 +22,7 @@ export default function Header({
     <header className="header flex justify-between align-center p-2">
       <div className="flex items-center">
         {enableBackButton ? (
-          <Link className="mr-2" to={backButtonLink || "/home"}>
+          <Link className="mr-2" to={backButtonLink || "/"}>
             <BsArrowLeftSquare size="1.7em" />
           </Link>
         ) : (

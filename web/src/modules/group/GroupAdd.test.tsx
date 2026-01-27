@@ -88,6 +88,6 @@ describe("<GroupAdd />", () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "Cancelar" }));
 
-    expect(navigateMock).toHaveBeenCalledWith("/home");
+    expect(navigateMock).toHaveBeenCalledWith("/");
   });
 });
