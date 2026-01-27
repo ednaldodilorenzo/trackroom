@@ -16,63 +16,42 @@ export default defineConfig({
     strategies: "generateSW",
     includeAssets: ["favicon.ico", "apple-touch-icon.png", "masked-icon.svg", "offline.html"],
     manifest: {
-      name: "TranckRoom",
-      short_name: "TranckRoom",
+      name: "TrackRoom",
+      short_name: "TrackRoom",
+      start_url: "/",
+      display: "standalone",
       theme_color: "#ffffff",
       background_color: "#ffffff",
-      display: "standalone",
-      start_url: "/",
       icons: [
         { src: "pwa-192x192.png", sizes: "192x192", type: "image/png" },
         { src: "pwa-512x512.png", sizes: "512x512", type: "image/png" },
-        { src: "pwa-512x512.png", sizes: "512x512", type: "image/png", purpose: "any maskable" },
       ],
     },
 
     workbox: {
-      // React Router / SPA offline navigation
+      // React Router SPA navigation fallback
       navigateFallback: "/index.html",
-
-      // When offline and a navigation can't be fulfilled, show offline page:
       navigateFallbackDenylist: [
-        // Don't apply SPA fallback to APIs and assets
         /^\/api\//,
         /^\/assets\//,
-        /\/[^/?]+\.[^/]+$/, // paths containing a "file.ext"
+        /\/[^/?]+\.[^/]+$/, // has a file extension
       ],
 
-      // Offline fallback for document navigations
-      offlineGoogleAnalytics: false,
       runtimeCaching: [
-        // 1) HTML/doc navigations (app shell)
+        // Cache API responses (adjust /api/ to match your app)
         {
-          urlPattern: ({ request }) => request.mode === "navigate",
-          handler: "NetworkFirst",
+          urlPattern: /^\/api\/.*$/i,
+          handler: "StaleWhileRevalidate",
           options: {
-            cacheName: "pages",
-            networkTimeoutSeconds: 3,
-            expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 7 },
-            // If both network and cache miss, serve offline.html
-            fallbackURL: "/offline.html",
-          } as any,
-        },
-
-        // 2) Static assets (JS/CSS/worker) – Cache-first
-        {
-          urlPattern: ({ request }) =>
-            request.destination === "script" ||
-            request.destination === "style" ||
-            request.destination === "worker",
-          handler: "CacheFirst",
-          options: {
-            cacheName: "assets",
-            expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 },
+            cacheName: "api",
+            cacheableResponse: { statuses: [0, 200] },
+            expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 7 },
           },
         },
 
-        // 3) Images – Cache-first
+        // Images
         {
-          urlPattern: ({ request }) => request.destination === "image",
+          urlPattern: /\.(png|jpg|jpeg|svg|gif|webp)$/i,
           handler: "CacheFirst",
           options: {
             cacheName: "images",
@@ -80,25 +59,13 @@ export default defineConfig({
           },
         },
 
-        // 4) Fonts – Cache-first
+        // Fonts
         {
-          urlPattern: ({ request }) => request.destination === "font",
+          urlPattern: /\.(woff2?|ttf|otf)$/i,
           handler: "CacheFirst",
           options: {
             cacheName: "fonts",
             expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 365 },
-          },
-        },
-
-        // 5) API calls – Stale-While-Revalidate (fast + works offline with cached data)
-        // Change /api/ to match your backend path, or use a domain check.
-        {
-          urlPattern: ({ url }) => url.pathname.startsWith("/api/"),
-          handler: "StaleWhileRevalidate",
-          options: {
-            cacheName: "api",
-            expiration: { maxEntries: 200, maxAgeSeconds: 60 * 60 * 24 * 7 },
-            cacheableResponse: { statuses: [0, 200] },
           },
         },
       ],
