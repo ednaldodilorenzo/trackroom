@@ -19,5 +19,5 @@ RUN npm run build
 FROM nginx:alpine AS release
 
 COPY --from=build-env /app/dist/ /usr/share/nginx/html/
-#COPY ./bioaccess.crt ./bioaccess.key /etc/nginx/ssl/
+COPY ./trackroom.crt ./trackroom.key /etc/nginx/ssl/
 COPY ./nginx.conf /etc/nginx/conf.d/default.conf
