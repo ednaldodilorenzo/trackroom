@@ -31,7 +31,7 @@ services:
     build:
       context: ./web
     ports:
-      - "80:80" # Usado apenas em produção, pois em testes automatizados utilizado na rede interna.
+      - "443:443" # Usado apenas em produção, pois em testes automatizados utilizado na rede interna.
     depends_on:
       - app  
 
