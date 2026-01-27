@@ -1,6 +1,6 @@
 import { Suspense, useEffect } from "react";
-import { TrackCard, TrackItem, Button, FallbackOverlay } from "@/components";
-import type { Group, Music } from "@/model";
+import { TrackCard, /*TrackItem,*/ Button, FallbackOverlay } from "@/components";
+import type { Group } from "@/model";
 import "./Home.css";
 import {
   useNavigate,
@@ -12,14 +12,14 @@ import homeService from "./home.service";
 import type { HeaderConfig } from "@/components/main/Header";
 
 export default function Home() {
-  const allTracks: Music[] = [
-    {
-      name: "02 - What's My Name (Feat. Drake)",
-      description: "Rihanna",
-      file: "Loud [2010]",
-      groupId: 1,
-    },
-  ];
+  // const allTracks: Music[] = [
+  //   {
+  //     name: "02 - What's My Name (Feat. Drake)",
+  //     description: "Rihanna",
+  //     file: "Loud [2010]",
+  //     groupId: 1,
+  //   },
+  // ];
 
   const navigate = useNavigate();
 
