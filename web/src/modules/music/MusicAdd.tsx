@@ -53,8 +53,8 @@ export default function MusicAdd() {
       >
         <TextField label="Nome" name="name" control={control} />
         <TextField label="Álbum" name="description" control={control} />
-        <label>Arquivo</label>
-        <input name="file" accept="audio/*" type="file" />
+        <label htmlFor="file-music">Arquivo</label>
+        <input id="file-music" name="file" accept="audio/*" type="file" />
       </RegisterForm>
     </>
   );
