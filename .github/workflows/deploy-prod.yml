@@ -22,7 +22,7 @@ jobs:
         run: npm ci # Use 'npm ci' for clean and fast installs in CI environments
 
       - name: Execute Vitest tests
-        run: npm test # Runs the 'test' script in package.json
+        run: npm run test # Runs the 'test' script in package.json
         
   execute-docker-compose:
     runs-on: ubuntu-latest
