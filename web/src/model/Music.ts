@@ -11,6 +11,7 @@ interface MusicMetaData {
   description: string;
   cipherUrl: string;
   uploadUrl: string;
+  cipher?: string;
 }
 
 export type { Music, MusicMetaData };

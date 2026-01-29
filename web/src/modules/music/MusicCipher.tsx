@@ -9,7 +9,7 @@ import {
   type LoaderFunctionArgs,
 } from "react-router-dom";
 import { BsCheckLg, BsFillPencilFill } from "react-icons/bs";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { musicService } from "./music.service";
 import { FallbackOverlay } from "@/components";
 import type { MusicMetaData } from "@/model";
@@ -22,22 +22,7 @@ export default function MusicCipher() {
 
   const { musicMetaData } = useLoaderData<{ musicMetaData: MusicMetaData }>();
 
-  ("D Uma vela se acende Em Pra acesa ficar\n A7 Iluminando a  D escuridão");
   const { transposedCipher, up, down, reset, setPrincipal } = useCipher("");
-
-  useEffect(() => {
-    async function loadCipher() {
-      try {
-        const data = await musicMetaData;
-        const response = await musicService.getMusicCipher(data.cipherUrl);
-        setPrincipal(response); // ⬅️ Load into hook
-      } catch (err) {
-        console.error("Failed to load cipher:", err);
-      }
-    }
-
-    loadCipher();
-  }, [musicMetaData, setPrincipal]);
 
   const submit = useSubmit();
 
@@ -69,7 +54,6 @@ export default function MusicCipher() {
                 ✕
               </button>
             </div>
-
             {!toggleEditMode && (
               <CipherContent
                 loadedMeta={loadedMeta}
@@ -102,7 +86,12 @@ export const cipherLoader = ({
 }: LoaderFunctionArgs): { musicMetaData: Promise<MusicMetaData> } => {
   const id = params.musicId;
   return {
-    musicMetaData: musicService.getMusicMetaData(Number(id!)),
+    musicMetaData: musicService.getMusicMetaData(Number(id!)).then(data =>
+      musicService.getMusicCipher(data.cipherUrl).then((cipher) => {
+        data.cipher = cipher;
+        return data;
+      })
+    ),
   };
 };
 

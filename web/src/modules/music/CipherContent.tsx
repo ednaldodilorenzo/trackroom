@@ -1,7 +1,5 @@
 import TransposeControls from "@/components/cipher/TransposeControls";
 import type { MusicMetaData } from "@/model";
-import { useEffect } from "react";
-import { musicService } from "./music.service";
 
 type CipherContentProps = {
   loadedMeta: MusicMetaData;
@@ -13,7 +11,9 @@ type CipherContentProps = {
 };
 
 const CHORD_REGEX =
-  /(?:\[([A-G][#b]?m?(?:maj7|m7|7|sus4|sus2|dim|aug|°|º|add9|6|9|11|13|M7|7M)?(?:\/[A-G][#b]?)?(?:\([^)]+\))?)\])/g;
+  /(?<!\[)([A-G][#b]?m?(?:maj7|m7|7|sus4|sus2|dim|aug|°|º|add9|6|9|11|13|M7|7M)?(?:\/[A-G][#b]?)?(?:\([^)]+\))?)(?!\])/g;
+
+const INSIDE_BRACKETS_REGEX = /\[[^\]]*\]/g;
 
 export default function CipherContent({
   loadedMeta,
@@ -23,27 +23,13 @@ export default function CipherContent({
   down,
   reset,
 }: CipherContentProps) {
-  useEffect(() => {
-    if (!loadedMeta?.cipherUrl) return;
-
-    async function loadCipher() {
-      try {
-        const response = await musicService.getMusicCipher(
-          loadedMeta.cipherUrl
-        );
-        //const text = await response.text();
-        setPrincipal(response);
-      } catch (err) {
-        console.error("Failed to load cipher:", err);
-      }
-    }
-
-    loadCipher();
-  }, [loadedMeta, setPrincipal]);
+  setPrincipal(loadedMeta.cipher || "");
 
   function parseCifraToHTML(cifra: string): string {
     return cifra.replace(/\n/g, "<br/>").replace(CHORD_REGEX, (_, chord) => {
       return `<span class="text-primary font-bold">${chord}</span>`;
+    }).replace(INSIDE_BRACKETS_REGEX, (match) => {
+      return match.slice(1, -1);
     });
   }
 

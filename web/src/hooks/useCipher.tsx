@@ -9,7 +9,7 @@ import { useState } from "react";
  * Group 2 = the bracket including original brackets
  */
 const CHORD_REGEX =
-  /(?:\[([A-G][#b]?m?(?:maj7|m7|7|sus4|sus2|dim|aug|°|º|add9|6|9|11|13|M7|7M)?(?:\/[A-G][#b]?)?(?:\([^)]+\))?)\])/g;
+  /(?<!\[)([A-G][#b]?m?(?:maj7|m7|7|sus4|sus2|dim|aug|°|º|add9|6|9|11|13|M7|7M)?(?:\/[A-G][#b]?)?(?:\([^)]+\))?)(?!\])/g;
 
 
 function transposeChord(chord: string, steps: number): string {
@@ -20,10 +20,10 @@ function transposeChord(chord: string, steps: number): string {
     if (!note) return part;
 
     const NOTES_SHARP = [
-      "C","C#","D","D#","E","F","F#","G","G#","A","A#","B"
+      "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"
     ];
     const NOTES_FLAT = [
-      "C","Db","D","Eb","E","F","Gb","G","Ab","A","Bb","B"
+      "C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"
     ];
 
     const useFlat = note[0].includes("b");
@@ -41,26 +41,27 @@ function transposeChord(chord: string, steps: number): string {
 
 function transposeCipher(cipher: string, steps: number): string {
   return cipher.replace(CHORD_REGEX, (match, chordInBrackets, chordPlain) => {
-    const chord = chordInBrackets || chordPlain;
+    const chord = chordInBrackets//; || chordPlain;
 
     if (!chord) return match;
 
     const transposed = transposeChord(chord, steps);
 
     // Restore brackets if they existed
-    return chordInBrackets ? `[${transposed}]` : transposed;
+    return transposed;
   });
 }
 
 export function useCipher(original: string) {
   const [steps, setSteps] = useState<number>(0);
+
   const [principal, setPrincipal] = useState<string>(original);
 
   const up = () => setSteps((prev) => prev + 1);
   const down = () => setSteps((prev) => prev - 1);
   const reset = () => setSteps(0);
 
-  const transposedCipher = transposeCipher(principal, steps);
+  const transposedCipher = transposeCipher(principal.toString(), steps);
 
   return { transposedCipher, up, down, reset, setPrincipal, steps };
 }
