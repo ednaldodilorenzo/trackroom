@@ -19,7 +19,7 @@ jobs:
           cache: 'npm' # Caches dependencies
 
       - name: Install dependencies
-        run: npm ci # Use 'npm ci' for clean and fast installs in CI environments
+        run: cd web && npm ci # Use 'npm ci' for clean and fast installs in CI environments
 
       - name: Execute Vitest tests
         run: npm run test # Runs the 'test' script in package.json
