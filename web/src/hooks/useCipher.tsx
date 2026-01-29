@@ -40,7 +40,7 @@ function transposeChord(chord: string, steps: number): string {
 }
 
 function transposeCipher(cipher: string, steps: number): string {
-  return cipher.replace(CHORD_REGEX, (match, chordInBrackets, chordPlain) => {
+  return cipher.replace(CHORD_REGEX, (match, chordInBrackets) => {
     const chord = chordInBrackets//; || chordPlain;
 
     if (!chord) return match;
