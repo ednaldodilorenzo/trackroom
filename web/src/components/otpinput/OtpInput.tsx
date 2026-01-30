@@ -148,7 +148,7 @@ export default function OtpInput({
                         <input
                             key={i}
                             value={d}
-                            ref={(el) => (refs.current[i] = el)}
+                            ref={(el) => { refs.current[i] = el; }}
                             onChange={(e) => handleChange(i, e.target.value)}
                             onKeyDown={(e) => handleKeyDown(i, e)}
                             onPaste={(e) => handlePaste(i, e)}
