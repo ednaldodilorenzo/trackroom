@@ -1,4 +1,5 @@
 import { useCipher } from "@/hooks/useCipher";
+import { BsXLg } from "react-icons/bs";
 import {
   Await,
   useLoaderData,
@@ -42,7 +43,7 @@ export default function MusicCipher() {
         {(loadedMeta) => (
           <div className="fixed inset-0 w-full h-full bg-white z-50 flex flex-col">
             {/* Header */}
-            <div className="bg-surface text-on-surface p-4 flex justify-between items-center shadow-medium border-b border-border">
+            <div className="header bg-surface text-on-surface p-4 flex justify-between items-center shadow-medium border-b border-border">
               <h2 className="text-xl font-bold">{loadedMeta.name}</h2>
               <button onClick={handleSaveCipher}>
                 {toggleEditMode ? <BsCheckLg /> : <BsFillPencilFill />}
@@ -51,7 +52,7 @@ export default function MusicCipher() {
                 className="text-on-surface hover:text-primary transition"
                 onClick={() => navigate(`/groups/${id}/musics`)}
               >
-                ✕
+                <BsXLg title="Close Icon" />
               </button>
             </div>
             {!toggleEditMode && (
@@ -67,8 +68,9 @@ export default function MusicCipher() {
             {toggleEditMode && (
               <>
                 <textarea
+                  name="cipher"
                   onChange={(e) => setPrincipal(e.target.value)}
-                  className="min-h-full p-2"
+                  className="p-2 flex-1 overflow-y-auto bg-white text-on-surface p-4"
                 >
                   {transposedCipher}
                 </textarea>

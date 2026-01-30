@@ -111,7 +111,7 @@ describe("<MusicCipher />", () => {
     render(<MusicCipher />);
 
     const user = userEvent.setup();
-    await user.click(screen.getByRole("button", { name: "✕" }));
+    await user.click(screen.getByRole("button", { name: "Close Icon" }));
 
     expect(navigateMock).toHaveBeenCalledTimes(1);
     expect(navigateMock).toHaveBeenCalledWith("/groups/10/musics");
