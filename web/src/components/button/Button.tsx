@@ -15,11 +15,12 @@ export default function Button({
   type = "button",
   disabled,
   variant,
+  className,
   ...props
 }: ButtonProps) {
   return (
     <button
-      className="md-button"
+      className={["md-button"].concat(variant ? [`md-button--${variant}`] : []).concat(className ?? []).join(" ")}
       type={type}
       onClick={onClick}
       disabled={disabled}

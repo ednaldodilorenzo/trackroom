@@ -2,6 +2,7 @@ import { lazy, Suspense } from "react";
 import { Main, FallbackOverlay } from "@/components";
 import { createBrowserRouter } from "react-router-dom";
 import { GroupProvider } from "@/modules/group/GroupContext";
+import Confirmation from "@/modules/auth/signup/Confirmation";
 
 const Login = lazy(() => import("@/modules/auth/login/Login"));
 const Signup = lazy(() => import("@/modules/auth/signup/Signup"));
@@ -31,6 +32,10 @@ export const router = createBrowserRouter(
         const mod = await import("@/modules/auth/signup/Signup");
         return mod.action(args);
       }
+    },
+    {
+      path: "/confirm/:token",
+      element: <Confirmation />,      
     },
     {
       path: "/",

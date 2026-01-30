@@ -87,6 +87,20 @@ class AuthService extends Requester {
         console.error("CPF availability check failed:", err);
         return false;
       })
+
+  confirmSignup = (code: string, token: string) =>
+    this.post<void, string>(code, {
+      headers: {
+        'Content-Type': 'text/plain'
+      }
+    }, `/auth/v1/confirm/${encodeURIComponent(token)}`)
+      .then(() => {
+        return true;
+      })
+      .catch((err) => {
+        console.error("Signup confirmation failed:", err);
+        return false;
+      })
 }
 
 export const authService = new AuthService(request);

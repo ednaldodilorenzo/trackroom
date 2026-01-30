@@ -7,5 +7,6 @@ import FallbackOverlay from "./fallbackoverlay/FallBackOverlay";
 import Main from "./main/Main";
 import RegisterForm from "./registerform/RegisterForm";
 import AsyncMultiSelect from "./asyncmultiselect/AsyncMultiSelect";
+import OtpInput from "./otpinput/OtpInput";
 
-export { Button, Form, TextField, TrackItem, TrackCard, FallbackOverlay, Main, RegisterForm, AsyncMultiSelect };
+export { Button, Form, TextField, TrackItem, TrackCard, FallbackOverlay, Main, RegisterForm, AsyncMultiSelect, OtpInput };
