@@ -90,6 +90,9 @@ export const cipherLoader = ({
       musicService.getMusicCipher(data.cipherUrl).then((cipher) => {
         data.cipher = cipher;
         return data;
+      }).catch(() => {
+        data.cipher = "";
+        return data;
       })
     ),
   };

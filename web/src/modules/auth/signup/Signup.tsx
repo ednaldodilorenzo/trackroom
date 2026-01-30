@@ -4,9 +4,10 @@ import { validateCPF } from "@/utils/validation";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Form, TextField } from "@/components";
 import { useForm } from "react-hook-form";
-import { Link, redirect, useSubmit, type ActionFunctionArgs } from "react-router-dom";
+import { Link, redirect, useSubmit, useNavigation, type ActionFunctionArgs } from "react-router-dom";
 import { authService, type SignupRequest } from "../authSevice";
 import toast from "react-hot-toast";
+import { useLoading } from "@/hooks/useLoading";
 
 const schema = yup.object({
     name: yup.string().required("Nome obrigatório"),
@@ -41,6 +42,12 @@ export default function Signup() {
         resolver: yupResolver(schema),
         mode: "onBlur",
     });
+
+    const { show, hide } = useLoading();
+
+    const navigation = useNavigation();
+
+    navigation.state === "submitting" ? show() : hide();
 
     const submit = useSubmit();
 
