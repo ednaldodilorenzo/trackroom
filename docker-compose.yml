@@ -24,6 +24,7 @@ services:
       SPRING_DATASOURCE_USERNAME: ${DB_USERNAME}
       SPRING_DATASOURCE_PASSWORD: ${DB_PASSWORD}
       OCI_CONFIG_PATH: /.oci/config
+      APP_FRONT_URL: ${APP_FRONT_URL}
     volumes:
       - /home/ubuntu/.oci:/.oci
 

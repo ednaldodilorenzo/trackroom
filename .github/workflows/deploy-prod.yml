@@ -37,7 +37,8 @@ jobs:
       MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
       DB_URL: ${{ secrets.DB_URL }}
       DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}     
+      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+      APP_FRONT_URL: ${{ secrets.APP_FRONT_URL }}
 
     steps:
     - name: Checkout Code
