@@ -38,12 +38,14 @@ export default function CipherContent({
       <TransposeControls up={up} down={down} reset={reset} />
 
       <div className="flex-1 overflow-y-auto bg-white text-on-surface p-4">
+
         <div
           className="font-mono whitespace-pre-wrap leading-relaxed text-[15px]"
           dangerouslySetInnerHTML={{
-            __html: parseCifraToHTML(transposedCipher),
+            __html: "<pre>" + parseCifraToHTML(transposedCipher) + "</pre>",
           }}
         />
+
       </div>
     </>
   );
