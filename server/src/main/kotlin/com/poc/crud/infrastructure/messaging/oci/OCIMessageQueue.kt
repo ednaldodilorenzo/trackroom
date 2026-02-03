@@ -16,7 +16,7 @@ class OCIMessageQueue(private val queueClient: QueueClient) : MessageQueue {
         val entry = PutMessagesDetailsEntry.builder().content(payload).build()
         val details = PutMessagesDetails.builder().messages(listOf(entry)).build()
         val request = PutMessagesRequest.builder()
-            .queueId("ocid1.queue.oc1.sa-saopaulo-1.amaaaaaawchok4iamlvh4y2dv6bzl23vnokzike6vhynakjgipaikqbzle4q-dlq")
+            .queueId("ocid1.queue.oc1.sa-saopaulo-1.amaaaaaawchok4iamlvh4y2dv6bzl23vnokzike6vhynakjgipaikqbzle4q")
             .putMessagesDetails(details).build()
         queueClient.putMessages(request)
     }
