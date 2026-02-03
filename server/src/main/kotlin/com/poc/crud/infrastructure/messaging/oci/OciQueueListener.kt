@@ -1,8 +1,12 @@
 package com.poc.crud.infrastructure.messaging.oci
 
+import com.fasterxml.jackson.databind.ObjectMapper
 import com.oracle.bmc.queue.QueueClient
 import com.oracle.bmc.queue.requests.DeleteMessageRequest
 import com.oracle.bmc.queue.requests.GetMessagesRequest
+import com.poc.crud.core.queue.Task
+import com.poc.crud.infrastructure.messaging.subscriber.SubscriberProcessor
+import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -10,7 +14,10 @@ import org.springframework.stereotype.Component
 
 @Component
 @Profile("oci")
-class OciQueueListener(private val queueClient: QueueClient) {
+class OciQueueListener(private val queueClient: QueueClient, private val objectMapper: ObjectMapper) {
+
+    @Autowired
+    private lateinit var subscriberProcessor: SubscriberProcessor
 
     @Scheduled(fixedDelay = 5000)
     fun listen() {
@@ -23,7 +30,8 @@ class OciQueueListener(private val queueClient: QueueClient) {
 
         messages.forEach { msg ->
             try {
-                process(msg.content)
+                val queueMessage = objectMapper.readValue(msg.content, Task::class.java)
+                processMessage(queueMessage)
 
                 val deleteRequest = DeleteMessageRequest.builder()
                     .queueId("ocid1.queue.oc1.sa-saopaulo-1.amaaaaaawchok4iamlvh4y2dv6bzl23vnokzike6vhynakjgipaikqbzle4q")
@@ -36,7 +44,8 @@ class OciQueueListener(private val queueClient: QueueClient) {
         }
     }
 
-    private fun process(content: String) {
-        println("Processed: $content")
+    private fun processMessage(task: Task) {
+        subscriberProcessor.process(task)
+        println("Consumed task ID: ${task.type}, Description: ${task.type}")
     }
 }
