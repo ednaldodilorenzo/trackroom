@@ -32,6 +32,7 @@ dependencies {
 	implementation(platform("com.oracle.oci.sdk:oci-java-sdk-bom:3.77.2"))
 	implementation("com.oracle.oci.sdk:oci-java-sdk-objectstorage")
 	implementation("com.oracle.oci.sdk:oci-java-sdk-common-httpclient-jersey3")
+	implementation("com.oracle.oci.sdk:oci-java-sdk-queue")
     implementation(platform("software.amazon.awssdk:bom:2.35.11"))
     implementation("software.amazon.awssdk:s3")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
