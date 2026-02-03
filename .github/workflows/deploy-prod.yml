@@ -24,7 +24,7 @@ jobs:
       - name: Execute Vitest tests
         run: cd web && npm run test # Runs the 'test' script in package.json
   
-  build:
+  backend-tests:
     runs-on: ubuntu-latest
 
     steps:
@@ -44,7 +44,7 @@ jobs:
       run: cd server && chmod +x gradlew
 
     - name: Run Gradle tests
-      run: cd server && ./gradlew test --stacktrac
+      run: cd server && ./gradlew test --stacktrace
   
   deploy-prod:
     runs-on: ubuntu-latest
