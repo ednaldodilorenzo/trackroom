@@ -1,5 +1,6 @@
 package com.poc.crud.config.queue
 
+import com.oracle.bmc.ConfigFileReader
 import com.oracle.bmc.auth.AuthenticationDetailsProvider
 import com.oracle.bmc.auth.ConfigFileAuthenticationDetailsProvider
 import com.oracle.bmc.queue.QueueClient
@@ -25,6 +26,7 @@ class OciQueueConfig {
     @Throws(IOException::class)
     fun authenticationDetailsProvider(): AuthenticationDetailsProvider {
         // Example using a local config file (~/.oci/config)
-        return ConfigFileAuthenticationDetailsProvider("DEFAULT")
+        val configFile = ConfigFileReader.parse("/.oci/config", "DEFAULT")
+        return ConfigFileAuthenticationDetailsProvider(configFile)
     }
 }

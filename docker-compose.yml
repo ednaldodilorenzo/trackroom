@@ -26,7 +26,7 @@ services:
       OCI_CONFIG_PATH: /.oci/config
       APP_FRONT_URL: ${APP_FRONT_URL}
     volumes:
-      - /home/ubuntu/.oci:/.oci
+      - /home/ubuntu/.oci:/.oci:ro
 
   web:
     build:
