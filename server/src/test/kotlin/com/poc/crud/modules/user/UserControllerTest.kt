@@ -41,6 +41,7 @@ class UserControllerTest {
     fun `should return users filtered by username`() {
         // given
         val username = "john"
+        val groupId = 1L
 
         val users = listOf(
             UserIdNameUsernameDTO(
@@ -50,11 +51,12 @@ class UserControllerTest {
             )
         )
 
-        every { userService.findAllByUsername(username) } returns users
+        every { userService.findNotInGroupByTerm(groupId, null) } returns users
 
         // when / then
         mockMvc.get("/v1/users") {
             param("username", username)
+            param("excludedGroupId", "1")
             accept = MediaType.APPLICATION_JSON
         }
             .andExpect {

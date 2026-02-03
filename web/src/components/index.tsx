@@ -8,5 +8,6 @@ import Main from "./main/Main";
 import RegisterForm from "./registerform/RegisterForm";
 import AsyncMultiSelect from "./asyncmultiselect/AsyncMultiSelect";
 import OtpInput from "./otpinput/OtpInput";
+import Input from "./input/Input";
 
-export { Button, Form, TextField, TrackItem, TrackCard, FallbackOverlay, Main, RegisterForm, AsyncMultiSelect, OtpInput };
+export { Button, Form, TextField, TrackItem, TrackCard, FallbackOverlay, Main, RegisterForm, AsyncMultiSelect, OtpInput, Input };

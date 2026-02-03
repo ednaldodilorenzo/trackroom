@@ -6,7 +6,7 @@
 
 .md-text-field input {
   width: 100%;
-  padding: 18px 12px 6px 12px;
+  padding: 12px 12px 10px 12px;
   border: 1px solid var(--md-border);
   border-radius: var(--md-radius);
   background: transparent;
@@ -32,7 +32,7 @@
   left: 12px;
   top: 16px;
   color: #666;
-  background: white;
+  background: #f4f6f8;
   padding: 0 4px;
   font-size: 16px;
   transition: 0.2s ease all;

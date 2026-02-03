@@ -19,9 +19,9 @@ class AuthController(private val authService: AuthService, private val userServi
 
     @PostMapping("/login")
     fun login(
-        @RequestBody loginRequestDTO: LoginRequestDTO, response: HttpServletResponse
+        @Valid @RequestBody loginRequestDTO: LoginRequestDTO, response: HttpServletResponse
     ): ResponseEntity<LoginResponseDTO> {
-        val result = authService.executeLogin(loginRequestDTO.email, loginRequestDTO.senha)
+        val result = authService.executeLogin(loginRequestDTO.email!!, loginRequestDTO.senha!!)
         val cookie = ResponseCookie.from("X-Auth", result.token).httpOnly(true)
             .secure(false) // Set to true in production with HTTPS
             .path("/").maxAge(3600) // 1 hour expiration
