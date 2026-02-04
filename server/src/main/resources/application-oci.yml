@@ -42,3 +42,6 @@ jwt:
 filestorage:
   endpoint: https://objectstorage.sa-saopaulo-1.oraclecloud.com
 
+queue:
+  ids:
+    email-account-confirmation-id: ocid1.queue.oc1.sa-saopaulo-1.amaaaaaawchok4iamlvh4y2dv6bzl23vnokzike6vhynakjgipaikqbzle4q

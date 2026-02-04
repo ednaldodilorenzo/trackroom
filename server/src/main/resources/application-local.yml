@@ -47,3 +47,8 @@ filestorage:
   secretkey: minioadmin
   endpoint: http://minio:9000
   region: us-east-1
+
+queue:
+  ids:
+    email-account-confirmation-id: QUEUE_MESSAGE_ACCOUNT_CONFIRM
+    document-evaluate-id: QUEUE_DOCUMENT_EVALUATE

@@ -19,7 +19,7 @@ class AccountConfirmationEmailPublisher(
             objectMapper.valueToTree(AccountConfirmationTaskPayload(email, token, code))
         )
         messageQueue.publish(
-            MessageQueueType.QUEUE_MESSAGE_ACCOUNT_CONFIRM_PUBLISH,
+            MessageQueueType.QUEUE_MESSAGE_ACCOUNT_CONFIRM,
             objectMapper.writeValueAsString(task)
         )
     }

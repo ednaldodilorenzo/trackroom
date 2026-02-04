@@ -1,7 +1,7 @@
 package com.poc.crud.core.queue
 
 enum class MessageQueueType {
-    QUEUE_MESSAGE_ACCOUNT_CONFIRM_PUBLISH,
+    QUEUE_MESSAGE_ACCOUNT_CONFIRM,
 }
 
 interface MessageQueue {
