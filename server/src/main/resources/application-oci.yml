@@ -44,4 +44,4 @@ filestorage:
 
 queue:
   ids:
-    email-account-confirmation-id: ocid1.queue.oc1.sa-saopaulo-1.amaaaaaawchok4iamlvh4y2dv6bzl23vnokzike6vhynakjgipaikqbzle4q
+    email-account-confirmation-id: "ocid1.queue.oc1.sa-saopaulo-1.amaaaaaawchok4iamlvh4y2dv6bzl23vnokzike6vhynakjgipaikqbzle4q"

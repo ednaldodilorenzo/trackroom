@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Profile
 
 @Configuration
 @Profile("oci")
-class OciConfig(@Value("\${OCI_CONFIG_PATH}") private val ociConfigPath: String) {
+class OciConfig(@field:Value("\${OCI_CONFIG_PATH}") private val ociConfigPath: String) {
 
     @Bean
     @Throws(Exception::class)

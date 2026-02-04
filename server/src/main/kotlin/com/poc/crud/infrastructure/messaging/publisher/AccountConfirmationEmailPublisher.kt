@@ -14,6 +14,7 @@ class AccountConfirmationEmailPublisher(
     private val objectMapper: ObjectMapper,
     @field:Value("\${queue.ids.email-account-confirmation-id}") private val queueId: String
 ) {
+
     fun publish(email: String, token: String, code: String) {
         val task = Task(
             TaskType.MESSAGE_EMAIL_CONFIRMATION,

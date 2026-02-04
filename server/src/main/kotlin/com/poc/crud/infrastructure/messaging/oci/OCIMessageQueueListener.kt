@@ -7,7 +7,6 @@ import com.oracle.bmc.queue.requests.GetMessagesRequest
 import com.poc.crud.core.queue.QueueData
 import com.poc.crud.core.queue.Task
 import com.poc.crud.infrastructure.messaging.subscriber.ProcessorResolver
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -17,11 +16,9 @@ import org.springframework.stereotype.Component
 class OCIMessageQueueListener(
     private val queueData: QueueData,
     private val queueClient: QueueClient,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    private val subscriberResolver: ProcessorResolver,
 ) {
-
-    @Autowired
-    private lateinit var subscriberResolver: ProcessorResolver
 
     @Scheduled(fixedDelay = 5000)
     fun listen() {

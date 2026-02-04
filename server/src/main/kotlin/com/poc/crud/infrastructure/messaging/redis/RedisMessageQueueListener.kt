@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.poc.crud.core.queue.QueueData
 import com.poc.crud.core.queue.Task
 import com.poc.crud.infrastructure.messaging.subscriber.ProcessorResolver
-import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.Profile
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
@@ -17,10 +16,8 @@ class RedisMessageQueueListener(
     private val redisTemplate: StringRedisTemplate,
     private val queueData: QueueData,
     private val objectMapper: ObjectMapper,
+    private val subscriberResolver: ProcessorResolver,
 ) {
-    @Autowired
-    private lateinit var subscriberResolver: ProcessorResolver
-
     @Scheduled(fixedDelay = 5000)
     fun listen() {
         queueData.ids.values.forEach { queue ->

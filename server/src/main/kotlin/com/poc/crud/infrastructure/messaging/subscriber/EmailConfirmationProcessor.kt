@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component
 class EmailConfirmationProcessor(
     private val objectMapper: ObjectMapper,
     private val mailService: EmailSenderService,
-    @Value("\${APP_FRONT_URL}") private val frontURL: String
+    @field:Value("\${APP_FRONT_URL}") private val frontURL: String
 ) : MessageProcessor {
     override val supports: TaskType = TaskType.MESSAGE_EMAIL_CONFIRMATION
     override fun processMessage(task: Task) {
