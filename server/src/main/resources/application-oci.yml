@@ -36,11 +36,11 @@ management:
       show-details: always
 
 jwt:
-  key: a9c986ede938a8b4f8721737c62efd8568ba43e976e2b77cdd90d0b2c4f66e97
+  key: "a9c986ede938a8b4f8721737c62efd8568ba43e976e2b77cdd90d0b2c4f66e97"
   accessTokenExpiration: 3600
 
 filestorage:
-  endpoint: https://objectstorage.sa-saopaulo-1.oraclecloud.com
+  endpoint: "https://objectstorage.sa-saopaulo-1.oraclecloud.com"
 
 queue:
   ids:
