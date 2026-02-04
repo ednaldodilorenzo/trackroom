@@ -2,16 +2,17 @@ package com.poc.crud.infrastructure.messaging.publisher
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.poc.crud.core.queue.MessageQueue
-import com.poc.crud.core.queue.MessageQueueType
 import com.poc.crud.core.queue.Task
 import com.poc.crud.core.queue.TaskType
 import com.poc.crud.infrastructure.messaging.task.AccountConfirmationTaskPayload
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
 
 @Component
 class AccountConfirmationEmailPublisher(
     private val messageQueue: MessageQueue,
-    private val objectMapper: ObjectMapper
+    private val objectMapper: ObjectMapper,
+    @field:Value("\${queue.ids.email-account-confirmation-id}") private val queueId: String
 ) {
     fun publish(email: String, token: String, code: String) {
         val task = Task(
@@ -19,8 +20,7 @@ class AccountConfirmationEmailPublisher(
             objectMapper.valueToTree(AccountConfirmationTaskPayload(email, token, code))
         )
         messageQueue.publish(
-            MessageQueueType.QUEUE_MESSAGE_ACCOUNT_CONFIRM,
-            objectMapper.writeValueAsString(task)
+            queueId, task
         )
     }
 
