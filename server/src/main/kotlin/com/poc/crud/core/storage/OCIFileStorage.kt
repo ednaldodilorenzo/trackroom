@@ -18,7 +18,7 @@ import java.util.*
 @Profile("oci")
 class OCIFileStorage(
     private val objectStorageClient: ObjectStorage,
-    @field:Value("\${filestorage.endpoint}") private val ociStorageUrl: String
+    @param:Value("\${filestorage.endpoint}") private val ociStorageUrl: String
 ) : FileStorage {
     override fun saveFile(
         bucketName: String,

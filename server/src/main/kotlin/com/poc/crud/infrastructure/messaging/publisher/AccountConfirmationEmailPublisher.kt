@@ -12,7 +12,7 @@ import org.springframework.stereotype.Component
 class AccountConfirmationEmailPublisher(
     private val messageQueue: MessageQueue,
     private val objectMapper: ObjectMapper,
-    @field:Value("\${queue.ids.email-account-confirmation-id}") private val queueId: String
+    @param:Value("\${queue.ids.email-account-confirmation-id}") private val queueId: String
 ) {
 
     fun publish(email: String, token: String, code: String) {

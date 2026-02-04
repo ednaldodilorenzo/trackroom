@@ -15,11 +15,11 @@ import java.net.URI
 @Configuration
 @Profile("local")
 class S3ClientConfig(
-    @field:Value("\${filestorage.accesskey}")
+    @param:Value("\${filestorage.accesskey}")
     private val accessKey: String,
-    @field:Value("\${filestorage.secretkey}")
+    @param:Value("\${filestorage.secretkey}")
     private val secretKey: String,
-    @field:Value("\${filestorage.endpoint:http://localhost:9000}")
+    @param:Value("\${filestorage.endpoint:http://localhost:9000}")
     private val endpoint: String,
 ) {
     @Bean

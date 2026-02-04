@@ -11,10 +11,10 @@ import java.util.Date
 
 @Service
 class TokenServiceImpl(
-    @field:Value("\${jwt.key}")
+    @param:Value("\${jwt.key}")
     private val securityKey: String,
 
-    @field:Value("\${jwt.accessTokenExpiration}")
+    @param:Value("\${jwt.accessTokenExpiration}")
     private val accessTokenExpiration: Long = 0,
 ): TokenService {
 
