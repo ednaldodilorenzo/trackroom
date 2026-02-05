@@ -45,6 +45,9 @@ jobs:
         # Optional: Set environment variables for React app if needed (e.g., CI=false to avoid warnings as errors)
         CI: false
 
+    - name: Debug Folder Structure
+      run: ls -R web/dist
+      
     - name: Sync build files to OCI Object Storage
       uses: oracle-actions/run-oci-cli-command@v1.3.2
       with:
@@ -57,7 +60,7 @@ jobs:
         OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
         OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
         # Set silent to false for debugging if necessary, but true is recommended for security
-        SILENT: true
+        SILENT: false
   
   backend-tests:
     runs-on: ubuntu-latest
