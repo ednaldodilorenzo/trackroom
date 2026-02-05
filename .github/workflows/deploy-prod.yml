@@ -63,8 +63,8 @@ jobs:
         SILENT: false
         
     - name: Sync to OCI (Native Run)
-        run: |
-          oci os object sync \
+      run: |
+        oci os object sync \
             --bucket-name "${{ secrets.BUCKET_NAME }}" \
             --namespace "${{ secrets.NAMESPACE }}" \
             --src-dir web/dist \
