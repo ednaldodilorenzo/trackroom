@@ -46,15 +46,21 @@ jobs:
         CI: false
 
     - name: Debug Folder Structure
-      run: ls -R web/dist    
-        
-    - name: Sync to OCI (Native Run)
-      run: |
-        oci os object sync \
-            --bucket-name "${{ secrets.BUCKET_NAME }}" \
-            --namespace "${{ secrets.NAMESPACE }}" \
-            --src-dir web/dist \
-            --delete-after
+      run: ls -R web/dist
+      
+    - name: Sync build files to OCI Object Storage
+      uses: oracle-actions/run-oci-cli-command@v1.3.2
+      with:
+        command: |
+          os object sync --bucket-name ${{ secrets.OCI_BUCKET_NAME }} --namespace ${{ secrets.OCI_NAMESPACE }} --src-dir web/dist
+      env:
+        OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
+        OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
+        OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+        OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+        OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
+        # Set silent to false for debugging if necessary, but true is recommended for security
+        SILENT: false    
   
   backend-tests:
     runs-on: ubuntu-latest
