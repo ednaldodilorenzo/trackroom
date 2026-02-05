@@ -46,7 +46,7 @@ jobs:
         CI: false
 
     - name: Sync build files to OCI Object Storage
-      uses: oracle-actions/run-oci-cli-command@v1.4.4
+      uses: oracle-actions/run-oci-cli-command@v1.3.2
       with:
         command: |
           cd web
