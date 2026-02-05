@@ -61,6 +61,14 @@ jobs:
         OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
         # Set silent to false for debugging if necessary, but true is recommended for security
         SILENT: false
+        
+    - name: Sync to OCI (Native Run)
+        run: |
+          oci os object sync \
+            --bucket-name "${{ secrets.BUCKET_NAME }}" \
+            --namespace "${{ secrets.NAMESPACE }}" \
+            --src-dir web/dist \
+            --delete-after
   
   backend-tests:
     runs-on: ubuntu-latest
