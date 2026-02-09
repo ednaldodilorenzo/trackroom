@@ -52,7 +52,7 @@ jobs:
       uses: oracle-actions/run-oci-cli-command@v1.3.2
       with:
         command: |
-          os object sync --bucket-name ${{ secrets.OCI_BUCKET_NAME }} --namespace ${{ secrets.OCI_NAMESPACE }} --src-dir web/dist --overwrite --content-type-by-extension
+          os object sync --bucket-name ${{ secrets.OCI_BUCKET_NAME }} --namespace ${{ secrets.OCI_NAMESPACE }} --src-dir web/dist --overwrite
       env:
         OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
         OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}

@@ -10,8 +10,8 @@ services:
   app:
     build:
       context: ./server
-    expose:
-      - "8080"
+    ports:
+      - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: ${APP_PROFILES_ACTIVE}
       SPRING_DATA_REDIS_HOST: ${CACHE_HOST}
@@ -28,13 +28,13 @@ services:
     volumes:
       - /home/ubuntu/.oci:/.oci:ro
 
-  web:
-    build:
-      context: ./web
-    ports:
-      - "443:443" # Usado apenas em produção, pois em testes automatizados utilizado na rede interna.
-    depends_on:
-      - app  
+  #web:
+  #  build:
+  #    context: ./web
+  #  ports:
+  #    - "443:443" # Usado apenas em produção, pois em testes automatizados utilizado na rede interna.
+  #  depends_on:
+  #    - app  
 
 volumes:
   redis_data:
