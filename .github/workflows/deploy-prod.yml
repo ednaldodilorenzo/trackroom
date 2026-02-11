@@ -48,50 +48,52 @@ jobs:
     - name: Debug Folder Structure
       run: ls -R web/dist
     
-    - name: Sync build files to OCI Object Storage (with correct content-types)
-      uses: oracle-actions/run-oci-cli-command@v1.3.2
+    - name: Setup OCI CLI
+      uses: oracle-actions/setup-oci-cli@v1
       with:
-        command: |
-          set -euo pipefail
+        version: "latest"
 
-          SRC_DIR="web/dist"
-          NS="${{ secrets.OCI_NAMESPACE }}"
-          BN="${{ secrets.OCI_BUCKET_NAME }}"
-
-          # 1) Bulk upload everything (fast)
-          os object bulk-upload --bn "$BN" --ns "$NS" --src-dir "$SRC_DIR" --overwrite
-
-          # 2) Re-upload selected types to force correct content-type metadata
-          # Note: find outputs paths like "web/dist/..." so ${f#web/dist/} works.
-          find "$SRC_DIR" -type f -name "*.svg" -print0 | while IFS= read -r -d '' f; do
-            os object put --ns "$NS" --bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "image/svg+xml" --force
-          done
-
-          find "$SRC_DIR" -type f -name "*.css" -print0 | while IFS= read -r -d '' f; do
-            os object put --ns "$NS" --bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "text/css; charset=utf-8" --force
-          done
-
-          find "$SRC_DIR" -type f -name "*.js" -print0 | while IFS= read -r -d '' f; do
-            os object put --ns "$NS" --bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "application/javascript; charset=utf-8" --force
-          done
-
-          find "$SRC_DIR" -type f -name "*.webmanifest" -print0 | while IFS= read -r -d '' f; do
-            os object put --ns "$NS" --bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "application/manifest+json; charset=utf-8" --force
-          done
-
-          find "$SRC_DIR" -type f -name "*.png" -print0 | while IFS= read -r -d '' f; do
-            os object put --ns "$NS" --bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "image/png" --force
-          done
-
-          # 3) Ensure index.html has the correct content-type (often needs charset)
-          os object put --ns "$NS" --bn "$BN" --name "index.html" --file "$SRC_DIR/index.html" --content-type "text/html; charset=utf-8" --force
+    - name: Sync build files to OCI Object Storage (with correct content-types)
+      shell: bash
       env:
         OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
         OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
         OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
         OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
         OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
-        SILENT: false    
+      run: |
+        set -euo pipefail
+
+        SRC_DIR="web/dist"
+        NS="${{ secrets.OCI_NAMESPACE }}"
+        BN="${{ secrets.OCI_BUCKET_NAME }}"
+
+        # 1) Bulk upload everything
+        oci os object bulk-upload --bn "$BN" --ns "$NS" --src-dir "$SRC_DIR" --overwrite
+
+        # 2) Re-upload selected types with forced content-type
+        find "$SRC_DIR" -type f -name "*.svg" -print0 | while IFS= read -r -d '' f; do
+          oci os object put --ns "$NS" --bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "image/svg+xml" --force
+        done
+
+        find "$SRC_DIR" -type f -name "*.css" -print0 | while IFS= read -r -d '' f; do
+          oci os object put --ns "$NS" --bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "text/css; charset=utf-8" --force
+        done
+
+        find "$SRC_DIR" -type f -name "*.js" -print0 | while IFS= read -r -d '' f; do
+          oci os object put --ns "$NS" --bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "application/javascript; charset=utf-8" --force
+        done
+
+        find "$SRC_DIR" -type f -name "*.webmanifest" -print0 | while IFS= read -r -d '' f; do
+          oci os object put --ns "$NS" --bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "application/manifest+json; charset=utf-8" --force
+        done
+
+        find "$SRC_DIR" -type f -name "*.png" -print0 | while IFS= read -r -d '' f; do
+          oci os object put --ns "$NS" --bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "image/png" --force
+        done
+
+        # 3) index.html
+        oci os object put --ns "$NS" --bn "$BN" --name "index.html" --file "$SRC_DIR/index.html" --content-type "text/html; charset=utf-8" --force    
   
   backend-tests:
     runs-on: ubuntu-latest
