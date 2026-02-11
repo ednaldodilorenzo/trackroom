@@ -50,6 +50,14 @@ jobs:
       
     - name: Sync build files to OCI Object Storage
       uses: oracle-actions/run-oci-cli-command@v1.3.2
+      env:
+        OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
+        OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
+        OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+        OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+        OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
+        # Set silent to false for debugging if necessary, but true is recommended for security
+        SILENT: false
       
     - name: Update bucket files 
       run: |
@@ -60,14 +68,6 @@ jobs:
           find dist -name "*.webmanifest" | while read f; do oci os object put --ns ${{ secrets.OCI_NAMESPACE }} --bn ${{ secrets.OCI_BUCKET_NAME }} --name "${f#web/dist/}" --file "$f" --content-type "text/webmanifest" --force; done
           find dist -name "*.png" | while read f; do oci os object put --ns ${{ secrets.OCI_NAMESPACE }} --bn ${{ secrets.OCI_BUCKET_NAME }} --name "${f#web/dist/}" --file "$f" --content-type "image/png" --force; done
           oci os object put --ns ${{ secrets.OCI_NAMESPACE }} --bn ${{ secrets.OCI_BUCKET_NAME }} --name index.html --file web/dist/index.html  --content-type "text/html; charset=utf-8" --force
-      env:
-        OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
-        OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
-        OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
-        OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
-        OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
-        # Set silent to false for debugging if necessary, but true is recommended for security
-        SILENT: false    
   
   backend-tests:
     runs-on: ubuntu-latest
