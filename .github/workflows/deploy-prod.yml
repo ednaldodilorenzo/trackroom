@@ -48,11 +48,6 @@ jobs:
     - name: Debug Folder Structure
       run: ls -R web/dist
     
-    - name: Setup OCI CLI
-      uses: oracle-actions/setup-oci-cli@v1
-      with:
-        version: "latest"
-
     - name: Install OCI CLI (via Oracle action)
       uses: oracle-actions/run-oci-cli-command@v1.3.2
       with:
