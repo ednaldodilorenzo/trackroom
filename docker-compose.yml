@@ -15,13 +15,14 @@ services:
       POSTGRES_USER: ${DB_USERNAME}
     expose:
       - "5432"
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d bioaccess"]
       interval: 10s
       timeout: 5s
       retries: 10
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    
 
   app:
     build:
@@ -54,4 +55,5 @@ services:
 
 volumes:
   redis_data:
+  postgres_data:
 

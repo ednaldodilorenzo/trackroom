@@ -119,8 +119,10 @@ jobs:
 
     - name: Execute Docker Compose Down
       run: |
-        DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose down --rmi all
+        DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose stop app
+        DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose rm -f app        
 
     - name: Execute Docker Compose Up
       run: |
-        DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose up --build -d
+        DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose build --pull app
+        DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose up -d app
