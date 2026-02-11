@@ -52,7 +52,11 @@ jobs:
       uses: oracle-actions/run-oci-cli-command@v1.3.2
       with:
         command: |
-          os object sync --bucket-name ${{ secrets.OCI_BUCKET_NAME }} --namespace ${{ secrets.OCI_NAMESPACE }} --src-dir web/dist --overwrite
+          os object bulk-upload --bn ${{ secrets.OCI_BUCKET_NAME }} --ns ${{ secrets.OCI_NAMESPACE }} --src-dir web/dist --overwrite
+          find dist -name "*.svg" | while read f; do os object put --ns ${{ secrets.OCI_NAMESPACE }} --bn ${{ secrets.OCI_BUCKET_NAME }} --name "${f#web/dist/}" --file "$f" --content-type "image/svg+xml" --force; done
+          find dist -name "*.css" | while read f; do os object put --ns ${{ secrets.OCI_NAMESPACE }} --bn ${{ secrets.OCI_BUCKET_NAME }} --name "${f#web/dist/}" --file "$f" --content-type "text/css" --force; done
+          find dist -name "*.js" | while read f; do os object put --ns ${{ secrets.OCI_NAMESPACE }} --bn ${{ secrets.OCI_BUCKET_NAME }} --name "${f#web/dist/}" --file "$f" --content-type "application/javascript" --force; done
+          os object put --ns ${{ secrets.OCI_NAMESPACE }} --bn ${{ secrets.OCI_BUCKET_NAME }} --name index.html --file web/dist/index.html  --content-type "text/html; charset=utf-8" --force
       env:
         OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
         OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
