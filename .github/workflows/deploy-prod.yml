@@ -50,6 +50,8 @@ jobs:
       
     - name: Sync build files to OCI Object Storage
       uses: oracle-actions/run-oci-cli-command@v1.3.2
+      
+    - name: Update bucket files 
       run: |
           oci os object bulk-upload --bn ${{ secrets.OCI_BUCKET_NAME }} --ns ${{ secrets.OCI_NAMESPACE }} --src-dir web/dist --overwrite
           find dist -name "*.svg" | while read f; do oci os object put --ns ${{ secrets.OCI_NAMESPACE }} --bn ${{ secrets.OCI_BUCKET_NAME }} --name "${f#web/dist/}" --file "$f" --content-type "image/svg+xml" --force; done
