@@ -13,7 +13,7 @@ type TextFieldProps<TFieldValues extends FieldValues = FieldValues> = {
   label: string;
   value?: string;
   name: Path<TFieldValues>;
-  control?: Control<TFieldValues>;
+  control?: Control<any>;
   type?: InputHTMLAttributes<HTMLInputElement>["type"];
   rules?: RegisterOptions<TFieldValues, Path<TFieldValues>>;
   onChange?: (e: ChangeEvent<HTMLInputElement>) => void;

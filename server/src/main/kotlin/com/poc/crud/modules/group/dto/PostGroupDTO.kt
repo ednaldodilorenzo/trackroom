@@ -14,3 +14,17 @@ data class PostGroupDTO(
     val description: String,
     val cover: String
 )
+
+data class PutGroupDTO(
+    @param:NotNull
+    val id: Long,
+
+    @param:NotNull
+    @param:NotBlank
+    val name: String,
+
+    @param:NotNull
+    @param:NotBlank
+    val description: String,
+    val cover: String
+)

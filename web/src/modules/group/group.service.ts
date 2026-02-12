@@ -19,6 +19,8 @@ class GroupService extends Requester {
 
   findUsersByGroupId = (id: string) =>
     this.get<User[]>(`/${id}/users`).then((resp) => resp.data);
+
+  updateGroup = (id: number, data: Group) => this.put<Group, Group>(data, `${id}`).then((resp) => resp.data);
 }
 
 export const groupService = new GroupService(request);

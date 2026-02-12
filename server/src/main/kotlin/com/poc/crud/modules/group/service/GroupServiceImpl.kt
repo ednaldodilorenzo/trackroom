@@ -9,6 +9,7 @@ import com.poc.crud.modules.group.dto.GroupDTO
 import com.poc.crud.modules.group.dto.GroupMembershipDTO
 import com.poc.crud.modules.group.dto.GroupWithMusicsNotPendingDTO
 import com.poc.crud.modules.group.dto.PostGroupDTO
+import com.poc.crud.modules.group.dto.PutGroupDTO
 import com.poc.crud.modules.group.dto.UserDTO
 import com.poc.crud.repository.GroupRepository
 import com.poc.crud.repository.UserGroupRepository
@@ -82,5 +83,14 @@ class GroupServiceImpl(
         id: Long
     ): List<UserDTO> =
         userGroupRepository.findByGroup_Id(id).map { UserDTO(it.user.id!!, it.user.name, it.isAdmin) }
+
+    override fun updateGroup(
+        userId: Long,
+        groupData: PutGroupDTO
+    ): Long? {
+        val group = Group(groupData.id, groupData.name, groupData.description, groupData.cover)
+        groupRepository.save(group)
+        return group.id
+    }
 
 }

@@ -13,6 +13,7 @@ services:
 
   web:
     build:
+      context: ./web
       dockerfile: Dockerfile-dev
     volumes:
       - ./web:/app

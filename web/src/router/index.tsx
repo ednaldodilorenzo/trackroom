@@ -18,7 +18,7 @@ const GroupAddMember = lazy(() => import("@/modules/group/GroupAddMember"));
 export const router = createBrowserRouter(
   [
     {
-      path: "/login",      
+      path: "/login",
       element: <Login />,
       action: async (args) => {
         const mod = await import("@/modules/auth/login/Login");
@@ -35,7 +35,7 @@ export const router = createBrowserRouter(
     },
     {
       path: "/confirm/:token",
-      element: <Confirmation />,      
+      element: <Confirmation />,
     },
     {
       path: "/",
@@ -73,6 +73,14 @@ export const router = createBrowserRouter(
             return mod.groupLoader(args);
           },
           children: [
+            {
+              path: "edit",
+              element: <GroupAdd />,
+              action: async (args) => {
+                const mod = await import("@/modules/group/GroupAdd");
+                return mod.action(args);
+              },
+            },
             {
               path: "musics",
               element: <MusicList />,

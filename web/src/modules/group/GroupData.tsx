@@ -2,6 +2,7 @@ import type { Group } from "@/model";
 import {
   Outlet,
   useLoaderData,
+  useNavigate,
   //useNavigate,
   useOutletContext,
   type LoaderFunctionArgs,
@@ -10,6 +11,8 @@ import { groupService } from "./group.service";
 import { useGroupContext } from "./GroupContext";
 import type { HeaderConfig } from "@/components/main/Header";
 import { useEffect } from "react";
+import { Button } from "@/components";
+import { BsFillPencilFill } from "react-icons/bs";
 
 export default function GroupData() {
   const { group } = useLoaderData<{ group: Promise<Group> }>();
@@ -17,7 +20,7 @@ export default function GroupData() {
     setHeaderConfig: (config: HeaderConfig) => void;
   }>();
   const { setCurrentGroup } = useGroupContext();
-  //const navigate = useNavigate();
+  const navigate = useNavigate();
 
   useEffect(() => {
     group.then((g) => {
@@ -25,13 +28,14 @@ export default function GroupData() {
         title: g.name,
         enableBackButton: true,
         backButtonLink: "/",
+        children: <Button onClick={() => navigate(`/groups/${g.id}/edit`)}><BsFillPencilFill /></Button>
         // suspendedMenuProps: {
         //   items: [
-            // {
-            //   label: "Members",
-            //   onClick: () => navigate(`/groups/${g.id}/members`),
-            // },
-            // { label: "Teste2", onClick: () => null },
+        // {
+        //   label: "Members",
+        //   onClick: () => navigate(`/groups/${g.id}/members`),
+        // },
+        // { label: "Teste2", onClick: () => null },
         //   ],
         // },
       });

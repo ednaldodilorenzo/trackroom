@@ -38,8 +38,12 @@ export default function MusicList() {
 
   return (
     <>
-      <h2 className="section-title">Músicas</h2>
       <TextField endIcon={<BsSearch />} onChange={(e) => setSearch(e.target.value)} value={search} label="" name="searchMusic" />
+      {currentGroup.isAdmin && (
+        <div className="my-6">
+          <Button className="me-2" onClick={() => navigate(`/groups/${id}/musics/add`)}>+</Button> Adicionar uma música
+        </div>
+      )}
       <Suspense fallback={<FallbackOverlay />}>
         <Await resolve={musics}>
           {(loadedMusics) => {
@@ -74,14 +78,6 @@ export default function MusicList() {
           }}
         </Await>
       </Suspense>
-      {currentGroup.isAdmin && (
-        <Button
-          className="suspended-button"
-          onClick={() => navigate(`/groups/${id}/musics/add`)}
-        >
-          + Nova Música
-        </Button>
-      )}
     </>
   );
 }

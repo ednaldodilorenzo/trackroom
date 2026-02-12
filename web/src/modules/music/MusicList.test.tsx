@@ -106,7 +106,6 @@ describe("<MusicList />", () => {
   it("renders title and search field", () => {
     render(<MusicList />);
 
-    expect(screen.getByText("Músicas")).toBeInTheDocument();
     expect(screen.getByTestId("searchMusic")).toBeInTheDocument();
   });
 
@@ -199,7 +198,7 @@ describe("<MusicList />", () => {
 
     render(<MusicList />);
 
-    const btn = screen.getByRole("button", { name: "+ Nova Música" });
+    const btn = screen.getByRole("button", { name: "+" });
     expect(btn).toBeInTheDocument();
 
     const user = userEvent.setup();
