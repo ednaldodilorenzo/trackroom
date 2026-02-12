@@ -4,7 +4,6 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import GroupAdd, { action } from "./GroupAdd";
 import { groupService } from "./group.service";
-import { useParams } from "react-router-dom";
 
 // -------------------- mocks --------------------
 const navigateMock = vi.fn();

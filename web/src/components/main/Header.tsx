@@ -4,8 +4,6 @@ import { BsArrowLeftSquare } from "react-icons/bs";
 import SuspendedMenu, {
   type SuspendedMenuProps,
 } from "../suspendedmenu/SuspendedMenu";
-import Button from "../button/Button";
-import { BsFillPencilFill } from "react-icons/bs";
 
 type HeaderConfig = {
   title: string;
