@@ -5,17 +5,13 @@ import com.poc.crud.core.exception.ExceptionType
 import com.poc.crud.model.Group
 import com.poc.crud.model.UserGroup
 import com.poc.crud.model.UserGroupId
-import com.poc.crud.modules.group.dto.GroupDTO
-import com.poc.crud.modules.group.dto.GroupMembershipDTO
-import com.poc.crud.modules.group.dto.GroupWithMusicsNotPendingDTO
-import com.poc.crud.modules.group.dto.PostGroupDTO
-import com.poc.crud.modules.group.dto.PutGroupDTO
-import com.poc.crud.modules.group.dto.UserDTO
+import com.poc.crud.modules.group.dto.*
 import com.poc.crud.repository.GroupRepository
 import com.poc.crud.repository.UserGroupRepository
 import com.poc.crud.repository.UserRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
+import kotlin.jvm.optionals.getOrElse
 
 @Service
 class GroupServiceImpl(
@@ -29,13 +25,10 @@ class GroupServiceImpl(
 
     @Transactional
     override fun insertGroup(
-        userId: Long,
-        groupData: PostGroupDTO
+        userId: Long, groupData: PostGroupDTO
     ): Long? {
         val newGroup = Group(
-            name = groupData.name,
-            description = groupData.description,
-            cover = groupData.cover
+            name = groupData.name, description = groupData.description, cover = groupData.cover
         )
         val group = groupRepository.save(newGroup)
         val user = userRepository.findById(userId).orElseThrow {
@@ -45,12 +38,8 @@ class GroupServiceImpl(
         }
         val newUserGroup = UserGroup(
             userGroupId = UserGroupId(
-                userId = userId,
-                groupId = group.id!!
-            ),
-            group = group,
-            user = user,
-            isAdmin = true
+                userId = userId, groupId = group.id!!
+            ), group = group, user = user, isAdmin = true
         )
         userGroupRepository.save(newUserGroup)
 
@@ -58,9 +47,7 @@ class GroupServiceImpl(
     }
 
     override fun findById(
-        id: Long,
-        withDependencies: Boolean,
-        userId: Long
+        id: Long, withDependencies: Boolean, userId: Long
     ): GroupMembershipDTO {
         return groupRepository.findGroupWithMembership(id, userId).orElseThrow {
             APIException(
@@ -79,16 +66,16 @@ class GroupServiceImpl(
     }
 
     override fun findUsersByGroupId(
-        userId: Long,
-        id: Long
-    ): List<UserDTO> =
-        userGroupRepository.findByGroup_Id(id).map { UserDTO(it.user.id!!, it.user.name, it.isAdmin) }
+        userId: Long, id: Long
+    ): List<UserDTO> = userGroupRepository.findByGroup_Id(id).map { UserDTO(it.user.id!!, it.user.name, it.isAdmin) }
 
     override fun updateGroup(
-        userId: Long,
-        groupData: PutGroupDTO
+        userId: Long, groupId: Long, groupData: PutGroupDTO
     ): Long? {
-        val group = Group(groupData.id, groupData.name, groupData.description, groupData.cover)
+        val group = groupRepository.findById(groupId)
+            .getOrElse { throw APIException(ExceptionType.NOT_FOUND, "Group not found", RuntimeException()) }
+        group.name = groupData.name
+        group.description = groupData.description
         groupRepository.save(group)
         return group.id
     }

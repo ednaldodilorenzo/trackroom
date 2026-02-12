@@ -1,10 +1,6 @@
 package com.poc.crud.modules.group
 
-import com.poc.crud.modules.group.dto.GroupDTO
-import com.poc.crud.modules.group.dto.GroupMembershipDTO
-import com.poc.crud.modules.group.dto.PostGroupDTO
-import com.poc.crud.modules.group.dto.PutGroupDTO
-import com.poc.crud.modules.group.dto.UserDTO
+import com.poc.crud.modules.group.dto.*
 import com.poc.crud.modules.group.service.GroupService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
@@ -38,6 +34,6 @@ class GroupController(
 
     @PutMapping("/{id}")
     fun put(principal: Principal, @PathVariable id: Long, @RequestBody putDto: PutGroupDTO): ResponseEntity<Long> {
-        return ResponseEntity.ok(groupService.updateGroup(principal.name.toLong(), putDto))
+        return ResponseEntity.ok(groupService.updateGroup(principal.name.toLong(), id, putDto))
     }
 }

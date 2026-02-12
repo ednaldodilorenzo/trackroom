@@ -1,10 +1,6 @@
 package com.poc.crud.modules.group.service
 
-import com.poc.crud.modules.group.dto.GroupDTO
-import com.poc.crud.modules.group.dto.GroupMembershipDTO
-import com.poc.crud.modules.group.dto.PostGroupDTO
-import com.poc.crud.modules.group.dto.PutGroupDTO
-import com.poc.crud.modules.group.dto.UserDTO
+import com.poc.crud.modules.group.dto.*
 
 
 interface GroupService {
@@ -16,5 +12,5 @@ interface GroupService {
 
     fun findUsersByGroupId(userId: Long, id: Long): List<UserDTO>
 
-    fun updateGroup(userId: Long, groupData: PutGroupDTO): Long?
+    fun updateGroup(userId: Long, groupId: Long, groupData: PutGroupDTO): Long?
 }

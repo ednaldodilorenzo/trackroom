@@ -9,8 +9,8 @@ data class Group(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-    val name: String,
-    val description: String,
+    var name: String,
+    var description: String,
     val cover: String,
     val active: Boolean = true,
     @ManyToMany(fetch = FetchType.LAZY)
