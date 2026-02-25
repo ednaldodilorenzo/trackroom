@@ -5,3 +5,15 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.section-title {
+  margin: 12px 0px;  
+  font-size: 20px;
+  font-weight: 500;
+}
+
+.page-title {
+  margin-top: 12px;  
+  font-size: 30px;
+  font-weight: 500;
+}

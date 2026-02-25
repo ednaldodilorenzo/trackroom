@@ -1,8 +1,8 @@
 interface User {
   id?: number;
   name: string;
-  username: string;
-  isAdmin: boolean;
+  userName?: string;
+  isAdmin?: boolean;
 }
 
 export type { User };

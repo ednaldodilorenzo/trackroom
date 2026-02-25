@@ -140,7 +140,6 @@ export default function AsyncMultiSelect({
         `}
                 onClick={() => setOpen(true)}
             >
-                {/* Selected chips */}
                 {value.map((item) => (
                     <span
                         key={item.id}

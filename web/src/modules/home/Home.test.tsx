@@ -8,8 +8,9 @@ import Home from "./Home";
 // --------- shared mocks ----------
 const navigateMock = vi.fn();
 const setHeaderConfigMock = vi.fn();
+const useHeaderConfigMock = vi.fn();
 
-// we’ll swap these per-test
+// swap per-test
 let loaderGroupsValue: any[] = [];
 
 vi.mock("react-router-dom", async () => {
@@ -19,35 +20,37 @@ vi.mock("react-router-dom", async () => {
 
   return {
     ...actual,
-
     useNavigate: () => navigateMock,
 
     // Home expects: const { groups } = useLoaderData();
-    // We return a "groups" value that <Await> will receive.
     useLoaderData: () => ({ groups: Promise.resolve(loaderGroupsValue) }),
 
-    // Home expects: const { setHeaderConfig } = useOutletContext()
-    useOutletContext: () => ({ setHeaderConfig: setHeaderConfigMock }),
-
-    // IMPORTANT: In unit tests, mock Await to immediately render children
-    // with the resolved value (since we’re not using RouterProvider data APIs here).
+    // Unit-test friendly Await: render immediately with loaderGroupsValue
     Await: ({ resolve, children }: any) => {
-      // resolve is a Promise in our mocked useLoaderData
-      // render immediately with the already-known loaderGroupsValue
-      // (keeping things deterministic for unit tests)
       void resolve;
       return children(loaderGroupsValue);
     },
   };
 });
 
-// Mock your UI components so tests don’t depend on their internal markup
+// Mock header hooks used by Home
+vi.mock("@/hooks/useHeader", () => ({
+  useHeader: () => ({ setHeaderConfig: setHeaderConfigMock }),
+}));
+
+vi.mock("@/hooks/useHeaderConfig", () => ({
+  useHeaderConfig: (cfg: any) => useHeaderConfigMock(cfg),
+}));
+
+// Mock UI components so tests don’t depend on internal markup
 vi.mock("@/components", () => ({
   TrackCard: (props: any) => (
     <div data-testid="track-card">{props.name ?? props.title ?? "card"}</div>
   ),
   Button: ({ children, ...props }: any) => (
-    <button {...props}>{children}</button>
+    <button type="button" {...props}>
+      {children}
+    </button>
   ),
   FallbackOverlay: () => <div data-testid="fallback">Loading...</div>,
 }));
@@ -58,15 +61,15 @@ describe("<Home />", () => {
     loaderGroupsValue = [];
   });
 
-  it("sets the header config on mount", () => {
+  it("calls useHeaderConfig with the expected config", () => {
     render(
       <MemoryRouter>
         <Home />
       </MemoryRouter>
     );
 
-    expect(setHeaderConfigMock).toHaveBeenCalledTimes(1);
-    expect(setHeaderConfigMock).toHaveBeenCalledWith({
+    expect(useHeaderConfigMock).toHaveBeenCalledTimes(1);
+    expect(useHeaderConfigMock).toHaveBeenCalledWith({
       title: "Minha Biblioteca",
       enableBackButton: false,
     });
@@ -89,10 +92,7 @@ describe("<Home />", () => {
     const cards = await screen.findAllByTestId("track-card");
     expect(cards).toHaveLength(2);
 
-    // empty-state should NOT be shown
-    expect(
-      screen.queryByText("Nenhum grupo cadastrado...")
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Nenhum grupo cadastrado...")).not.toBeInTheDocument();
   });
 
   it("renders empty-state message when loader returns empty list", () => {

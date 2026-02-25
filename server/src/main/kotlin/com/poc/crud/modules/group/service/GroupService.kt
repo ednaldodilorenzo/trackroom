@@ -13,4 +13,12 @@ interface GroupService {
     fun findUsersByGroupId(userId: Long, id: Long): List<UserDTO>
 
     fun updateGroup(userId: Long, groupId: Long, groupData: PutGroupDTO): Long?
+
+    fun addGroupMembers(principalId: Long, groupId: Long, members: List<UserDTO>)
+
+    fun promoteMemberToAdmin(principalId: Long, groupId: Long, userId: Long)
+
+    fun demoteMemberFromAdmin(principalId: Long, groupId: Long, userId: Long)
+
+    fun deleteMemberFromGroup(principalId: Long, groupId: Long, memberId: Long)
 }

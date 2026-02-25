@@ -8,7 +8,7 @@ data class UserGroup(
     val userGroupId: UserGroupId,
 
     @Column(name = "admin")
-    val isAdmin: Boolean,
+    var isAdmin: Boolean,
 
     @ManyToOne
     @JoinColumn(name = "user_id", insertable = false, updatable = false)

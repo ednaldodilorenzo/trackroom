@@ -14,8 +14,8 @@ class UserController(private val userService: UserService) {
 
     @GetMapping("")
     fun getUserNotInGroupByTerm(
-        @RequestParam excludedGroupId: Long,
+        @RequestParam notInGroupId: Long,
         @RequestParam(required = false) search: String?
     ): ResponseEntity<List<UserIdNameUsernameDTO>> =
-        ResponseEntity.ok(userService.findNotInGroupByTerm(excludedGroupId, search))
+        ResponseEntity.ok(userService.findNotInGroupByTerm(notInGroupId, search))
 }

@@ -1,7 +1,5 @@
 package com.poc.crud.modules.user.service
 
-import com.poc.crud.core.exception.APIException
-import com.poc.crud.core.exception.ExceptionType
 import com.poc.crud.core.type.CPF
 import com.poc.crud.core.type.Email
 import com.poc.crud.modules.user.dto.UserIdNameUsernameDTO
@@ -18,9 +16,8 @@ class UserServiceImpl(private val userRepository: UserRepository) : UserService 
     ): List<UserIdNameUsernameDTO> =
         userRepository.findUsersNotInGroupWithTerm(groupId, term).map { UserIdNameUsernameDTO(it) }
 
-    override fun findEmailAvailability(email: Email): Boolean {
-        return userRepository.findByEmail(email) == null
-    }
+    override fun findEmailAvailability(email: Email): Boolean = userRepository.findByEmail(email) == null
+
 
     override fun findCPFAvailability(cpf: CPF): Boolean {
         return userRepository.findByCpf(cpf) == null

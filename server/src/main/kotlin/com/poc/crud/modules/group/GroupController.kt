@@ -28,9 +28,25 @@ class GroupController(
     fun post(principal: Principal, @RequestBody @Valid groupData: PostGroupDTO): Long? =
         groupService.insertGroup(principal.name.toLong(), groupData)
 
+    @PostMapping("/{id}/members")
+    fun addMembers(principal: Principal, @PathVariable id: Long, @RequestBody memberList: List<UserDTO>) =
+        groupService.addGroupMembers(principal.name.toLong(), id, memberList)
+
     @GetMapping("/{id}/users")
     fun getUserByGroup(principal: Principal, @PathVariable id: Long): ResponseEntity<List<UserDTO>> =
         ResponseEntity.ok(groupService.findUsersByGroupId(principal.name.toLong(), id))
+
+    @PostMapping("/{id}/users/{userId}/admin")
+    fun addAdmin(principal: Principal, @PathVariable id: Long, @PathVariable userId: Long) =
+        groupService.promoteMemberToAdmin(principal.name.toLong(), id, userId)
+
+    @PostMapping("/{id}/users/{userId}/member")
+    fun removeAdmin(principal: Principal, @PathVariable id: Long, @PathVariable userId: Long) =
+        groupService.demoteMemberFromAdmin(principal.name.toLong(), id, userId)
+
+    @DeleteMapping("/{id}/members/{userId}")
+    fun deleteMember(principal: Principal, @PathVariable id: Long, @PathVariable userId: Long) =
+        groupService.deleteMemberFromGroup(principal.name.toLong(), id, userId)
 
     @PutMapping("/{id}")
     fun put(principal: Principal, @PathVariable id: Long, @RequestBody putDto: PutGroupDTO): ResponseEntity<Long> {

@@ -1,5 +1,5 @@
 import { RegisterForm, TextField } from "@/components";
-import { groupService } from "./group.service";
+import groupService from "./group.service";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";

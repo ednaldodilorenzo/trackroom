@@ -6,35 +6,23 @@ import {
   useNavigate,
   Await,
   useLoaderData,
-  useOutletContext,
 } from "react-router-dom"; // useLoaderData not used in this snippet
 import homeService from "./home.service";
-import type { HeaderConfig } from "@/components/main/Header";
+import { useHeader } from "@/hooks/useHeader";
+import { useHeaderConfig } from "@/hooks/useHeaderConfig";
 
 export default function Home() {
-  // const allTracks: Music[] = [
-  //   {
-  //     name: "02 - What's My Name (Feat. Drake)",
-  //     description: "Rihanna",
-  //     file: "Loud [2010]",
-  //     groupId: 1,
-  //   },
-  // ];
 
   const navigate = useNavigate();
 
   const { groups } = useLoaderData();
+  const { setHeaderConfig } = useHeader();
+  console.log("Home useHeader got:", { setHeaderConfig });
 
-  const { setHeaderConfig } = useOutletContext<{
-    setHeaderConfig: (config: HeaderConfig) => void;
-  }>();
-
-  useEffect(() => {
-    setHeaderConfig({
-      title: "Minha Biblioteca",
-      enableBackButton: false,
-    });
-  }, []);
+  useHeaderConfig({
+    title: "Minha Biblioteca",
+    enableBackButton: false,
+  });
 
   return (
     <>

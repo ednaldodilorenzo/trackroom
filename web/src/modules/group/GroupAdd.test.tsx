@@ -3,7 +3,7 @@ import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import GroupAdd, { action } from "./GroupAdd";
-import { groupService } from "./group.service";
+import groupService from "./group.service";
 
 // -------------------- mocks --------------------
 const navigateMock = vi.fn();
@@ -89,7 +89,7 @@ vi.mock("@/components", () => ({
 }));
 
 vi.mock("./group.service", () => ({
-  groupService: { save: vi.fn(), updateGroup: vi.fn() },
+ default: { save: vi.fn(), updateGroup: vi.fn() },
 }));
 
 // -------------------- component tests --------------------

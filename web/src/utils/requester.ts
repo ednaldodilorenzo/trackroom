@@ -81,8 +81,8 @@ export class Requester {
     return this.instance.put<T>(url, data, params);
   }
 
-  delete<T>(): Promise<AxiosResponse<T>> {
-    return this.instance.delete<T>(this.baseUri);
+  delete<T>(uri: string = ""): Promise<AxiosResponse<T>> {
+    return this.instance.delete<T>(`${this.baseUri}${uri}`);
   }
 }
 

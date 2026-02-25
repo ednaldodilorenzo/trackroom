@@ -1,5 +1,6 @@
 import type { Group } from "@/model";
 import {
+  Await,
   Outlet,
   useLoaderData,
   useNavigate,
@@ -7,43 +8,39 @@ import {
   useOutletContext,
   type LoaderFunctionArgs,
 } from "react-router-dom";
-import { groupService } from "./group.service";
+import groupService from "./group.service";
 import { useGroupContext } from "./GroupContext";
-import type { HeaderConfig } from "@/components/main/Header";
-import { useEffect } from "react";
+import { Suspense } from "react";
 import { Button } from "@/components";
 import { BsFillPencilFill } from "react-icons/bs";
+import { useHeaderConfig } from "@/hooks/useHeaderConfig";
 
 export default function GroupData() {
   const { group } = useLoaderData<{ group: Promise<Group> }>();
-  const { setHeaderConfig } = useOutletContext<{
-    setHeaderConfig: (config: HeaderConfig) => void;
-  }>();
   const { setCurrentGroup } = useGroupContext();
   const navigate = useNavigate();
+  const ctx = useOutletContext<any>();
 
-  useEffect(() => {
-    group.then((g) => {
-      setHeaderConfig({
-        title: g.name,
-        enableBackButton: true,
-        backButtonLink: "/",
-        children: <Button onClick={() => navigate(`/groups/${g.id}/edit`)}><BsFillPencilFill /></Button>
-        // suspendedMenuProps: {
-        //   items: [
-        // {
-        //   label: "Members",
-        //   onClick: () => navigate(`/groups/${g.id}/members`),
-        // },
-        // { label: "Teste2", onClick: () => null },
-        //   ],
-        // },
-      });
-      setCurrentGroup(g);
-    });
-  }, []);
+  return <>
+    <Suspense>
+      <Await resolve={group}>
+        {loadedGroup => {
+          useHeaderConfig({
+            title: loadedGroup.name,
+            titleLink: `/groups/${loadedGroup.id}/info`,
+            enableBackButton: true,
+            backButtonLink: "/",
+            children: <Button onClick={() => navigate(`/groups/${loadedGroup.id}/edit`)}><BsFillPencilFill /></Button>,
+            hidden: false,
+          });
 
-  return <Outlet />;
+          setCurrentGroup(loadedGroup);
+
+          return <Outlet context={ctx} />; // or some JSX if you want to render something specific for the group data page
+        }}
+      </Await>
+    </Suspense>
+  </>;
 }
 
 export const groupLoader = ({

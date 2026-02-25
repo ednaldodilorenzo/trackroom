@@ -7,7 +7,7 @@ class UserService extends Requester {
         super(instance, "/v1/users");
     }
 
-    findAllNotInGroupByTerm = (groupId: string, term: string): Promise<User[]> => this.get<User[]>("", { search: term, groupId: groupId }).then(resp => resp.data);
+    findAllNotInGroupByTerm = (groupId: string, term: string): Promise<User[]> => this.get<User[]>("", { search: term, notInGroupId: groupId }).then(resp => resp.data);
 }
 
 export const userService = new UserService(request);
