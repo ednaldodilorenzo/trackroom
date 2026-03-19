@@ -7,7 +7,6 @@ import com.poc.crud.core.security.TokenService
 import com.poc.crud.core.type.Email
 import com.poc.crud.infrastructure.messaging.publisher.AccountConfirmationEmailPublisher
 import com.poc.crud.model.User
-import com.poc.crud.modules.auth.dto.LoginResponseDTO
 import com.poc.crud.modules.auth.dto.SignupRequestDTO
 import com.poc.crud.repository.UserRepository
 import jakarta.transaction.Transactional
@@ -24,42 +23,42 @@ class AuthServiceImpl(
     private val accountConfirmationEmailNotification: AccountConfirmationEmailPublisher,
     private val cacheManager: CacheManager,
 ) : AuthService {
-    override fun executeLogin(email: Email, password: String): LoginResponseDTO {
-        val user = userRepository.findByEmail(email) ?: throw APIException(
-            ExceptionType.UNAUTHORIZED, "Usuário não encontrado", RuntimeException("")
-        )
-        if (user.active && passwordEncoder.matches(password, user.password)) {
-            val jwt = tokenService.createAccessToken(user.id.toString())
-            return LoginResponseDTO(user, jwt)
-        } else {
-            throw APIException(
-                ExceptionType.UNAUTHORIZED, "Login ou senha inválida!", RuntimeException("")
-            )
-        }
-    }
 
     @Transactional
     override fun executeSignup(signupRequestDTO: SignupRequestDTO) {
-        var user = userRepository.findByEmail(signupRequestDTO.email)
+        var user = userRepository.findByEmail(signupRequestDTO.email).map { value ->
+            if (value.active) {
+                throw APIException(
+                    ExceptionType.BUSINESS_ERROR, "User email already exists!", RuntimeException()
+                )
+            }
+            value
+        }.orElse(null)
 
-        if (user != null && user.active) {
-            throw APIException(ExceptionType.BUSINESS_ERROR, "User email already exists!", RuntimeException())
-        }
+        user = user ?: userRepository.findByCpf(signupRequestDTO.cpf).map { value ->
+            if (value.active) {
+                throw APIException(
+                    ExceptionType.BUSINESS_ERROR, "User cpf already exists!", RuntimeException()
+                )
+            }
+            value
+        }.orElse(null)
 
-        user = userRepository.findByCpf(signupRequestDTO.cpf)
-
-        if (user != null && user.active) {
-            throw APIException(ExceptionType.BUSINESS_ERROR, "User CPF already exists!", RuntimeException())
-        }
-
-        user = userRepository.findByUsername(signupRequestDTO.username)
-
-        if (user != null && user.active) {
-            throw APIException(ExceptionType.BUSINESS_ERROR, "User username already exists!", RuntimeException())
-        }
+        user = user ?: userRepository.findByUsername(signupRequestDTO.username).map { value ->
+            if (value.active) {
+                throw APIException(
+                    ExceptionType.BUSINESS_ERROR, "User username already exists!", RuntimeException()
+                )
+            }
+            value
+        }.orElse(null)
 
         if (signupRequestDTO.password != signupRequestDTO.confirmPassword) {
-            throw APIException(ExceptionType.BAD_REQUEST, "User already exists!", RuntimeException(""))
+            throw APIException(
+                ExceptionType.BAD_REQUEST,
+                "Passowrd and confirmation do not match!",
+                RuntimeException("")
+            )
         }
 
         val newUser = User(
@@ -74,7 +73,7 @@ class AuthServiceImpl(
         )
 
         userRepository.save(newUser)
-        val jwt = tokenService.createAccessToken(signupRequestDTO.email.address)
+        val jwt = tokenService.createValidationToken(signupRequestDTO.email.address)
         val code = (SecureRandom().nextInt(900000) + 100000).toString()
         cacheManager.putValueWithExpiration("signup:${signupRequestDTO.email}", code, 10 * 60)
         accountConfirmationEmailNotification.publish(
@@ -91,13 +90,14 @@ class AuthServiceImpl(
             ExceptionType.BUSINESS_ERROR, "User email not found!", RuntimeException("")
         )
 
-        val user = userRepository.findByEmail(Email(email)) ?: throw APIException(
-            ExceptionType.BUSINESS_ERROR, "User not registered!", RuntimeException("")
-        )
-
-        user.active && throw APIException(
-            ExceptionType.BUSINESS_ERROR, "User already activated!", RuntimeException("")
-        )
+        val user = userRepository.findByEmail(Email(email)).map { value ->
+            if (value.active) {
+                throw APIException(
+                    ExceptionType.BUSINESS_ERROR, "User email already exists!", RuntimeException()
+                )
+            }
+            value
+        }.orElse(null)
 
         val sentCode = cacheManager.getValue("signup:$email")
 
@@ -109,7 +109,9 @@ class AuthServiceImpl(
             ExceptionType.BUSINESS_ERROR, "Provided does not match!", RuntimeException("")
         )
 
-        user.active = true
+        if (user != null) {
+            user.active = true
+        }
 
         cacheManager.deleteByKey("signup:$email")
     }

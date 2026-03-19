@@ -6,32 +6,46 @@ import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.io.Decoders
 import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
+import org.springframework.security.core.Authentication
 import org.springframework.stereotype.Service
-import java.util.Date
+import java.util.*
+import javax.crypto.spec.SecretKeySpec
 
 @Service
 class TokenServiceImpl(
-    @param:Value("\${jwt.key}")
-    private val securityKey: String,
+    @param:Value($$"${jwt.key}") private val securityKey: String,
 
-    @param:Value("\${jwt.accessTokenExpiration}")
-    private val accessTokenExpiration: Long = 0,
-): TokenService {
+    @param:Value($$"${jwt.accessTokenExpiration}") private val accessTokenExpiration: Long = 0,
+) : TokenService {
 
-    override fun createAccessToken(subject: String): String {
-        val jwtToken = Jwts.builder()
-            .setSubject(subject) // e.g. user id
-            .setIssuedAt(Date())
-            .setExpiration(Date(System.currentTimeMillis() + (60 * 60 * 1000)))
-            .signWith(Keys.hmacShaKeyFor(Decoders.BASE64.decode(securityKey)))
+    override fun createAccessToken(authentication: Authentication): String {
+        val keyBytes = Decoders.BASE64.decode(securityKey)
+        // Use SecretKeySpec to ensure cross-library compatibility
+        val key = SecretKeySpec(keyBytes, "HmacSHA256")
+
+        return Jwts.builder()
+            .subject(authentication.name)
+            .id(authentication.authorities.firstOrNull()?.authority)
+            .issuedAt(Date())
+            .expiration(Date(System.currentTimeMillis() + 60 * 60 * 1000))
+            .signWith(key) // JJWT 0.12.x+ will automatically use HS256 for this key
             .compact()
-        return jwtToken
     }
 
     override fun validateJwt(jwt: String): Jws<Claims> {
-        return Jwts.parserBuilder()
-            .setSigningKey(Keys.hmacShaKeyFor(Decoders.BASE64.decode(securityKey)))
-            .build()
-            .parseClaimsJws(jwt)
+        val keyBytes = Decoders.BASE64.decode(securityKey)
+        // Use SecretKeySpec to ensure cross-library compatibility
+        val key = SecretKeySpec(keyBytes, "HmacSHA256")
+        return Jwts.parser()           // Returns a JwtParserBuilder
+            .verifyWith(key)     // Modern replacement for setSigningKey
+            .build()                   // Creates the immutable JwtParser
+            .parseSignedClaims(jwt)
+    }
+
+    override fun createValidationToken(data: String): String {
+        val key = Keys.hmacShaKeyFor(Decoders.BASE64.decode(securityKey))
+
+        return Jwts.builder().subject(data)
+            .issuedAt(Date()).expiration(Date(System.currentTimeMillis() + 60 * 60 * 1000)).signWith(key).compact()
     }
 }

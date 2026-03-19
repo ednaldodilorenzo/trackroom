@@ -1,6 +1,7 @@
 services:
   app:
     build:
+      context: ./server
       dockerfile: Dockerfile-dev
     ports:
       - "8080:8080"
@@ -9,8 +10,10 @@ services:
       - ./server/src/main:/app/src/main
     depends_on:
       db:
-        condition: service_healthy
-
+        condition: service_healthy 
+    environment:
+      - APP_ENABLE_DEBUG=true
+    
   web:
     build:
       context: ./web
@@ -28,7 +31,7 @@ services:
       test: ["CMD-SHELL", "pg_isready -U postgres -d bioaccess"]
       interval: 10s
       timeout: 5s
-      retries: 10    
+      retries: 10
 
   minio:
     image: minio/minio:latest
@@ -43,6 +46,6 @@ services:
       - "9000:9000"
       - "9001:9001"
     restart: always
-  
+
 volumes:
   minio_data:

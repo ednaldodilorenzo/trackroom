@@ -7,15 +7,16 @@ import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.data.repository.query.Param
 import org.springframework.stereotype.Repository
+import java.util.Optional
 
 @Repository
 interface UserRepository : JpaRepository<User, Long> {
 
-    fun findByEmail(email: Email): User?
+    fun findByEmail(email: Email): Optional<User>
 
-    fun findByCpf(cpf: CPF): User?
+    fun findByCpf(cpf: CPF): Optional<User>
 
-    fun findByUsername(username: String): User?
+    fun findByUsername(username: String): Optional<User>
 
     fun findByUsernameContaining(username: String): List<User>
 

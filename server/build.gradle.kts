@@ -1,4 +1,5 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.run.BootRun
 
 plugins {
 	kotlin("jvm") version "2.2.21"
@@ -27,6 +28,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
+	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.liquibase:liquibase-core")
 	implementation(platform("com.oracle.oci.sdk:oci-java-sdk-bom:3.77.2"))
@@ -37,10 +39,9 @@ dependencies {
     implementation("software.amazon.awssdk:s3")
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
 	implementation("org.springframework.boot:spring-boot-starter-data-redis")
-	//developmentOnly("org.springframework.boot:spring-boot-docker-compose")
-	implementation("io.jsonwebtoken:jjwt-api:0.11.5")
-	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.11.5")
-	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.11.5") // or jjwt-gson
+	implementation("io.jsonwebtoken:jjwt-api:0.13.0")
+	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
+	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0") // or jjwt-gson
 	runtimeOnly("org.postgresql:postgresql")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
 	testImplementation("org.jetbrains.kotlin:kotlin-test-junit5")
@@ -95,4 +96,12 @@ tasks.register<Copy>("getDependencies") {
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.compilerOptions {
 	freeCompilerArgs.set(listOf("-Xannotation-default-target=param-property=param-property"))
+}
+
+tasks.withType<BootRun> {
+    // This tells the JVM running your app to listen for a debugger
+    // The *:5005 is essential for Docker connectivity
+	if (System.getenv("APP_ENABLE_DEBUG") == "true") {
+		jvmArgs("-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005")
+	}
 }

@@ -1,10 +1,12 @@
 package com.poc.crud.core.security
 
 
+import com.poc.crud.core.type.Email
 import com.poc.crud.repository.UserRepository
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 
 
@@ -14,13 +16,13 @@ class CustomUserDetailsService(
 ) : UserDetailsService {
 
     override fun loadUserByUsername(username: String?): UserDetails? {
-        val user = userRepository.findById(username?.toLong() ?: 0L).orElse(null)
+        val user = userRepository.findByEmail(Email(username!!))
+            .orElseThrow { UsernameNotFoundException("Usuário não encontrado!") }
+
         return user?.let {
-            User.builder()
-                .username(it.email.toString())
+            User.builder().username(it.email.address)
                 .password(it.password) // not used in JWT, but required by interface
-                .authorities(it.id.toString())
-                .build()
+                .authorities(it.id.toString()).build()
         }
     }
 }

@@ -13,7 +13,7 @@ RUN ./gradlew bootJar -x test
 # ==============================
 # 🚀 2nd Stage: Runtime (Debug + DevTools)
 # ==============================
-FROM eclipse-temurin:21-jdk-jammy AS runtime
+FROM eclipse-temurin:21-jre-alpine-3.23 AS runtime
 
 WORKDIR /app
 
@@ -21,8 +21,7 @@ WORKDIR /app
 COPY --from=builder /app/build/libs/*.jar app.jar
 
 # JVM options: enable debug & optimize for containers
-ENV JAVA_OPTS="-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005 \
-               -XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
+ENV JAVA_OPTS="-XX:+UseContainerSupport -XX:MaxRAMPercentage=75.0 -Djava.security.egd=file:/dev/./urandom"
 
 RUN ls -al
 

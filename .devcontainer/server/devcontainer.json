@@ -1,5 +1,15 @@
 {
-  "name": "server",
-  "dockerComposeFile": "../../docker-compose.yml",
-  "service": "server"
+  "name": "Server",
+  "dockerComposeFile": ["../../docker-compose.yml", "../../dev.yml"],
+  "service": "app",
+  "workspaceFolder": "/app",
+  "runArgs": [
+    "--env-file",
+    "../../.env.dev"
+  ],
+  "runServices": [
+    "app",
+    "db",
+    "redis"
+  ]
 }

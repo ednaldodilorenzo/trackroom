@@ -1,5 +1,6 @@
 package com.poc.crud.modules.auth
 
+import com.poc.crud.core.security.TokenService
 import com.poc.crud.core.type.CPF
 import com.poc.crud.core.type.Email
 import com.poc.crud.modules.auth.dto.LoginRequestDTO
@@ -11,23 +12,38 @@ import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
 import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 
 @RestController
 @RequestMapping("/auth/v1")
-class AuthController(private val authService: AuthService, private val userService: UserService) {
+class AuthController(
+    private val authService: AuthService,
+    private val userService: UserService,
+    private val authenticationManager: AuthenticationManager,
+    private val tokenService: TokenService,
+) {
 
     @PostMapping("/login")
     fun login(
         @Valid @RequestBody loginRequestDTO: LoginRequestDTO, response: HttpServletResponse
     ): ResponseEntity<LoginResponseDTO> {
-        val result = authService.executeLogin(loginRequestDTO.email!!, loginRequestDTO.senha!!)
-        val cookie = ResponseCookie.from("X-Auth", result.token).httpOnly(true)
-            .secure(false) // Set to true in production with HTTPS
-            .path("/").maxAge(3600) // 1 hour expiration
-            .build()
+        val authentication = authenticationManager.authenticate(
+            UsernamePasswordAuthenticationToken(
+                loginRequestDTO.email,
+                loginRequestDTO.senha
+            )
+        )
+
+        val token = this.tokenService.createAccessToken(authentication)
+        val cookie =
+            ResponseCookie.from("X-Auth", token).httpOnly(true).secure(false) // Set to true in production with HTTPS
+                .path("/").maxAge(3600) // 1 hour expiration
+                .build()
         response.addHeader("Set-Cookie", cookie.toString())
-        return ResponseEntity.ok(result)
+        return ResponseEntity.ok(LoginResponseDTO(authentication.name, token))
     }
 
     @PostMapping("/logout")
