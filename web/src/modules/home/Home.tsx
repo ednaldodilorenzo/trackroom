@@ -1,4 +1,4 @@
-import { Suspense, useEffect } from "react";
+import { Suspense } from "react";
 import { TrackCard, /*TrackItem,*/ Button, FallbackOverlay } from "@/components";
 import type { Group } from "@/model";
 import "./Home.css";
