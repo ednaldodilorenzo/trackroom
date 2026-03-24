@@ -2,8 +2,10 @@ import axios, { type AxiosInstance, type AxiosResponse } from "axios";
 import { store } from "@/store";
 import { logout } from "@/store/authSlice";
 
+const apiUrl = import.meta.env.VITE_API_URL || "/api";
+
 export const request: AxiosInstance = axios.create({
-  baseURL: "/api",
+  baseURL: apiUrl,
 });
 
 request.interceptors.response.use(
