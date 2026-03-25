@@ -6,6 +6,7 @@ const apiUrl = import.meta.env.VITE_API_URL || "/api";
 
 export const request: AxiosInstance = axios.create({
   baseURL: apiUrl,
+  withCredentials: true, // Include cookies in requests
 });
 
 request.interceptors.response.use(
