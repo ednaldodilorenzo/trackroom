@@ -19,6 +19,7 @@ class MusicService extends Requester {
     this.putData<string, File>(url, file, {
       headers: {
         "Content-Type": file.type,
+        "x-ms-blob-type": "BlockBlob",
       },
     }).then((resp) => resp.data);
 
