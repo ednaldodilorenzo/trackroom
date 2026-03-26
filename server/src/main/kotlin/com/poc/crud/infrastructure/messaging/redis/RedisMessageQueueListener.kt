@@ -1,9 +1,9 @@
 package com.poc.crud.infrastructure.messaging.redis
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import com.poc.crud.core.infrastructure.messaging.subscriber.ProcessorResolver
 import com.poc.crud.core.queue.QueueData
 import com.poc.crud.core.queue.Task
-import com.poc.crud.infrastructure.messaging.subscriber.ProcessorResolver
 import org.springframework.context.annotation.Profile
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
 @Component
-@Profile("local")
+@Profile("local | azure")
 class RedisMessageQueueListener(
     private val redisTemplate: StringRedisTemplate,
     private val queueData: QueueData,

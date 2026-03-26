@@ -6,6 +6,9 @@ COPY . /app
 
 EXPOSE 8080
 
+ARG CLOUD=local
+ENV SPRING_PROFILES_ACTIVE=$CLOUD
+
 # Fetch project dependencies
 RUN chmod +x start.sh && ./gradlew getDependencies
 

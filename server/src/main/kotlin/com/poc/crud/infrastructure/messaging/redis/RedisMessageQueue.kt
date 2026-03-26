@@ -8,7 +8,7 @@ import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Component
 
 @Component
-@Profile("local")
+@Profile("local | azure")
 class RedisMessageQueue(
     private val redisTemplate: StringRedisTemplate,
     private val objectMapper: ObjectMapper,

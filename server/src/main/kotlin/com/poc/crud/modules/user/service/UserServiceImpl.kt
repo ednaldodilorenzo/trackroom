@@ -5,6 +5,7 @@ import com.poc.crud.core.type.Email
 import com.poc.crud.modules.user.dto.UserIdNameUsernameDTO
 import com.poc.crud.repository.UserRepository
 import org.springframework.stereotype.Service
+import kotlin.jvm.optionals.getOrNull
 
 @Service
 class UserServiceImpl(private val userRepository: UserRepository) : UserService {
@@ -16,14 +17,14 @@ class UserServiceImpl(private val userRepository: UserRepository) : UserService 
     ): List<UserIdNameUsernameDTO> =
         userRepository.findUsersNotInGroupWithTerm(groupId, term).map { UserIdNameUsernameDTO(it) }
 
-    override fun findEmailAvailability(email: Email): Boolean = userRepository.findByEmail(email) == null
+    override fun findEmailAvailability(email: Email): Boolean = userRepository.findByEmail(email).getOrNull() == null
 
 
     override fun findCPFAvailability(cpf: CPF): Boolean {
-        return userRepository.findByCpf(cpf) == null
+        return userRepository.findByCpf(cpf).getOrNull() == null
     }
 
     override fun findUsernameAvailability(username: String): Boolean {
-        return userRepository.findByUsername(username) == null
+        return userRepository.findByUsername(username).getOrNull() == null
     }
 }

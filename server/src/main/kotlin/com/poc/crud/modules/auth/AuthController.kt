@@ -39,8 +39,8 @@ class AuthController(
 
         val token = this.tokenService.createAccessToken(authentication)
         val cookie =
-            ResponseCookie.from("X-Auth", token).httpOnly(true).secure(false) // Set to true in production with HTTPS
-                .path("/").maxAge(3600) // 1 hour expiration
+            ResponseCookie.from("X-Auth", token).httpOnly(true).secure(true) // Set to true in production with HTTPS
+                .path("/").maxAge(3600).sameSite("None") // 1 hour expiration
                 .build()
         response.addHeader("Set-Cookie", cookie.toString())
         return ResponseEntity.ok(LoginResponseDTO(authentication.name, token))

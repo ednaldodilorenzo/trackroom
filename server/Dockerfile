@@ -3,12 +3,14 @@
 # ==============================
 FROM gradle:8.8-jdk21-alpine AS builder
 
+ARG CLOUD=azure
+
 WORKDIR /app
 COPY build.gradle.kts settings.gradle.kts gradlew ./
 COPY gradle ./gradle
 RUN ./gradlew dependencies || return 0
 COPY . /app
-RUN ./gradlew bootJar -x test
+RUN ./gradlew bootJar -Pcloud=$CLOUD -x test
 
 # ==============================
 # 🚀 2nd Stage: Runtime (Debug + DevTools)

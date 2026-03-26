@@ -2,12 +2,12 @@ package com.poc.crud.config.security
 
 import com.poc.crud.core.security.CookieBearerTokenResolver
 import io.jsonwebtoken.io.Decoders
-import io.jsonwebtoken.security.Keys
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
+import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -23,6 +23,9 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter
 import org.springframework.security.oauth2.server.resource.web.BearerTokenResolver
 import org.springframework.security.web.SecurityFilterChain
+import org.springframework.web.cors.CorsConfiguration
+import org.springframework.web.cors.CorsConfigurationSource
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 import javax.crypto.spec.SecretKeySpec
 
 
@@ -31,12 +34,14 @@ import javax.crypto.spec.SecretKeySpec
 @EnableMethodSecurity
 class SecurityConfig(
     @param:Value("\${jwt.key}") private val securityKey: String,
+    @param:Value("\${APP_CORS_ALLOWED_ORIGINS}") private val allowedOrigins: String,
 ) {
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http.csrf { it.disable() }.formLogin { it.disable() }.httpBasic { it.disable() }.logout { it.disable() }
-            .sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }.authorizeHttpRequests {
+        http.cors(Customizer.withDefaults()).csrf { it.disable() }.formLogin { it.disable() }.httpBasic { it.disable() }
+            .logout { it.disable() }.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
+            .authorizeHttpRequests {
                 it.requestMatchers("/auth/**").permitAll().anyRequest().authenticated()
             }.oauth2ResourceServer { oauth ->
                 oauth.bearerTokenResolver(cookieBearerTokenResolver()).jwt { jwt ->
@@ -45,6 +50,22 @@ class SecurityConfig(
             }
 
         return http.build()
+    }
+
+    @Bean
+    fun corsConfigurationSource(): CorsConfigurationSource {
+        val origins = this.allowedOrigins.split(",")
+        val configuration = CorsConfiguration().apply {
+            allowedOrigins = origins
+            allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            allowedHeaders = listOf("Authorization", "Cache-Control", "Content-Type")
+            allowCredentials = true
+            maxAge = 3600L
+        }
+
+        val source = UrlBasedCorsConfigurationSource()
+        source.registerCorsConfiguration("/**", configuration)
+        return source
     }
 
     @Bean
@@ -65,8 +86,7 @@ class SecurityConfig(
 
     @Bean
     fun daoAuthentication(
-        userDetailsService: UserDetailsService,
-        passwordEncoder: PasswordEncoder
+        userDetailsService: UserDetailsService, passwordEncoder: PasswordEncoder
     ): DaoAuthenticationProvider {
         val provider = DaoAuthenticationProvider(userDetailsService)
         provider.setPasswordEncoder(passwordEncoder)
@@ -84,9 +104,7 @@ class SecurityConfig(
         // Use SecretKeySpec to ensure cross-library compatibility
         val key = SecretKeySpec(keyBytes, "HmacSHA256")
 
-        return NimbusJwtDecoder.withSecretKey(key)
-            .macAlgorithm(MacAlgorithm.HS256)
-            .build()
+        return NimbusJwtDecoder.withSecretKey(key).macAlgorithm(MacAlgorithm.HS256).build()
     }
 
     @Bean
