@@ -36,9 +36,32 @@ jobs:
               - 'web/**'
             back:
               - 'server/**'
+              
+  frontend-tests:
+    needs: changes
+    if: |
+      (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')) &&
+      needs.changes.outputs.front == 'true'
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '25' # Or any other version compatible with your project
+          cache: 'npm' # Caches dependencies
+
+      - name: Install dependencies
+        run: cd web && npm ci # Use 'npm ci' for clean and fast installs in CI environments
+
+      - name: Execute Vitest tests
+        run: cd web && npm run test # Runs the 'test' script in package.json              
 
   build_and_deploy_front:
-    needs: changes
+    needs: frontend-tests
     if: |
       (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')) &&
       needs.changes.outputs.front == 'true'
@@ -73,8 +96,31 @@ jobs:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GENTLE_POND_0C4FB600F }}
           action: "close"
 
-  build_and_deploy_back:
+  backend-tests:
+    runs-on: ubuntu-latest
     needs: changes
+    if: github.event_name == 'push' && needs.changes.outputs.back == 'true'
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up JDK 21
+      uses: actions/setup-java@v4
+      with:
+        java-version: '21'
+        distribution: 'temurin'
+        cache: gradle
+
+    - name: Setup Gradle
+      uses: gradle/actions/setup-gradle@v3
+
+    - name: Grant execute permission for gradlew
+      run: cd server && chmod +x gradlew
+
+    - name: Run Gradle tests
+      run: cd server && ./gradlew test --stacktrace
+  
+  build_and_deploy_back:
+    needs: backend-tests
     if: github.event_name == 'push' && needs.changes.outputs.back == 'true'
     runs-on: ubuntu-latest
     environment: azure_prod
