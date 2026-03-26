@@ -8,7 +8,7 @@ on:
     types: [opened, synchronize, reopened, closed]
     branches:
       - master
-      
+
 env:
   RESOURCE_GROUP: trackroom-app
   CONTAINER_APP_NAME: trackroomback
@@ -17,28 +17,49 @@ env:
   IMAGE_TAG: ${{ github.sha }}
 
 jobs:
-  build_and_deploy_front:
-    if: github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')
+  changes:
     runs-on: ubuntu-latest
-    name: Build and Deploy Job
+    outputs:
+      front: ${{ steps.filter.outputs.front }}
+      back: ${{ steps.filter.outputs.back }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed paths
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          filters: |
+            front:
+              - 'web/**'
+            back:
+              - 'server/**'
+
+  build_and_deploy_front:
+    needs: changes
+    if: |
+      (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')) &&
+      needs.changes.outputs.front == 'true'
+    runs-on: ubuntu-latest
+    name: Build and Deploy Front
     steps:
       - uses: actions/checkout@v3
         with:
           submodules: true
           lfs: false
+
       - name: Build And Deploy
         id: builddeploy
         uses: Azure/static-web-apps-deploy@v1
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_GENTLE_POND_0C4FB600F }}
-          repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
           action: "upload"
-          ###### Repository/Build Configurations - These values can be configured to match your app requirements. ######
-          # For more information regarding Static Web App workflow configurations, please visit: https://aka.ms/swaworkflowconfig
-          app_location: "./web" # App source code path
-          api_location: "" # Api source code path - optional
-          output_location: "dist" # Built app content directory - optional
-          ###### End of Repository/Build Configurations ######
+          app_location: "./web"
+          api_location: ""
+          output_location: "dist"
 
   close_pull_request_job:
     if: github.event_name == 'pull_request' && github.event.action == 'closed'
@@ -53,6 +74,8 @@ jobs:
           action: "close"
 
   build_and_deploy_back:
+    needs: changes
+    if: github.event_name == 'push' && needs.changes.outputs.back == 'true'
     runs-on: ubuntu-latest
     environment: azure_prod
     permissions:
