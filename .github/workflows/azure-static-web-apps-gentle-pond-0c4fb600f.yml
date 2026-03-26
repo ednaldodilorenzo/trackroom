@@ -73,7 +73,7 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t $ACR_NAME.azurecr.io/$IMAGE_NAME:$IMAGE_TAG -f server/Dockerfile --build-arg CLOUD=azure .
+          docker build -t $ACR_NAME.azurecr.io/$IMAGE_NAME:$IMAGE_TAG -f server/Dockerfile --build-arg CLOUD=azure ./server
 
       - name: Push Docker image
         run: |
