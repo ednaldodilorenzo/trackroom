@@ -17,14 +17,15 @@ class UserServiceImpl(private val userRepository: UserRepository) : UserService 
     ): List<UserIdNameUsernameDTO> =
         userRepository.findUsersNotInGroupWithTerm(groupId, term).map { UserIdNameUsernameDTO(it) }
 
-    override fun findEmailAvailability(email: Email): Boolean = userRepository.findByEmail(email).getOrNull() == null
+    override fun findEmailAvailability(email: Email): Boolean =
+        userRepository.findByEmail(email).map { !it.active }.orElse(true) ?: true
 
 
     override fun findCPFAvailability(cpf: CPF): Boolean {
-        return userRepository.findByCpf(cpf).getOrNull() == null
+        return userRepository.findByCpf(cpf).map { !it.active }.orElse(true) ?: true
     }
 
     override fun findUsernameAvailability(username: String): Boolean {
-        return userRepository.findByUsername(username).getOrNull() == null
+        return userRepository.findByUsername(username).map { !it.active }.orElse(true) ?: true
     }
 }

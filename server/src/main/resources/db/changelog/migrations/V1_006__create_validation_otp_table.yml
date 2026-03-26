@@ -1,0 +1,25 @@
+databaseChangeLog:
+  - changeSet:
+      id: V1_006
+      author: Ednaldo Dilorenzo
+      changes:
+        - createTable:
+            tableName: confirmation_otp
+            columns:
+              - column:
+                  name: key
+                  type: VARCHAR(100)
+                  constraints:
+                    unique: true
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: code
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: expires_at
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: true

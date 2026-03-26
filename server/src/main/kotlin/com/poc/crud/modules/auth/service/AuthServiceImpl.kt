@@ -10,6 +10,8 @@ import com.poc.crud.model.User
 import com.poc.crud.modules.auth.dto.SignupRequestDTO
 import com.poc.crud.repository.UserRepository
 import jakarta.transaction.Transactional
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import java.security.SecureRandom
@@ -21,8 +23,11 @@ class AuthServiceImpl(
     private val tokenService: TokenService,
     private val passwordEncoder: PasswordEncoder,
     private val accountConfirmationEmailNotification: AccountConfirmationEmailPublisher,
-    private val cacheManager: CacheManager,
 ) : AuthService {
+
+    @Autowired
+    @Qualifier("database")
+    private lateinit var cacheManager: CacheManager
 
     @Transactional
     override fun executeSignup(signupRequestDTO: SignupRequestDTO) {
@@ -84,7 +89,7 @@ class AuthServiceImpl(
     @Transactional
     override fun activateSignUp(token: String, code: String) {
         val claims = tokenService.validateJwt(token)
-        val email = claims.body.subject ?: ""
+        val email = claims.payload.subject ?: ""
 
         email.isBlank() && throw APIException(
             ExceptionType.BUSINESS_ERROR, "User email not found!", RuntimeException("")

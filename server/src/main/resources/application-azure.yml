@@ -3,11 +3,6 @@ spring:
     name: trackroom
   datasource:
     driver-class-name: org.postgresql.Driver
-  jpa:
-    show-sql: true
-  devtools:
-    restart:
-      enabled: true
   liquibase:
     enabled: true
   mail:
