@@ -1,0 +1,11 @@
+databaseChangeLog:
+  - changeSet:
+      id: drop-music-unique-constraints
+      author: Ednaldo Dilorenzo
+      changes:
+        - dropUniqueConstraint:
+            constraintName: music_name_unique
+            tableName: musics
+        - dropUniqueConstraint:
+            constraintName: music_file_unique
+            tableName: musics
