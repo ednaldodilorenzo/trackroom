@@ -24,24 +24,30 @@ jobs:
       back: ${{ steps.filter.outputs.back }}
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+        #with:
+        #  fetch-depth: 0
 
       - name: Detect changed paths
         id: filter
         uses: dorny/paths-filter@v3
         with:
+          base: ${{ github.ref }} 
           filters: |
             front:
               - 'web/**'
             back:
               - 'server/**'
+      
+      - name: Debug Filters
+        run: |
+          echo "Front changed: ${{ steps.filter.outputs.front }}"
+          echo "Back changed: ${{ steps.filter.outputs.back }}"
               
   frontend-tests:
     needs: changes
     if: |
       (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')) &&
-      steps.filter.outputs.front == 'true'
+      needs.changes.outputs.front == 'true'
     runs-on: ubuntu-latest
     
     steps:
@@ -64,7 +70,7 @@ jobs:
     needs: frontend-tests
     if: |
       (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')) &&
-      steps.filter.outputs.front == 'true'
+      needs.changes.outputs.front == 'true'
     runs-on: ubuntu-latest
     name: Build and Deploy Front
     steps:
