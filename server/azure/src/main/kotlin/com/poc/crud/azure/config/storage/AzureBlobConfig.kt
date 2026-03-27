@@ -25,7 +25,7 @@ class AzureBlobConfig {
     @Bean
     @Profile("azure")
     fun localBlobServiceClient(
-        @Value("\${APP_AZURE_STORAGE_CONNECTION_STRING}") connectionString: String
+        @Value("\${AZURE_STORAGE_CONNECTION_STRING}") connectionString: String
     ): BlobServiceClient {
         return BlobServiceClientBuilder()
             .connectionString(connectionString)
