@@ -41,7 +41,7 @@ jobs:
     needs: changes
     if: |
       (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')) &&
-      needs.changes.outputs.front == 'true'
+      steps.filter.outputs.front == 'true'
     runs-on: ubuntu-latest
     
     steps:
@@ -64,7 +64,7 @@ jobs:
     needs: frontend-tests
     if: |
       (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed')) &&
-      needs.changes.outputs.front == 'true'
+      steps.filter.outputs.front == 'true'
     runs-on: ubuntu-latest
     name: Build and Deploy Front
     steps:
