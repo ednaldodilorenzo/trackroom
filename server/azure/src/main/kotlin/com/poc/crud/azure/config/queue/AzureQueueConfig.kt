@@ -14,6 +14,7 @@ class AzureQueueConfig {
         @Value("\${AZURE_STORAGE_CONNECTION_STRING}") connectionString: String,
         @Value("\${AZURE_STORAGE_QUEUE_NAME}") queueName: String
     ): QueueClient {
+
         val client = QueueClientBuilder()
             .connectionString(connectionString)
             .queueName(queueName)
