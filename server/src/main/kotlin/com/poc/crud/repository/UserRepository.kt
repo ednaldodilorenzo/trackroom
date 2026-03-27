@@ -14,6 +14,8 @@ interface UserRepository : JpaRepository<User, Long> {
 
     fun findByEmail(email: Email): Optional<User>
 
+    fun findByEmailAndActiveTrue(email: Email): Optional<User>
+
     fun findByCpf(cpf: CPF): Optional<User>
 
     fun findByUsername(username: String): Optional<User>

@@ -3,6 +3,11 @@ spring:
     name: trackroom
   datasource:
     driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+      connection-timeout: 20000
+      idle-timeout: 300000
   liquibase:
     enabled: true
   mail:
