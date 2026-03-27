@@ -120,7 +120,7 @@ jobs:
 #      run: cd server && ./gradlew test --stacktrace
   
   build_and_deploy_back:
-    needs: backend-tests
+    needs: changes
     if: github.event_name == 'push' && needs.changes.outputs.back == 'true'
     runs-on: ubuntu-latest
     environment: azure_prod
