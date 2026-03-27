@@ -11,7 +11,6 @@ import org.springframework.stereotype.Component
 import java.util.concurrent.TimeUnit
 
 @Component
-@Profile("local | azure")
 class RedisMessageQueueListener(
     private val redisTemplate: StringRedisTemplate,
     private val queueData: QueueData,

@@ -16,6 +16,7 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter")
     implementation(platform("com.azure.spring:spring-cloud-azure-dependencies:7.1.0"))
     implementation("com.azure.spring:spring-cloud-azure-starter-storage-blob")
+    implementation("com.azure:azure-storage-queue")
     implementation(project(":core"))
     testImplementation(kotlin("test"))
 }

@@ -5,182 +5,182 @@ on:
     branches:
       - master
 
-jobs:
-  frontend-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+#jobs:
+#  frontend-tests:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - name: Checkout repository
+#        uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '25' # Or any other version compatible with your project
-          cache: 'npm' # Caches dependencies
+#      - name: Set up Node.js
+#        uses: actions/setup-node@v4
+#        with:
+#          node-version: '25' # Or any other version compatible with your project
+#          cache: 'npm' # Caches dependencies
 
-      - name: Install dependencies
-        run: cd web && npm ci # Use 'npm ci' for clean and fast installs in CI environments
+#      - name: Install dependencies
+#        run: cd web && npm ci # Use 'npm ci' for clean and fast installs in CI environments
 
-      - name: Execute Vitest tests
-        run: cd web && npm run test # Runs the 'test' script in package.json
+#      - name: Execute Vitest tests
+#        run: cd web && npm run test # Runs the 'test' script in package.json
 
-  build-and-deploy-front:
-    runs-on: ubuntu-latest
+#  build-and-deploy-front:
+#    runs-on: ubuntu-latest
 
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+#    steps:
+#    - name: Checkout code
+#      uses: actions/checkout@v4
 
-    - name: Set up Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '25'
+#    - name: Set up Node.js
+#      uses: actions/setup-node@v4
+#      with:
+#        node-version: '25'
 
-    - name: Install dependencies and build React app
-      run: |
-        cd web
-        npm install
-        npm run build
-      env:
+#    - name: Install dependencies and build React app
+#      run: |
+#        cd web
+#        npm install
+#        npm run build
+#      env:
         # Optional: Set environment variables for React app if needed (e.g., CI=false to avoid warnings as errors)
-        CI: false
+#        CI: false
 
-    - name: Debug Folder Structure
-      run: ls -R web/dist
+#    - name: Debug Folder Structure
+#      run: ls -R web/dist
     
-    - name: Install OCI CLI (via Oracle action)
-      uses: oracle-actions/run-oci-cli-command@v1.3.2
-      with:
-        command: --version
-        silent: true
-      env:
-        OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
-        OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
-        OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
-        OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
-        OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
+#    - name: Install OCI CLI (via Oracle action)
+#      uses: oracle-actions/run-oci-cli-command@v1.3.2
+#      with:
+#        command: --version
+#        silent: true
+#      env:
+#        OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
+#        OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
+#        OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+#        OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+#        OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
     
-    - name: Update bucket files (correct content-types)
-      shell: bash
-      env:
-        OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
-        OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
-        OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
-        OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
-        OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
-        OCI_NAMESPACE: ${{ secrets.OCI_NAMESPACE }}
-        OCI_BUCKET_NAME: ${{ secrets.OCI_BUCKET_NAME }}
-      run: |
-        set -euo pipefail
-        export PATH="$HOME/.local/bin:$PATH"
+#    - name: Update bucket files (correct content-types)
+#      shell: bash
+#      env:
+#        OCI_CLI_USER: ${{ secrets.OCI_CLI_USER }}
+#        OCI_CLI_TENANCY: ${{ secrets.OCI_CLI_TENANCY }}
+#        OCI_CLI_FINGERPRINT: ${{ secrets.OCI_CLI_FINGERPRINT }}
+#        OCI_CLI_KEY_CONTENT: ${{ secrets.OCI_CLI_KEY_CONTENT }}
+#        OCI_CLI_REGION: ${{ secrets.OCI_CLI_REGION }}
+#        OCI_NAMESPACE: ${{ secrets.OCI_NAMESPACE }}
+#        OCI_BUCKET_NAME: ${{ secrets.OCI_BUCKET_NAME }}
+#      run: |
+#        set -euo pipefail
+#        export PATH="$HOME/.local/bin:$PATH"
 
         # --- ensure OCI CLI has config/key available in this step ---
-        mkdir -p ~/.oci
-        cat > ~/.oci/config <<EOF
-        [DEFAULT]
-        user=${OCI_CLI_USER}
-        fingerprint=${OCI_CLI_FINGERPRINT}
-        tenancy=${OCI_CLI_TENANCY}
-        region=${OCI_CLI_REGION}
-        key_file=~/.oci/oci_api_key.pem
-        EOF
+#        mkdir -p ~/.oci
+#        cat > ~/.oci/config <<EOF
+#        [DEFAULT]
+#        user=${OCI_CLI_USER}
+#        fingerprint=${OCI_CLI_FINGERPRINT}
+#        tenancy=${OCI_CLI_TENANCY}
+#        region=${OCI_CLI_REGION}
+#        key_file=~/.oci/oci_api_key.pem
+#        EOF
 
-        printf "%s" "${OCI_CLI_KEY_CONTENT}" > ~/.oci/oci_api_key.pem
-        chmod 600 ~/.oci/oci_api_key.pem
+#        printf "%s" "${OCI_CLI_KEY_CONTENT}" > ~/.oci/oci_api_key.pem
+#        chmod 600 ~/.oci/oci_api_key.pem
 
         # quick sanity check (optional but helpful)
-        oci os ns get --auth api_key >/dev/null
+#        oci os ns get --auth api_key >/dev/null
 
-        SRC_DIR="web/dist"
-        NS="$OCI_NAMESPACE"
-        BN="$OCI_BUCKET_NAME"
+#        SRC_DIR="web/dist"
+#        NS="$OCI_NAMESPACE"
+#        BN="$OCI_BUCKET_NAME"
 
-        oci os object bulk-upload -bn "$BN" -ns "$NS" --src-dir "$SRC_DIR" --overwrite
+#        oci os object bulk-upload -bn "$BN" -ns "$NS" --src-dir "$SRC_DIR" --overwrite
 
-        find "$SRC_DIR" -type f -name "*.svg" -print0 | while IFS= read -r -d '' f; do
-          oci os object put -ns "$NS" -bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "image/svg+xml" --force
-        done
+  #       find "$SRC_DIR" -type f -name "*.svg" -print0 | while IFS= read -r -d '' f; do
+  #         oci os object put -ns "$NS" -bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "image/svg+xml" --force
+  #       done
 
-        find "$SRC_DIR" -type f -name "*.css" -print0 | while IFS= read -r -d '' f; do
-          oci os object put -ns "$NS" -bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "text/css; charset=utf-8" --force
-        done
+  #       find "$SRC_DIR" -type f -name "*.css" -print0 | while IFS= read -r -d '' f; do
+  #         oci os object put -ns "$NS" -bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "text/css; charset=utf-8" --force
+  #       done
 
-        find "$SRC_DIR" -type f -name "*.js" -print0 | while IFS= read -r -d '' f; do
-          oci os object put -ns "$NS" -bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "application/javascript; charset=utf-8" --force
-        done
+  #       find "$SRC_DIR" -type f -name "*.js" -print0 | while IFS= read -r -d '' f; do
+  #         oci os object put -ns "$NS" -bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "application/javascript; charset=utf-8" --force
+  #       done
 
-        find "$SRC_DIR" -type f -name "*.webmanifest" -print0 | while IFS= read -r -d '' f; do
-          oci os object put -ns "$NS" -bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "application/manifest+json; charset=utf-8" --force
-        done
+  #       find "$SRC_DIR" -type f -name "*.webmanifest" -print0 | while IFS= read -r -d '' f; do
+  #         oci os object put -ns "$NS" -bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "application/manifest+json; charset=utf-8" --force
+  #       done
 
-        find "$SRC_DIR" -type f -name "*.png" -print0 | while IFS= read -r -d '' f; do
-          oci os object put -ns "$NS" -bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "image/png" --force
-        done
+  #       find "$SRC_DIR" -type f -name "*.png" -print0 | while IFS= read -r -d '' f; do
+  #         oci os object put -ns "$NS" -bn "$BN" --name "${f#$SRC_DIR/}" --file "$f" --content-type "image/png" --force
+  #       done
 
-        oci os object put -ns "$NS" -bn "$BN" --name "index.html" --file "$SRC_DIR/index.html" --content-type "text/html; charset=utf-8" --force
+  #       oci os object put -ns "$NS" -bn "$BN" --name "index.html" --file "$SRC_DIR/index.html" --content-type "text/html; charset=utf-8" --force
 
 
-  backend-tests:
-    runs-on: ubuntu-latest
+  # backend-tests:
+  #   runs-on: ubuntu-latest
 
-    steps:
-    - uses: actions/checkout@v4
+  #   steps:
+  #   - uses: actions/checkout@v4
 
-    - name: Set up JDK 17
-      uses: actions/setup-java@v4
-      with:
-        java-version: '17'
-        distribution: 'temurin'
-        cache: gradle
+  #   - name: Set up JDK 17
+  #     uses: actions/setup-java@v4
+  #     with:
+  #       java-version: '17'
+  #       distribution: 'temurin'
+  #       cache: gradle
 
-    - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
+  #   - name: Setup Gradle
+  #     uses: gradle/actions/setup-gradle@v3
 
-    - name: Grant execute permission for gradlew
-      run: cd server && chmod +x gradlew
+  #   - name: Grant execute permission for gradlew
+  #     run: cd server && chmod +x gradlew
 
-    - name: Run Gradle tests
-      run: cd server && ./gradlew test --stacktrace
+  #   - name: Run Gradle tests
+  #     run: cd server && ./gradlew test --stacktrace
   
-  deploy-prod:
-    runs-on: ubuntu-latest
-    environment: production
-    env:
-      APP_PROFILES_ACTIVE: ${{ secrets.APP_PROFILES_ACTIVE }}
-      CACHE_HOST: ${{ secrets.CACHE_HOST }}
-      CACHE_PORT: ${{ secrets.CACHE_PORT }}
-      MAIL_HOST: ${{ secrets.MAIL_HOST }}
-      MAIL_PORT: ${{ secrets.MAIL_PORT }}
-      MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
-      MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
-      DB_URL: ${{ secrets.DB_URL }}
-      DB_USERNAME: ${{ secrets.DB_USERNAME }}
-      DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
-      APP_FRONT_URL: ${{ secrets.APP_FRONT_URL }}
+  # deploy-prod:
+  #   runs-on: ubuntu-latest
+  #   environment: production
+  #   env:
+  #     APP_PROFILES_ACTIVE: ${{ secrets.APP_PROFILES_ACTIVE }}
+  #     CACHE_HOST: ${{ secrets.CACHE_HOST }}
+  #     CACHE_PORT: ${{ secrets.CACHE_PORT }}
+  #     MAIL_HOST: ${{ secrets.MAIL_HOST }}
+  #     MAIL_PORT: ${{ secrets.MAIL_PORT }}
+  #     MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+  #     MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+  #     DB_URL: ${{ secrets.DB_URL }}
+  #     DB_USERNAME: ${{ secrets.DB_USERNAME }}
+  #     DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
+  #     APP_FRONT_URL: ${{ secrets.APP_FRONT_URL }}
 
-    steps:
-    - name: Checkout Code
-      uses: actions/checkout@v3
+  #   steps:
+  #   - name: Checkout Code
+  #     uses: actions/checkout@v3
       
-    - name: Install Docker Compose
-      run: |
-        sudo apt-get update
-        sudo apt install python3-paramiko
-        sudo apt-get install -y docker-compose
+  #   - name: Install Docker Compose
+  #     run: |
+  #       sudo apt-get update
+  #       sudo apt install python3-paramiko
+  #       sudo apt-get install -y docker-compose
       
-    - name: Set up SSH Key
-      run: |
-        mkdir -p ~/.ssh
-        echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
-        chmod 600 ~/.ssh/id_rsa
-        ssh-keyscan -H ${{ secrets.ENVIRONMENT_HOST }} >> ~/.ssh/known_hosts
+  #   - name: Set up SSH Key
+  #     run: |
+  #       mkdir -p ~/.ssh
+  #       echo "${{ secrets.SSH_PRIVATE_KEY }}" > ~/.ssh/id_rsa
+  #       chmod 600 ~/.ssh/id_rsa
+  #       ssh-keyscan -H ${{ secrets.ENVIRONMENT_HOST }} >> ~/.ssh/known_hosts
 
-    - name: Execute Docker Compose Down
-      run: |
-        DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose stop app
-        DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose rm -f app        
+  #   - name: Execute Docker Compose Down
+  #     run: |
+  #       DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose stop app
+  #       DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose rm -f app        
 
-    - name: Execute Docker Compose Up
-      run: |
-        DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose build --pull app
-        DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose up -d app
+  #   - name: Execute Docker Compose Up
+  #     run: |
+  #       DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose build --pull app
+  #       DOCKER_HOST=ssh://${{ secrets.SSH_USER }}@${{ secrets.ENVIRONMENT_HOST }} docker compose up -d app
