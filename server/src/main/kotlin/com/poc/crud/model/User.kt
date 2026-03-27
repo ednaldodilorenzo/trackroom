@@ -17,7 +17,7 @@ data class User(
     val cpf: CPF,
     var active: Boolean,
     val phoneNumber: String,
-    val password: String,
+    val password: String?,
     val username: String,
 
     @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)

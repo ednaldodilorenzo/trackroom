@@ -47,13 +47,3 @@ jwt:
   key: a9c986ede938a8b4f8721737c62efd8568ba43e976e2b77cdd90d0b2c4f66e97
   accessTokenExpiration: 3600
 
-filestorage:
-  accesskey: minioadmin
-  secretkey: minioadmin
-  endpoint: http://minio:9000
-  region: us-east-1
-
-queue:
-  ids:
-    email-account-confirmation-id: QUEUE_MESSAGE_ACCOUNT_CONFIRM
-    document-evaluate-id: QUEUE_DOCUMENT_EVALUATE

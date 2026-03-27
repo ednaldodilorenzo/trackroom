@@ -15,11 +15,11 @@ class CustomUserDetailsService(
     private val userRepository: UserRepository
 ) : UserDetailsService {
 
-    override fun loadUserByUsername(username: String?): UserDetails? {
+    override fun loadUserByUsername(username: String): UserDetails {
         val user = userRepository.findByEmailAndActiveTrue(Email(username!!))
             .orElseThrow { UsernameNotFoundException("Usuário ativo não encontrado!") }
 
-        return user?.let {
+        return user.let {
             User.builder().username(it.email.address)
                 .password(it.password) // not used in JWT, but required by interface
                 .authorities(it.id.toString()).build()

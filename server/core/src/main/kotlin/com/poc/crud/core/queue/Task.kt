@@ -1,6 +1,7 @@
 package com.poc.crud.core.queue
 
-import com.fasterxml.jackson.databind.JsonNode
+import tools.jackson.databind.JsonNode
+
 
 enum class TaskType {
     MESSAGE_EMAIL_CONFIRMATION,

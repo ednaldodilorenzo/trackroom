@@ -4,7 +4,7 @@ import org.springframework.boot.gradle.tasks.run.BootRun
 plugins {
 	kotlin("jvm") version "2.2.21"
 	kotlin("plugin.spring") version "2.2.21"
-	id("org.springframework.boot") version "3.5.3"
+	id("org.springframework.boot") version "4.0.4"
 	id("io.spring.dependency-management") version "1.1.7"
 	kotlin("plugin.jpa") version "2.2.21"
 }
@@ -28,13 +28,17 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-web") {
 		exclude(group = "org.springframework.boot", module = "spring-boot-starter-tomcat")
 	}
-	implementation("org.springframework.boot:spring-boot-starter-undertow")
+	implementation("org.springframework.boot:spring-boot-starter-jetty")
+
+	// Add this dependency to enable HTTP/2 support in Jetty
+	implementation("org.eclipse.jetty.http2:jetty-http2-server")
+	implementation("tools.jackson.module:jackson-module-kotlin")
+	implementation("org.jetbrains.kotlin:kotlin-reflect")
 	implementation("org.springframework.boot:spring-boot-starter-mail")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
 	implementation("org.springframework.boot:spring-boot-starter-security")
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
-	implementation("com.fasterxml.jackson.module:jackson-module-kotlin")
 	implementation("org.liquibase:liquibase-core")
 	implementation(project(":core"))
 	when (cloud.lowercase()) {
@@ -42,18 +46,15 @@ dependencies {
 			implementation(project(":oci"))
 		}
 		"local" -> {
-			implementation(platform("software.amazon.awssdk:bom:2.35.11"))
-			implementation("software.amazon.awssdk:s3")
+			implementation(project(":queue"))
+			implementation(project(":storage"))
 		}
 		"azure" -> {
-			implementation(platform("software.amazon.awssdk:bom:2.35.11"))
-			implementation("software.amazon.awssdk:s3")
 			implementation(project(":azure"))
 		}
 	}
 
 	developmentOnly("org.springframework.boot:spring-boot-devtools")
-	implementation("org.springframework.boot:spring-boot-starter-data-redis")
 	implementation("io.jsonwebtoken:jjwt-api:0.13.0")
 	runtimeOnly("io.jsonwebtoken:jjwt-impl:0.13.0")
 	runtimeOnly("io.jsonwebtoken:jjwt-jackson:0.13.0") // or jjwt-gson

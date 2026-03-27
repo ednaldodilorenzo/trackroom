@@ -1,14 +1,12 @@
-package com.poc.crud.infrastructure.messaging.redis
+package com.poc.crud.queue
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.poc.crud.core.queue.MessageQueue
 import com.poc.crud.core.queue.Task
-import org.springframework.context.annotation.Profile
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Component
+import tools.jackson.databind.ObjectMapper
 
 @Component
-@Profile("local")
 class RedisMessageQueue(
     private val redisTemplate: StringRedisTemplate,
     private val objectMapper: ObjectMapper,

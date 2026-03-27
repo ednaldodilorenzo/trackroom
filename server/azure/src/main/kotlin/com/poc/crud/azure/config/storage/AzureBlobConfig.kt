@@ -11,17 +11,6 @@ import org.springframework.context.annotation.Profile
 @Configuration
 class AzureBlobConfig {
 
-//    @Bean
-//    @Profile("azure")
-//    fun azureBlobServiceClient(
-//        @Value("\${app.azure.storage.account-name}") accountName: String
-//    ): BlobServiceClient {
-//        return BlobServiceClientBuilder()
-//            .endpoint("https://$accountName.blob.core.windows.net")
-//            .credential(DefaultAzureCredentialBuilder().build())
-//            .buildClient()
-//    }
-
     @Bean
     @Profile("azure")
     fun localBlobServiceClient(

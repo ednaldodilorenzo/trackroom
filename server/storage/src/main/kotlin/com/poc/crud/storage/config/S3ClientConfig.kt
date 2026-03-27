@@ -1,4 +1,4 @@
-package com.poc.crud.config.storage
+package com.poc.crud.storage.config
 
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean

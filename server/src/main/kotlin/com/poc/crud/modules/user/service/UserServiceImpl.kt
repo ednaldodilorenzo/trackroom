@@ -5,7 +5,6 @@ import com.poc.crud.core.type.Email
 import com.poc.crud.modules.user.dto.UserIdNameUsernameDTO
 import com.poc.crud.repository.UserRepository
 import org.springframework.stereotype.Service
-import kotlin.jvm.optionals.getOrNull
 
 @Service
 class UserServiceImpl(private val userRepository: UserRepository) : UserService {

@@ -1,4 +1,4 @@
-package com.poc.crud.infrastructure.cache
+package com.poc.crud.cache
 
 import com.poc.crud.core.cache.CacheManager
 import org.springframework.data.redis.core.StringRedisTemplate

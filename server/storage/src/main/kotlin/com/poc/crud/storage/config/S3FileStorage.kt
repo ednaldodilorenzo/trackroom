@@ -1,8 +1,8 @@
-package com.poc.crud.core.storage
+package com.poc.crud.storage.config
 
+import com.poc.crud.core.storage.FileStorage
 import org.springframework.context.annotation.Profile
 import org.springframework.stereotype.Component
-import org.springframework.web.multipart.MultipartFile
 import software.amazon.awssdk.core.ResponseInputStream
 import java.io.InputStream
 

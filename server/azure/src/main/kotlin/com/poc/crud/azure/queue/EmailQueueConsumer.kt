@@ -11,7 +11,6 @@ import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
 @Component
-@Profile("azure")
 class EmailQueueConsumer(
     private val queueClient: QueueClient,
     private val objectMapper: ObjectMapper,

@@ -1,13 +1,12 @@
-package com.poc.crud.infrastructure.messaging.redis
+package com.poc.crud.queue
 
-import com.fasterxml.jackson.databind.ObjectMapper
 import com.poc.crud.core.infrastructure.messaging.subscriber.ProcessorResolver
 import com.poc.crud.core.queue.QueueData
 import com.poc.crud.core.queue.Task
-import org.springframework.context.annotation.Profile
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
+import tools.jackson.databind.ObjectMapper
 import java.util.concurrent.TimeUnit
 
 @Component
