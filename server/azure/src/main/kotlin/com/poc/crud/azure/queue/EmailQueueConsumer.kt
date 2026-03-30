@@ -10,7 +10,7 @@ import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
 
-@Component
+//@Component
 class EmailQueueConsumer(
     private val queueClient: QueueClient,
     private val objectMapper: ObjectMapper,
@@ -19,7 +19,7 @@ class EmailQueueConsumer(
 
     private val log = LoggerFactory.getLogger(javaClass)
 
-    @Scheduled(fixedDelay = 5000)
+    //@Scheduled(fixedDelay = 5000)
     fun consume() {
         val messages = queueClient.receiveMessages(10)
 
