@@ -47,3 +47,7 @@ jwt:
   key: a9c986ede938a8b4f8721737c62efd8568ba43e976e2b77cdd90d0b2c4f66e97
   accessTokenExpiration: 3600
 
+queue:
+  ids:
+    email-account-confirmation-id: email-confirmation
+
