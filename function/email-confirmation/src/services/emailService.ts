@@ -18,7 +18,7 @@ export class EmailService {
         code: string;
     }): Promise<void> {
         const displayName =  "usuário";
-        const confirmationUrl = `https://${env.appHost}/confirm/${encodeURIComponent(params.token)}`;
+        const confirmationUrl = `${env.appHost}/confirm/${encodeURIComponent(params.token)}`;
 
         const subject = "Confirme sua conta no TrackRoom";
 
@@ -53,7 +53,7 @@ export class EmailService {
           >
             Confirmar conta
           </a>
-          E informe o código de confirmação: <strong>${escapeHtml(params.code)}</strong>
+          <p>E informe o código de confirmação: <strong>${escapeHtml(params.code)}</strong><p>
         </p>
         <p>Ou, se preferir, use este link:</p>
         <p>
