@@ -12,7 +12,7 @@ on:
 env:
   AZURE_FUNCTIONAPP_NAME: email-confirmation
   PACKAGE_PATH: email-confirmation
-  NODE_VERSION: "22"
+  NODE_VERSION: "25"
 
 jobs:
   build-and-deploy:
