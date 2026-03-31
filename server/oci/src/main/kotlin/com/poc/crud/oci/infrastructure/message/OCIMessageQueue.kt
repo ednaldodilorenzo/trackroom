@@ -15,7 +15,7 @@ import org.springframework.stereotype.Component
 @Profile("oci")
 class OCIMessageQueue(private val queueClient: QueueClient, private val objectMapper: ObjectMapper) : MessageQueue {
 
-    override fun publish(queue: String, task: Task) {
+    override fun <T> publish(queue: String, task: Task<T>) {
         val payload = objectMapper.writeValueAsString(task)
         val entry = PutMessagesDetailsEntry.builder().content(payload).build()
         val details = PutMessagesDetails.builder().messages(listOf(entry)).build()

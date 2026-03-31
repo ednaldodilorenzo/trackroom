@@ -3,6 +3,7 @@ package com.poc.crud.queue
 import com.poc.crud.core.infrastructure.messaging.subscriber.ProcessorResolver
 import com.poc.crud.core.queue.QueueData
 import com.poc.crud.core.queue.Task
+import com.poc.crud.core.queue.TaskType
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -22,8 +23,7 @@ class RedisMessageQueueListener(
             try {
                 val entry = redisTemplate.opsForList().leftPop(queue, 5, TimeUnit.SECONDS)
                 entry?.let { messageJson ->
-                    val queueMessage = objectMapper.readValue(messageJson, Task::class.java)
-                    processMessage(queueMessage)
+                    processMessage(messageJson)
                 }
             } catch (e: Exception) {
                 println("Error processing message: ${e.message}")
@@ -31,8 +31,8 @@ class RedisMessageQueueListener(
         }
     }
 
-    private fun processMessage(task: Task) {
-        subscriberResolver.resolve(task.type).processMessage(task)
-        println("Consumed task ID: ${task.type}, Description: ${task.type}")
+    private fun processMessage(payload: String) {
+        subscriberResolver.resolve(TaskType.MESSAGE_EMAIL_CONFIRMATION).processMessage(payload)
+        println("Consumed task ID: ${TaskType.MESSAGE_EMAIL_CONFIRMATION}, Description: ${TaskType.MESSAGE_EMAIL_CONFIRMATION}")
     }
 }

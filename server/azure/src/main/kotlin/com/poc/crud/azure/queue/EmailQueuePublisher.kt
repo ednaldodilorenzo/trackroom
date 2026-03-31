@@ -13,7 +13,7 @@ class EmailQueuePublisher(
     private val queueClient: QueueClient,
     private val objectMapper: ObjectMapper,
 ): MessageQueue {
-    override fun publish(queue: String, task: Task) {
+    override fun <T> publish(queue: String, task: Task<T>) {
         val payload = objectMapper.writeValueAsString(task)
         this.queueClient.sendMessage(payload)
     }

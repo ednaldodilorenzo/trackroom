@@ -7,6 +7,7 @@ import com.oracle.bmc.queue.requests.GetMessagesRequest
 import com.poc.crud.core.queue.QueueData
 import com.poc.crud.core.queue.Task
 import com.poc.crud.core.infrastructure.messaging.subscriber.ProcessorResolver
+import com.poc.crud.core.queue.TaskType
 import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
@@ -32,8 +33,7 @@ class OCIMessageQueueListener(
 
             messages.forEach { msg ->
                 try {
-                    val queueMessage = objectMapper.readValue(msg.content, Task::class.java)
-                    processMessage(queueMessage)
+                    processMessage(msg.content)
 
                     val deleteRequest = DeleteMessageRequest.builder()
                         .queueId(queue)
@@ -47,8 +47,8 @@ class OCIMessageQueueListener(
         }
     }
 
-    private fun processMessage(task: Task) {
-        subscriberResolver.resolve(task.type).processMessage(task)
-        println("Consumed task ID: ${task.type}, Description: ${task.type}")
+    private fun processMessage(payload: String) {
+        subscriberResolver.resolve(TaskType.MESSAGE_EMAIL_CONFIRMATION).processMessage(payload)
+        println("Consumed task ID: ${TaskType.MESSAGE_EMAIL_CONFIRMATION}, Description: ${TaskType.MESSAGE_EMAIL_CONFIRMATION}")
     }
 }

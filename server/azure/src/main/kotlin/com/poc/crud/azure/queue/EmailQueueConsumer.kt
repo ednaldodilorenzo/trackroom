@@ -5,6 +5,7 @@ import com.azure.storage.queue.QueueClient
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.poc.crud.core.infrastructure.messaging.subscriber.ProcessorResolver
 import com.poc.crud.core.queue.Task
+import com.poc.crud.core.queue.TaskType
 import org.slf4j.LoggerFactory
 import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
@@ -25,12 +26,7 @@ class EmailQueueConsumer(
 
         for (message in messages) {
             try {
-                val payload = objectMapper.readValue(
-                    message.body.toString(),
-                    Task::class.java
-                )
-
-                processMessage(payload)
+                processMessage(message.body.toString())
 
                 queueClient.deleteMessage(message.messageId, message.popReceipt)
             } catch (ex: Exception) {
@@ -39,8 +35,8 @@ class EmailQueueConsumer(
         }
     }
 
-    private fun processMessage(task: Task) {
-        this.subscriberResolver.resolve(task.type).processMessage(task)
-        println("Consumed task ID: ${task.type}, Description: ${task.type}")
+    private fun processMessage(payload: String) {
+        this.subscriberResolver.resolve(TaskType.MESSAGE_EMAIL_CONFIRMATION).processMessage(payload)
+        println("Consumed task ID: ${TaskType.MESSAGE_EMAIL_CONFIRMATION}, Description: ${TaskType.MESSAGE_EMAIL_CONFIRMATION}")
     }
 }
