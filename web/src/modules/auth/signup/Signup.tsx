@@ -52,49 +52,57 @@ export default function Signup() {
     const submit = useSubmit();
 
     return (
-        <div className="auth-container">
-            <Form
-                className="auth-form"
-                onSubmit={handleSubmit((data: FormData) => submit(data, { method: "post" }))}
-
-            >
-                <h2 style={{ marginBottom: "20px" }}>Novo Usuário</h2>
-
-                <TextField label="Nome" name="name" type="text" control={control} />
-                <TextField label="CPF" name="cpf" type="text" control={control} />
-                <TextField label="Usuário" name="username" type="text" control={control} />
-                <TextField label="Telefone" name="phone" type="text" control={control} />
-                <TextField label="Email" name="email" type="email" control={control} />
-                <TextField
-                    label="Senha"
-                    name="password"
-                    type="password"
-                    control={control}
-                />
-
-                <TextField
-                    label="Confirme a Senha"
-                    name="confirmPassword"
-                    type="password"
-                    control={control}
-                />
-
-                <div style={{ marginTop: "32px" }}>
-                    <Button type="submit">Enviar</Button>
+        <main className="min-h-100vh grid w-full grow grid-cols-1 place-items-center"><div className="w-full max-w-[26rem] p-4 sm:px-5">
+            <div className="text-center">                
+                <div className="mt-4">
+                    <h2 className="text-2xl font-semibold text-gray-600 dark:text-dark-100">Bem Vindo ao Trackroom</h2>
+                    <p className="text-gray-400 dark:text-dark-300">Por favor registre-se para continuar</p>
                 </div>
+            </div>
+            <div className="relative break-words print:border bg-white card rounded-lg border border-gray-200 dark:border-dark-600 print:border-0 mt-5 rounded-lg p-5 lg:p-7">
+                <Form
+                    onSubmit={handleSubmit((data: FormData) => submit(data, { method: "post" }))}
 
-                <div
-                    style={{
-                        marginTop: "16px",
-                        fontSize: "14px",
-                        display: "flex",
-                        justifyContent: "space-between",
-                    }}
                 >
-                    <Link to="/login">Já possui cadastro?</Link>
-                </div>
-            </Form>
+                    <h2 style={{ marginBottom: "20px" }}>Novo Usuário</h2>
+
+                    <TextField label="Nome" name="name" type="text" control={control} />
+                    <TextField maxLength={11} label="CPF" name="cpf" type="text" control={control} />
+                    <TextField label="Usuário" name="username" type="text" control={control} />
+                    <TextField maxLength={11} label="Telefone" name="phone" type="text" control={control} />
+                    <TextField label="Email" name="email" type="email" control={control} />
+                    <TextField
+                        label="Senha"
+                        name="password"
+                        type="password"
+                        control={control}
+                    />
+
+                    <TextField
+                        label="Confirme a Senha"
+                        name="confirmPassword"
+                        type="password"
+                        control={control}
+                    />
+
+                    <div style={{ marginTop: "32px" }}>
+                        <Button className="w-full" type="submit">Enviar</Button>
+                    </div>
+
+                    <div
+                        style={{
+                            marginTop: "16px",
+                            fontSize: "14px",
+                            display: "flex",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        Já possui cadastro? <Link to="/login">Entrar</Link>
+                    </div>
+                </Form>
+            </div>
         </div>
+        </main>
     );
 }
 

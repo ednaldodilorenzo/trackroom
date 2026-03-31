@@ -5,21 +5,24 @@ import com.poc.crud.core.validation.ConfirmPassword
 import com.poc.crud.core.validation.ConfirmPasswordInterface
 import com.poc.crud.core.type.Email
 import jakarta.validation.constraints.NotBlank
+import org.hibernate.validator.constraints.Length
 
 @ConfirmPassword
 data class SignupRequestDTO(
-    @NotBlank(message = "Name is required")
+    @param:NotBlank(message = "Name is required")
     val name: String,
-    @NotBlank(message = "Email is required")
+    @param:NotBlank(message = "Email is required")
     val email: Email,
-    @NotBlank(message = "CPF is required")
+    @param:NotBlank(message = "CPF is required")
+    @param:Length(max = 11, message = "CPF number must be no more than 11 characters")
     val cpf: CPF,
-    @NotBlank(message = "Username is required")
+    @param:NotBlank(message = "Username is required")
     val username: String,
-    @NotBlank(message = "Password is required")
+    @param:NotBlank(message = "Password is required")
     override val password: String,
-    @NotBlank(message = "Password confirmation is required")
+    @param:NotBlank(message = "Password confirmation is required")
     override val confirmPassword: String,
-    @NotBlank(message = "Phone number is required")
+    @param:NotBlank(message = "Phone number is required")
+    @param:Length(max = 11, message = "Phone number must be no more than 11 characters")
     val phoneNumber: String,
 ): ConfirmPasswordInterface
