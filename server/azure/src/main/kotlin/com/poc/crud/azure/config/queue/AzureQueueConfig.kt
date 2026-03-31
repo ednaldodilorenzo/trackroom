@@ -2,6 +2,7 @@ package com.poc.crud.azure.config.queue
 
 import com.azure.storage.queue.QueueClient
 import com.azure.storage.queue.QueueClientBuilder
+import com.azure.storage.queue.QueueMessageEncoding
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
@@ -18,6 +19,7 @@ class AzureQueueConfig {
         val client = QueueClientBuilder()
             .connectionString(connectionString)
             .queueName(queueName)
+            .messageEncoding(QueueMessageEncoding.BASE64)
             .buildClient()
 
         client.createIfNotExists()
