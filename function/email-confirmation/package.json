@@ -1,0 +1,25 @@
+{
+  "name": "trackroom-email-confirmation-function",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Azure Function to consume Azure Queue Storage messages and send account confirmation emails",
+  "main": "dist/src/functions/*.js",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rimraf dist",
+    "start": "func start",
+    "dev": "npm run build && func start",
+    "prestart": "npm run build"
+  },
+  "dependencies": {
+    "@azure/functions": "^4.5.0",
+    "nodemailer": "^6.9.14",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "@types/nodemailer": "^6.4.16",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.6.3"
+  }
+}

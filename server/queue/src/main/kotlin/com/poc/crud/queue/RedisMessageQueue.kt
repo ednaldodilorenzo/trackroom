@@ -13,7 +13,7 @@ class RedisMessageQueue(
 ) : MessageQueue {
 
     override fun <T> publish(queue: String, task: Task<T>) {
-        val payload = objectMapper.writeValueAsString(task)
+        val payload = objectMapper.writeValueAsString(task.payload)
         redisTemplate.opsForList().rightPush(queue, payload)
         println("Message published: $payload")
     }

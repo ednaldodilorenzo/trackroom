@@ -1,0 +1,46 @@
+name: Deploy Email Confirmation Function
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "email-confirmation/**"
+      - ".github/workflows/deploy-email-confirmation.yml"
+  workflow_dispatch:
+
+env:
+  AZURE_FUNCTIONAPP_NAME: email-confirmation
+  PACKAGE_PATH: email-confirmation
+  NODE_VERSION: "20"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment: azure_prod
+    
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: npm
+          cache-dependency-path: ${{ env.PACKAGE_PATH }}/package-lock.json
+
+      - name: Install dependencies
+        working-directory: ${{ env.PACKAGE_PATH }}
+        run: npm ci
+
+      - name: Build
+        working-directory: ${{ env.PACKAGE_PATH }}
+        run: npm run build
+
+      - name: Deploy to Azure Function App
+        uses: Azure/functions-action@v1
+        with:
+          app-name: ${{ env.AZURE_FUNCTIONAPP_NAME }}
+          package: ${{ env.PACKAGE_PATH }}
+          publish-profile: ${{ secrets.AZURE_FUNCTIONAPP_PUBLISH_PROFILE }}

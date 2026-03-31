@@ -18,9 +18,8 @@ class EmailConfirmationProcessor(
 ) : MessageProcessor {
     override val supports: TaskType = TaskType.MESSAGE_EMAIL_CONFIRMATION
     override fun processMessage(payload: String) {
-        val task: AccountConfirmationTask =
-            objectMapper.readValue(payload, AccountConfirmationTask::class.java)
-        val emailPayload = task.payload
+        val emailPayload: AccountConfirmationTaskPayload =
+            objectMapper.readValue(payload, AccountConfirmationTaskPayload::class.java)
         mailService.sendEmail(
             emailPayload.email,
             "Código de validação de email",
