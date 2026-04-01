@@ -38,6 +38,7 @@ const schema = yup.object({
 type FormData = yup.InferType<typeof schema>;
 
 export default function Signup() {
+    
     const { control, handleSubmit } = useForm<FormData>({
         resolver: yupResolver(schema),
         mode: "onBlur",
