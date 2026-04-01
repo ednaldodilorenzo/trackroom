@@ -59,12 +59,15 @@ jobs:
         with:
           node-version: '25' # Or any other version compatible with your project
           cache: 'npm' # Caches dependencies
+          cache-dependency-path: web/package-lock.json
 
       - name: Install dependencies
-        run: cd web && npm ci # Use 'npm ci' for clean and fast installs in CI environments
+        working-directory: web
+        run: npm ci # Use 'npm ci' for clean and fast installs in CI environments
 
       - name: Execute Vitest tests
-        run: cd web && npm run test # Runs the 'test' script in package.json              
+        working-directory: web
+        run: npm run test # Runs the 'test' script in package.json              
 
   build_and_deploy_front:
     needs: frontend-tests
