@@ -3,9 +3,7 @@ package com.poc.crud.modules.auth
 import com.poc.crud.core.security.TokenService
 import com.poc.crud.core.type.CPF
 import com.poc.crud.core.type.Email
-import com.poc.crud.modules.auth.dto.LoginRequestDTO
-import com.poc.crud.modules.auth.dto.LoginResponseDTO
-import com.poc.crud.modules.auth.dto.SignupRequestDTO
+import com.poc.crud.modules.auth.dto.*
 import com.poc.crud.modules.auth.service.AuthService
 import com.poc.crud.modules.user.service.UserService
 import jakarta.servlet.http.HttpServletResponse
@@ -14,7 +12,6 @@ import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
-import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -32,8 +29,7 @@ class AuthController(
     ): ResponseEntity<LoginResponseDTO> {
         val authentication = authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(
-                loginRequestDTO.email,
-                loginRequestDTO.senha
+                loginRequestDTO.email, loginRequestDTO.senha
             )
         )
 
@@ -81,6 +77,18 @@ class AuthController(
     @GetMapping("/availability/username/{username}")
     fun availabilityUsername(@PathVariable username: String): ResponseEntity<Boolean> {
         return ResponseEntity.ok(userService.findUsernameAvailability(username))
+    }
+
+    @PostMapping("/forgot-password")
+    fun startPasswordRecoverProcess(@RequestBody dto: ForgotPasswordReqDTO): ResponseEntity<String> {
+        this.authService.startPasswordReset(Email(dto.email))
+        return ResponseEntity.ok().build()
+    }
+
+    @PostMapping("/password-recover/{token}")
+    fun recoverPassword(@PathVariable token: String, @RequestBody dto: PasswordRecoverReqDTO): ResponseEntity<String> {
+        this.authService.resetPassword(token, dto)
+        return ResponseEntity.ok().build()
     }
 
 }

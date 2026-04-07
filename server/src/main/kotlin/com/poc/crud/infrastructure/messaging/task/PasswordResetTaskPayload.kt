@@ -1,4 +1,4 @@
 package com.poc.crud.infrastructure.messaging.task
 
-class PasswordResetTaskPayload {
+data class PasswordResetTaskPayload(val email: String, val token: String) {
 }

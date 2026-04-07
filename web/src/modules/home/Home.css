@@ -1,5 +1,6 @@
 .track-card-list {
   display: flex;
+  flex-wrap: wrap;
   gap: 12px;
   overflow-x: auto;
   padding-bottom: 8px;

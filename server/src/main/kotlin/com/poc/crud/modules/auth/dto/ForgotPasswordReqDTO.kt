@@ -1,11 +1,18 @@
 package com.poc.crud.modules.auth.dto
 
-import com.poc.crud.core.type.Email
+import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 
 
 
-data class PasswordRecoverReqDTO(
+data class ForgotPasswordReqDTO(
     @field:NotNull("Email must not be null or empty")
     val email: String
+)
+
+data class PasswordRecoverReqDTO(
+    @field:NotBlank("Senha deve ser informada")
+    val password: String,
+    @field:NotBlank("Confirmação de senha deve ser informada")
+    val confirmPassword: String
 )

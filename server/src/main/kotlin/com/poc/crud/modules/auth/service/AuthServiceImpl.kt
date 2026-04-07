@@ -6,9 +6,12 @@ import com.poc.crud.core.exception.ExceptionType
 import com.poc.crud.core.security.TokenService
 import com.poc.crud.core.type.Email
 import com.poc.crud.infrastructure.messaging.publisher.AccountConfirmationEmailPublisher
+import com.poc.crud.infrastructure.messaging.publisher.PasswordResetPublisher
 import com.poc.crud.model.User
+import com.poc.crud.modules.auth.dto.PasswordRecoverReqDTO
 import com.poc.crud.modules.auth.dto.SignupRequestDTO
 import com.poc.crud.repository.UserRepository
+import io.jsonwebtoken.JwtException
 import jakarta.transaction.Transactional
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -23,6 +26,7 @@ class AuthServiceImpl(
     private val tokenService: TokenService,
     private val passwordEncoder: PasswordEncoder,
     private val accountConfirmationEmailNotification: AccountConfirmationEmailPublisher,
+    private val passwordResetPublisher: PasswordResetPublisher,
 ) : AuthService {
 
     @Autowired
@@ -60,9 +64,7 @@ class AuthServiceImpl(
 
         if (signupRequestDTO.password != signupRequestDTO.confirmPassword) {
             throw APIException(
-                ExceptionType.BAD_REQUEST,
-                "Passowrd and confirmation do not match!",
-                RuntimeException("")
+                ExceptionType.BAD_REQUEST, "Passowrd and confirmation do not match!", RuntimeException("")
             )
         }
 
@@ -120,4 +122,32 @@ class AuthServiceImpl(
 
         cacheManager.deleteByKey("signup:$email")
     }
+
+    override fun startPasswordReset(email: Email) {
+        val user = this.userRepository.findByEmailAndActiveTrue(email).orElseThrow {
+            APIException(
+                ExceptionType.BUSINESS_ERROR, "Code not registered or expired!", RuntimeException("")
+            )
+        }
+
+        val jwt = tokenService.createValidationToken(user.username)
+        this.passwordResetPublisher.publish(jwt, email.address)
+    }
+
+    @Transactional
+    override fun resetPassword(token: String, dto: PasswordRecoverReqDTO) {
+        try {
+            val claims = tokenService.validateJwt(token)
+            val username = claims.payload.subject ?: ""
+            val user = this.userRepository.findByUsername(username)
+                .orElseThrow { APIException(ExceptionType.NOT_FOUND, "User username not found!") }
+
+            user.password = passwordEncoder.encode(dto.password)
+        } catch (jwtex: JwtException) {
+            throw APIException(ExceptionType.BAD_REQUEST, "Token para validação de usuário expirou!", jwtex)
+        }
+
+    }
 }
+
+

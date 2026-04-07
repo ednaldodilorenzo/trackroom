@@ -62,6 +62,7 @@ export default function TextField<
         {...fieldValue}
         type={type}
         id={name}
+        name={name}
         placeholder=" "
         className={errorValue ? "invalid" : ""}
         aria-invalid={!!errorValue}

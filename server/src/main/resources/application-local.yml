@@ -56,4 +56,4 @@ filestorage:
 queue:
   ids:
     email-account-confirmation-id: QUEUE_MESSAGE_ACCOUNT_CONFIRM
-    document-evaluate-id: QUEUE_DOCUMENT_EVALUATE
+    email-password-reset-id: QUEUE_EMAIL_PASSWORD_RESET

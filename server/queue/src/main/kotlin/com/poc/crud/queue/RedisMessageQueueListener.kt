@@ -14,25 +14,34 @@ import java.util.concurrent.TimeUnit
 class RedisMessageQueueListener(
     private val redisTemplate: StringRedisTemplate,
     private val queueData: QueueData,
-    private val objectMapper: ObjectMapper,
     private val subscriberResolver: ProcessorResolver,
 ) {
     @Scheduled(fixedDelay = 5000)
     fun listen() {
-        queueData.ids.values.forEach { queue ->
+
             try {
-                val entry = redisTemplate.opsForList().leftPop(queue, 5, TimeUnit.SECONDS)
+                var entry = redisTemplate.opsForList().leftPop(queueData.emailAccountConfirmationId, 5, TimeUnit.SECONDS)
                 entry?.let { messageJson ->
-                    processMessage(messageJson)
+                    processMessageEmailConfirmation(messageJson)
+                }
+
+                entry = redisTemplate.opsForList().leftPop(queueData.emailPasswordResetId, 5, TimeUnit.SECONDS)
+                entry?.let { messageJson ->
+                    processMessageEmailPasswordReset(messageJson)
                 }
             } catch (e: Exception) {
                 println("Error processing message: ${e.message}")
             }
-        }
+
     }
 
-    private fun processMessage(payload: String) {
+    private fun processMessageEmailConfirmation(payload: String) {
         subscriberResolver.resolve(TaskType.MESSAGE_EMAIL_CONFIRMATION).processMessage(payload)
         println("Consumed task ID: ${TaskType.MESSAGE_EMAIL_CONFIRMATION}, Description: ${TaskType.MESSAGE_EMAIL_CONFIRMATION}")
+    }
+
+    private fun processMessageEmailPasswordReset(payload: String) {
+        subscriberResolver.resolve(TaskType.MESSAGE_EMAIL_PASSWORD_RESET).processMessage(payload)
+        println("Consumed task ID: ${TaskType.MESSAGE_EMAIL_PASSWORD_RESET}, Description: ${TaskType.MESSAGE_EMAIL_PASSWORD_RESET}")
     }
 }

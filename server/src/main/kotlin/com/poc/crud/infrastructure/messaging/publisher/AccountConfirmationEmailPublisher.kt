@@ -1,25 +1,21 @@
 package com.poc.crud.infrastructure.messaging.publisher
 
 import com.poc.crud.core.queue.MessageQueue
+import com.poc.crud.core.queue.QueueData
 import com.poc.crud.infrastructure.messaging.task.AccountConfirmationTaskPayload
-import org.springframework.beans.factory.annotation.Value
 import org.springframework.stereotype.Component
-import tools.jackson.databind.ObjectMapper
 
 @Component
 class AccountConfirmationEmailPublisher(
     private val messageQueue: MessageQueue,
-    private val objectMapper: ObjectMapper,
-    @param:Value("\${queue.ids.email-account-confirmation-id}") private val queueId: String
+    private val queueData: QueueData,
 ) {
 
     fun publish(email: String, token: String, code: String) {
         val task = AccountConfirmationTask(
             AccountConfirmationTaskPayload(email, token, code)
         )
-        messageQueue.publish(
-            queueId, task
-        )
+        messageQueue.publish(queueData.emailAccountConfirmationId, task)
     }
 
 }

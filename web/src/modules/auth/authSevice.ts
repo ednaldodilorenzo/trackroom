@@ -101,6 +101,28 @@ class AuthService extends Requester {
         console.error("Signup confirmation failed:", err);
         return false;
       })
+
+  startPasswordRecovery = (email: string) =>
+    this.post<void, { email: string }>({ email }, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }, "/auth/v1/forgot-password")
+      .then(() => {
+        return true;
+      })
+      .catch((err) => {
+        console.error("Password recovery initiation failed:", err);
+        return false;
+      })
+
+  resetPassword = (token: string, password: string, confirmPassword: string) => this.post<void, { password: string; confirmPassword: string }>(
+    { password, confirmPassword },
+    {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    }, `/auth/v1/password-recover/${encodeURIComponent(token)}`);
 }
 
 export const authService = new AuthService(request);

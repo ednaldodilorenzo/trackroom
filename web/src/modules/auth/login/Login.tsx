@@ -71,10 +71,10 @@ export default function Login() {
 
           <div className="mt-4 flex items-center justify-between space-x-2">
             <label className="input-label inline-flex items-center gap-2">
-              <input className="form-checkbox this:primary border-gray-400/70 bg-origin-border before:bg-center before:bg-no-repeat before:[background-size:100%_100%] before:[background-image:var(--tw-thumb)] checked:border-this checked:bg-this indeterminate:border-this indeterminate:bg-this hover:border-this focus:border-this dark:border-dark-400 dark:checked:border-this-light dark:checked:bg-this-light dark:indeterminate:border-this-light dark:indeterminate:bg-this-light dark:hover:border-this-light dark:focus:border-this-light" type="checkbox"/>
+              <input className="form-checkbox this:primary border-gray-400/70 bg-origin-border before:bg-center before:bg-no-repeat before:[background-size:100%_100%] before:[background-image:var(--tw-thumb)] checked:border-this checked:bg-this indeterminate:border-this indeterminate:bg-this hover:border-this focus:border-this dark:border-dark-400 dark:checked:border-this-light dark:checked:bg-this-light dark:indeterminate:border-this-light dark:indeterminate:bg-this-light dark:hover:border-this-light dark:focus:border-this-light" type="checkbox" />
               <span className="label">Lembrar me</span>
             </label>
-            <a href="##" className="text-xs text-gray-400 transition-colors hover:text-gray-800 focus:text-gray-800 dark:text-dark-300 dark:hover:text-dark-100 dark:focus:text-dark-100">Esqueceu a Senha?</a>
+            <Link className="text-xs text-gray-400 transition-colors hover:text-gray-800 focus:text-gray-800 dark:text-dark-300 dark:hover:text-dark-100 dark:focus:text-dark-100" to="/forgot-password">Esqueceu a Senha?</Link>
           </div>
 
           <div style={{ marginTop: "32px" }}>

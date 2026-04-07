@@ -1,5 +1,5 @@
 package com.poc.crud.core.queue
 
 interface MessageQueue {
-    fun <T> publish(queue: String, task: Task<T>)
+    fun <T> publish(queueName: String, task: Task<T>)
 }

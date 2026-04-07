@@ -14,6 +14,8 @@ const MusicAdd = lazy(() => import("@/modules/music/MusicAdd"));
 const MusicCipher = lazy(() => import("@/modules/music/MusicCipher"));
 const GroupAddMember = lazy(() => import("@/modules/group/GroupAddMember"));
 const GroupInfo = lazy(() => import("@/modules/group/GroupInfo"));
+const ForgotPassword = lazy(() => import("@/modules/auth/password-recover/ForgotPassword"));
+const PasswordReset = lazy(() => import("@/modules/auth/password-recover/PasswordReset"));
 
 export const router = createBrowserRouter(
   [
@@ -32,6 +34,14 @@ export const router = createBrowserRouter(
         const mod = await import("@/modules/auth/signup/Signup");
         return mod.action(args);
       }
+    },
+    {
+      path: "/forgot-password",
+      element: <ForgotPassword />,
+    },
+    {
+      path: "/password-reset/:token",
+      element: <PasswordReset />,
     },
     {
       path: "/confirm/:token",
