@@ -16,7 +16,7 @@ export class EmailService {
     to: string;
     token: string;
   }): Promise<void> {
-    const resetUrl = `${env.appHost}/password-recover/${encodeURIComponent(params.token)}`;
+    const resetUrl = `${env.appHost}/password-reset/${encodeURIComponent(params.token)}`;
 
     const subject = "Redefina sua senha no TrackRoom";
 

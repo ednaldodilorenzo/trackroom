@@ -2,7 +2,6 @@ import { app, InvocationContext } from "@azure/functions";
 import { accountConfirmationMessageSchema, type AccountConfirmationMessage } from "../types/emailMessage.js";
 import { EmailService } from "../services/emailService.js";
 import { passwordResetMessageSchema, type PasswordResetMessage } from "../types/passwordResetMessage.js";
-import tr from "zod/v4/locales/tr.js";
 
 const emailService = new EmailService();
 
