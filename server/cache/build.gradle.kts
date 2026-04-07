@@ -13,7 +13,7 @@ repositories {
 
 dependencies {
     implementation(project(":core"))
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.0.4"))
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.0.5"))
     implementation("org.springframework.boot:spring-boot-starter")
     implementation("org.springframework.boot:spring-boot-starter-data-redis")
     testImplementation(kotlin("test"))

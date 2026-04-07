@@ -2,7 +2,7 @@ package com.poc.crud.azure.config.queue
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.poc.crud.core.queue.MessageQueue
-import com.poc.crud.core.queue.Task
+import com.poc.crud.core.queue.task.Task
 import org.springframework.stereotype.Component
 
 @Component

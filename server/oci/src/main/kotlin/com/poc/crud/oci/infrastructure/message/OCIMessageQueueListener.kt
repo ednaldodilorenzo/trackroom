@@ -5,9 +5,8 @@ import com.oracle.bmc.queue.QueueClient
 import com.oracle.bmc.queue.requests.DeleteMessageRequest
 import com.oracle.bmc.queue.requests.GetMessagesRequest
 import com.poc.crud.core.queue.QueueData
-import com.poc.crud.core.queue.Task
 import com.poc.crud.core.infrastructure.messaging.subscriber.ProcessorResolver
-import com.poc.crud.core.queue.TaskType
+import com.poc.crud.core.queue.task.TaskType
 import org.springframework.context.annotation.Profile
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component

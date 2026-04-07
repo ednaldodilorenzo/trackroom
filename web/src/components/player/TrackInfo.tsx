@@ -13,7 +13,7 @@ export default function TrackInfo() {
     <div className="flex items-center gap-4">
       <div>
         <p className="font-bold lg:truncate lg:max-w-64">
-          {shortenText(currentTrack.title, 30)}
+          {shortenText(currentTrack.title, 12)}
         </p>
         <p className="text-sm text-gray-400">{currentTrack.author}</p>
       </div>

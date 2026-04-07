@@ -2,7 +2,7 @@ package com.poc.crud.infrastructure.messaging.publisher
 
 import com.poc.crud.core.queue.MessageQueue
 import com.poc.crud.core.queue.QueueData
-import com.poc.crud.infrastructure.messaging.task.PasswordResetTaskPayload
+import com.poc.crud.core.queue.task.PasswordResetTaskPayload
 import org.springframework.stereotype.Component
 
 @Component

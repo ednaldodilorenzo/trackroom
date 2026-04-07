@@ -1,7 +1,7 @@
 package com.poc.crud.queue
 
 import com.poc.crud.core.queue.MessageQueue
-import com.poc.crud.core.queue.Task
+import com.poc.crud.core.queue.task.Task
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.stereotype.Component
 import tools.jackson.databind.ObjectMapper

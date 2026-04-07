@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.0.4"))
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.0.5"))
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("io.jsonwebtoken:jjwt-api:0.13.0")
     implementation("com.fasterxml.jackson.core:jackson-databind:2.15.2")

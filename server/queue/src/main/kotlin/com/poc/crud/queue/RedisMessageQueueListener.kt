@@ -2,12 +2,10 @@ package com.poc.crud.queue
 
 import com.poc.crud.core.infrastructure.messaging.subscriber.ProcessorResolver
 import com.poc.crud.core.queue.QueueData
-import com.poc.crud.core.queue.Task
-import com.poc.crud.core.queue.TaskType
+import com.poc.crud.core.queue.task.TaskType
 import org.springframework.data.redis.core.StringRedisTemplate
 import org.springframework.scheduling.annotation.Scheduled
 import org.springframework.stereotype.Component
-import tools.jackson.databind.ObjectMapper
 import java.util.concurrent.TimeUnit
 
 @Component

@@ -1,4 +1,4 @@
-package com.poc.crud.core.queue
+package com.poc.crud.core.queue.task
 
 
 enum class TaskType {

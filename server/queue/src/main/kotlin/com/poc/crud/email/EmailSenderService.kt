@@ -1,4 +1,4 @@
-package com.poc.crud.infrastructure.email
+package com.poc.crud.email
 
 import org.springframework.mail.SimpleMailMessage
 import org.springframework.mail.javamail.JavaMailSender

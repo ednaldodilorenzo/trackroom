@@ -12,7 +12,7 @@ repositories {
 }
 
 dependencies {
-    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.0.4"))
+    implementation(platform("org.springframework.boot:spring-boot-dependencies:4.0.5"))
     implementation("org.springframework.boot:spring-boot-starter")
     implementation(platform("com.azure.spring:spring-cloud-azure-dependencies:7.1.0"))
     implementation("com.azure.spring:spring-cloud-azure-starter-storage-blob")

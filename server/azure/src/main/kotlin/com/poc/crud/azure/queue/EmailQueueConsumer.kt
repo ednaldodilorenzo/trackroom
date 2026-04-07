@@ -4,12 +4,8 @@ package com.poc.crud.azure.queue
 import com.azure.storage.queue.QueueClient
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.poc.crud.core.infrastructure.messaging.subscriber.ProcessorResolver
-import com.poc.crud.core.queue.Task
-import com.poc.crud.core.queue.TaskType
+import com.poc.crud.core.queue.task.TaskType
 import org.slf4j.LoggerFactory
-import org.springframework.context.annotation.Profile
-import org.springframework.scheduling.annotation.Scheduled
-import org.springframework.stereotype.Component
 
 //@Component
 class EmailQueueConsumer(

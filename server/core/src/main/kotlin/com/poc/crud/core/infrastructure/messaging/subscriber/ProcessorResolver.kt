@@ -1,7 +1,7 @@
 package com.poc.crud.core.infrastructure.messaging.subscriber
 
 import com.poc.crud.core.queue.MessageProcessor
-import com.poc.crud.core.queue.TaskType
+import com.poc.crud.core.queue.task.TaskType
 import org.springframework.stereotype.Component
 
 @Component
