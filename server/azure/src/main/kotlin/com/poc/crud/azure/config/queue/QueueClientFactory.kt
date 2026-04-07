@@ -8,7 +8,7 @@ import org.springframework.stereotype.Component
 
 @Component
 class QueueClientFactory(
-    @field:Value("\${AZURE_STORAGE_CONNECTION_STRING}")
+    @Value("\${AZURE_STORAGE_CONNECTION_STRING}")
     private val connectionString: String
 ) {
 
