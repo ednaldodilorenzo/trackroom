@@ -50,4 +50,5 @@ jwt:
 queue:
   ids:
     email-account-confirmation-id: email-confirmation
+    email-password-reset-id: password-reset
 
