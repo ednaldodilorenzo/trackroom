@@ -4,15 +4,9 @@ import { authService } from "../authSevice";
 import { useActionState, useEffect } from "react";
 import { useLoading } from "@/hooks/useLoading";
 import toast from "react-hot-toast";
+import { type FormState } from "@/model";
 
-interface FormState {
-    success: boolean;
-    message: string;
-    errors?: {
-        password?: string[];
-        confirmPassword?: string[];
-    };
-}
+
 
 export default function PasswordReset() {
     const { token } = useParams();
