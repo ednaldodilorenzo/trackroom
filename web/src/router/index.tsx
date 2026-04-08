@@ -106,6 +106,22 @@ export const router = createBrowserRouter(
                 const mod = await import("@/modules/music/MusicAdd");
                 return mod.action(args);
               },
+              loader: async (args) => {
+                const mod = await import("@/modules/music/MusicAdd");
+                return mod.load(args);
+              }
+            },
+            {
+              path: "musics/:musicId",
+              element: <MusicAdd />,
+              action: async (args) => {
+                const mod = await import("@/modules/music/MusicAdd");
+                return mod.action(args);
+              },
+              loader: async (args) => {
+                const mod = await import("@/modules/music/MusicAdd");
+                return mod.load(args);
+              }
             },
             {
               path: "musics/:musicId/cipher",

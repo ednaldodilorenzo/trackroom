@@ -2,14 +2,14 @@ package com.poc.crud.modules.music.service
 
 import com.poc.crud.modules.music.dto.MusicCipherResponseDTO
 import com.poc.crud.modules.music.dto.MusicDTO
-import com.poc.crud.modules.music.dto.PostMusicDTORequest
-import com.poc.crud.modules.music.dto.PostMusicDTOResponse
-import org.springframework.web.multipart.MultipartFile
+import com.poc.crud.modules.music.dto.PatchMusicReqDTO
+import com.poc.crud.modules.music.dto.PostMusicReqDTO
+import com.poc.crud.modules.music.dto.PostMusicRespDTO
 
 interface MusicService {
     fun getAllMusic(groupId: Long?): Set<MusicDTO>
 
-    fun insertMusic(dto: PostMusicDTORequest): PostMusicDTOResponse
+    fun insertMusic(dto: PostMusicReqDTO): PostMusicRespDTO
 
     fun getMusicUrl(musicId: Long): String
 
@@ -18,4 +18,8 @@ interface MusicService {
     fun updateMusicCipherFile(musicId: Long, cipherFile: String)
 
     fun confirmMusicUpload(musicId: Long)
+
+    fun updateMusic(id: Long, music: PatchMusicReqDTO, userId: Long): PostMusicRespDTO
+
+    fun getById(id: Long): MusicDTO
 }

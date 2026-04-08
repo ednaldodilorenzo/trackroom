@@ -1,13 +1,12 @@
 package com.poc.crud.modules.music
 
-import com.poc.crud.modules.music.dto.MusicCipherResponseDTO
-import com.poc.crud.modules.music.dto.MusicDTO
-import com.poc.crud.modules.music.dto.PostMusicDTORequest
-import com.poc.crud.modules.music.dto.PostMusicDTOResponse
+import com.poc.crud.modules.music.dto.*
 import com.poc.crud.modules.music.service.MusicService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
+import org.springframework.security.core.annotation.AuthenticationPrincipal
+import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -19,6 +18,9 @@ class MusicController(
     @GetMapping("")
     fun getAll(@RequestParam(required = false) groupId: Long?): ResponseEntity<Set<MusicDTO>> =
         ResponseEntity(musicService.getAllMusic(groupId), HttpStatus.OK)
+
+    @GetMapping("/{id}")
+    fun getById(@PathVariable id: Long): ResponseEntity<MusicDTO> = ResponseEntity.ok(this.musicService.getById(id))
 
     @GetMapping("/{id}/url")
     fun getMusicUrl(@PathVariable id: Long): ResponseEntity<String> = ResponseEntity.ok(musicService.getMusicUrl(id))
@@ -38,10 +40,17 @@ class MusicController(
 
     @PostMapping("", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun post(
-        @RequestBody music: PostMusicDTORequest,
-    ): PostMusicDTOResponse? = musicService.insertMusic(
+        @RequestBody music: PostMusicReqDTO,
+    ): PostMusicRespDTO? = musicService.insertMusic(
         music
     )
+
+    @PatchMapping("/{id}")
+    fun updateMusic(
+        @AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long, @RequestBody music: PatchMusicReqDTO
+    ): ResponseEntity<PostMusicRespDTO> {
+        return ResponseEntity.ok(this.musicService.updateMusic(id, music, jwt.id.toLong()))
+    }
 
     @PostMapping("/confirm/{id}")
     fun confirmMusic(@PathVariable id: Long): ResponseEntity<String> {

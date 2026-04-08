@@ -4,7 +4,7 @@ import com.poc.crud.model.Music
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 
-data class PostMusicDTORequest(
+data class PostMusicReqDTO(
 
     val id: Long? = null,
 

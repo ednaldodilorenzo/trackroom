@@ -10,10 +10,16 @@ class MusicService extends Requester {
   getAll = (params: Params): Promise<Music[]> =>
     this.get<Music[]>("", params).then((resp) => resp.data);
 
+  getById = (id: number): Promise<Music> =>
+    this.get<Music>(`/${id}`).then((resp) => resp.data);
+
   save = (data: Music): Promise<{ id: number; uploadUrl: string }> =>
     this.post<{ id: number; uploadUrl: string }, Music>(data).then(
       (resp) => resp.data
     );
+
+  update = (id: number, data: Music): Promise<{ id: number; uploadUrl: string }> =>
+    this.patch<{ id: number; uploadUrl: string }, Music>(data, `/${id}`).then((resp) => resp.data);
 
   uploadFile = (url: string, file: File): Promise<string> =>
     this.putData<string, File>(url, file, {
@@ -37,7 +43,7 @@ class MusicService extends Requester {
   getMusicMetaData = (id: number): Promise<MusicMetaData> =>
     this.get<MusicMetaData>(`/${id}/cipher`).then((resp) => resp.data);
 
-  uploadCipher = (id:number, file: string): Promise<void> =>
+  uploadCipher = (id: number, file: string): Promise<void> =>
     this.put<void, string>(file, `${id}/cipher`, {
       headers: {
         "Content-Type": "text/plain",

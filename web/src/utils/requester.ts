@@ -63,8 +63,8 @@ export class Requester {
     return this.instance.post<T>(url, data, params);
   }
 
-  patch<T, D>(data?: D): Promise<AxiosResponse<T>> {
-    return this.instance.patch<T>(this.baseUri, data);
+  patch<T, D>(data?: D, uri: string = ""): Promise<AxiosResponse<T>> {
+    return this.instance.patch<T>(`${this.baseUri}${uri}`, data);
   }
 
   put<T, D>(

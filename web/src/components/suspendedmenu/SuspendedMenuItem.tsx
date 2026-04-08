@@ -8,7 +8,8 @@ export default function SuspendedMenuItem({ label, onClick, ...rest }: Suspended
         <button
             {...rest}
             onClick={onClick}
-            className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+            style={{ height: "42px" }}
+            className="w-full text-left px-4 cursor-pointer text-sm text-gray-700 hover:bg-gray-100"
         >
             {label}
         </button>

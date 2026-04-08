@@ -46,7 +46,7 @@ export default function MusicList() {
       )}
       <Suspense fallback={<FallbackOverlay />}>
         <Await resolve={musics}>
-          {(loadedMusics) => {
+          {loadedMusics => {
             const filteredMusics = useMemo(() => {
               if (!search.trim()) return loadedMusics;
 
@@ -64,6 +64,24 @@ export default function MusicList() {
                         active={currentTrack.id === item.id}
                         onClick={() => handlePlay(item)}
                         cipherLink={`/groups/${id}/musics/${item.id}/cipher`}
+                        showMenu={currentGroup.isAdmin}
+                        suspendedMenuProps={{
+                          items: [
+                            {
+                              label: "Editar",
+                              onClick: () => navigate(`/groups/${id}/musics/${item.id}`),
+                            },
+                            {
+                              label: "Excluir",
+                              onClick: async () => {
+                                if (confirm("Tem certeza que deseja excluir esta música?")) {
+                                  await musicService.delete(''+item.id!!);
+                                  navigate(0);
+                                }
+                              }
+                            },
+                          ],
+                        }}
                         {...item}
                       />
                     </div>

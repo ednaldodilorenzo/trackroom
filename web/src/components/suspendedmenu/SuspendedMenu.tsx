@@ -30,24 +30,22 @@ export default function SuspendedMenu({ items }: SuspendedMenuProps) {
 
   return (
     <div className="relative inline-block text-left" ref={menuRef}>
-      <button onClick={toggleMenu}>
+      <button style={{ verticalAlign: "middle" }} className="cursor-pointer" onClick={toggleMenu}>
         <BsThreeDotsVertical size="1.5em" className="logout-icon" />
       </button>
 
       {isOpen && (
-        <div className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50">
-          <div className="py-1">
-            {items.map((item, index) => (
-              <SuspendedMenuItem
-                key={index}
-                label={item.label}
-                onClick={() => {
-                  item.onClick();
-                  handleClickOutside(new MouseEvent("mousedown", { bubbles: true }));
-                }}
-              />
-            ))}
-          </div>
+        <div className="origin-top-right absolute right-0 mt-2 w-56 p-3 rounded-md shadow-lg bg-white ring-opacity-5 z-50">
+          {items.map((item, index) => (
+            <SuspendedMenuItem
+              key={index}
+              label={item.label}
+              onClick={() => {
+                item.onClick();
+                handleClickOutside(new MouseEvent("mousedown", { bubbles: true }));
+              }}
+            />
+          ))}
         </div>
       )}
     </div>
