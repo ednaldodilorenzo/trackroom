@@ -22,28 +22,28 @@ class OCIMessageQueueListener(
 
     @Scheduled(fixedDelay = 5000)
     fun listen() {
-        queueData.ids.values.forEach { queue ->
-            val getRequest = GetMessagesRequest.builder()
-                .queueId(queue)
-                .limit(10).build()
-
-            val response = queueClient.getMessages(getRequest)
-            val messages = response.getMessages?.messages.orEmpty()
-
-            messages.forEach { msg ->
-                try {
-                    processMessage(msg.content)
-
-                    val deleteRequest = DeleteMessageRequest.builder()
-                        .queueId(queue)
-                        .messageReceipt(msg.receipt).build()
-
-                    queueClient.deleteMessage(deleteRequest)
-                } catch (e: Exception) {
-                    println("Error: ${e.message}")
-                }
-            }
-        }
+//        queueData.ids.values.forEach { queue ->
+//            val getRequest = GetMessagesRequest.builder()
+//                .queueId(queue)
+//                .limit(10).build()
+//
+//            val response = queueClient.getMessages(getRequest)
+//            val messages = response.getMessages?.messages.orEmpty()
+//
+//            messages.forEach { msg ->
+//                try {
+//                    processMessage(msg.content)
+//
+//                    val deleteRequest = DeleteMessageRequest.builder()
+//                        .queueId(queue)
+//                        .messageReceipt(msg.receipt).build()
+//
+//                    queueClient.deleteMessage(deleteRequest)
+//                } catch (e: Exception) {
+//                    println("Error: ${e.message}")
+//                }
+//            }
+//        }
     }
 
     private fun processMessage(payload: String) {

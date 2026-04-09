@@ -1,110 +1,96 @@
 package com.poc.crud.modules.auth
 
-import com.ninjasquad.springmockk.MockkBean
-import com.poc.crud.core.exception.APIException
-import com.poc.crud.core.exception.ExceptionType
+import com.poc.crud.core.security.TokenService
 import com.poc.crud.core.type.Email
-import com.poc.crud.modules.auth.dto.LoginResponseDTO
+import com.poc.crud.modules.auth.dto.LoginRequestDTO
 import com.poc.crud.modules.auth.service.AuthService
 import com.poc.crud.modules.user.service.UserService
 import io.mockk.every
-import org.hamcrest.Matchers.containsString
+import io.mockk.mockk
+import io.mockk.verify
+import jakarta.servlet.http.HttpServletResponse
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
-import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.context.annotation.ComponentScan
-import org.springframework.context.annotation.FilterType
-import org.springframework.http.MediaType
+import org.springframework.mock.web.MockHttpServletResponse
+import org.springframework.security.authentication.AuthenticationManager
+import org.springframework.security.authentication.BadCredentialsException
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken
+import org.springframework.security.core.Authentication
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.post
-import tools.jackson.databind.ObjectMapper
 
-//@WebMvcTest(
-//    controllers = [AuthController::class], excludeFilters = [ComponentScan.Filter(
-//        type = FilterType.ASSIGNABLE_TYPE, classes = [JwtAuthenticationFilter::class]
-//    )]
-//)
-//@AutoConfigureMockMvc(addFilters = false)
+
 class AuthControllerTest {
-//    @Autowired
-//    lateinit var mockMvc: MockMvc
-//
-//    @MockkBean
-//    lateinit var authService: AuthService
-//
-//    @MockkBean
-//    lateinit var userService: UserService
-//
-//    @Autowired
-//    lateinit var objectMapper: ObjectMapper
-//
-//    @Test
-//    fun `POST login returns 200 and sets cookie`() {
-//        every { authService.executeLogin(Email("a@b.com"), "123") } returns LoginResponseDTO(
-//            "test", Email("a@b.com"), "TOKEN123"
-//        )
-//
-//        mockMvc.post("/auth/v1/login") {
-//            contentType = MediaType.APPLICATION_JSON
-//            content = """{"email":"a@b.com","senha":"123"}"""
-//        }.andExpect {
-//            status { isOk() }
-//            header { string("Set-Cookie", containsString("X-Auth=TOKEN123")) }
-//            header { string("Set-Cookie", containsString("HttpOnly")) }
-//        }
-//    }
-//
-//    @Test
-//    fun `POST login returns 401 if invalid username or password`() {
-//        every { authService.executeLogin(Email("a@b.com"), "123") } throws APIException(
-//            ExceptionType.UNAUTHORIZED,
-//            "Invalid credentials",
-//            RuntimeException()
-//        )
-//
-//        mockMvc.post("/auth/v1/login") {
-//            contentType = MediaType.APPLICATION_JSON
-//            content = """{"email":"a@b.com","senha":"123"}"""
-//        }.andExpect {
-//            status { isUnauthorized() }
-//        }
-//    }
-//
-//    @Test
-//    fun `POST login returns 400 if invalid username or password`() {
-//        every { authService.executeLogin(Email("a@b.com"), "123") } throws APIException(
-//            ExceptionType.UNAUTHORIZED,
-//            "Invalid credentials",
-//            RuntimeException()
-//        )
-//
-//        mockMvc.post("/auth/v1/login") {
-//            contentType = MediaType.APPLICATION_JSON
-//            content = """{"senha":"123"}"""
-//        }.andExpect {
-//            status { isBadRequest() }
-//        }
-//
-//        mockMvc.post("/auth/v1/login") {
-//            contentType = MediaType.APPLICATION_JSON
-//            content = """{"email":"a@b.com"}"""
-//        }.andExpect {
-//            status { isBadRequest() }
-//        }
-//
-//        mockMvc.post("/auth/v1/login") {
-//            contentType = MediaType.APPLICATION_JSON
-//            content = """{}"""
-//        }.andExpect {
-//            status { isBadRequest() }
-//        }
-//    }
-//
-//    @Test
-//    fun `POST logout sets cookie expired`() {
-//        mockMvc.post("/auth/v1/logout").andExpect {
-//                status { isOk() }
-//                content { string("Logged out successfully.") }
-//                header { string("Set-Cookie", containsString("Max-Age=0")) }
-//            }
-//    }
+    private lateinit var authService: AuthService
+    private lateinit var userService: UserService
+    private lateinit var authenticationManager: AuthenticationManager
+    private lateinit var tokenService: TokenService
+    private lateinit var controller: AuthController
+
+    @BeforeEach
+    fun setUp() {
+        authService = mockk()
+        userService = mockk()
+        authenticationManager = mockk()
+        tokenService = mockk()
+        controller = AuthController(authService, userService, authenticationManager, tokenService)
+    }
+
+    @Test
+    fun `login should authenticate, create token, set cookie and return response`() {
+        val request = LoginRequestDTO(
+            email = Email("john@example.com"), senha = "123456"
+        )
+
+        val authentication = mockk<Authentication>()
+        every { authentication.name } returns "john@example.com"
+
+        every {
+            authenticationManager.authenticate(any<UsernamePasswordAuthenticationToken>())
+        } returns authentication
+
+        every { tokenService.createAccessToken(authentication) } returns "jwt-token-123"
+
+        val response: HttpServletResponse = MockHttpServletResponse()
+
+        val result = controller.login(request, response)
+
+        assertEquals(200, result.statusCode.value())
+        assertNotNull(result.body)
+        assertEquals("jwt-token-123", result.body?.token)
+
+        val cookie = (response as MockHttpServletResponse).getHeader("Set-Cookie")
+        assertNotNull(cookie)
+        assertTrue(cookie!!.contains("X-Auth=jwt-token-123"))
+        assertTrue(cookie.contains("HttpOnly"))
+        assertTrue(cookie.contains("Secure"))
+        assertTrue(cookie.contains("Path=/"))
+        assertTrue(cookie.contains("Max-Age=3600"))
+        assertTrue(cookie.contains("SameSite=None"))
+
+        verify(exactly = 1) {
+            authenticationManager.authenticate(
+                match<UsernamePasswordAuthenticationToken> {
+                    it.principal == Email("john@example.com") && it.credentials == "123456"
+                })
+        }
+        verify(exactly = 1) { tokenService.createAccessToken(authentication) }
+    }
+
+    @Test
+    fun `login should not authenticate, create token, set cookie and return response for wrong usernam or password`() {
+        val request = LoginRequestDTO(
+            email = Email("john@example.com"), senha = "123456"
+        )
+
+        every {
+            authenticationManager.authenticate(any<UsernamePasswordAuthenticationToken>())
+        } throws BadCredentialsException("Wrong username or password")
+
+        val response: HttpServletResponse = MockHttpServletResponse()
+
+        assertThrows(BadCredentialsException::class.java) {
+            controller.login(request, response)
+        }
+    }
 }
