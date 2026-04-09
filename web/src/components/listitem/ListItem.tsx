@@ -1,19 +1,20 @@
 import "./ListItem.css";
-import type { SuspendedMenuProps } from "../suspendedmenu/SuspendedMenu";
-import SuspendedMenu from "../suspendedmenu/SuspendedMenu";
+
 
 type ListItemProps = {
     title: string;
     description?: string;
     detail?: string;
-    actionItems?: SuspendedMenuProps;
+    //actionItems?: SuspendedMenuProps;
+    children?: React.ReactNode;
 };
 
 export default function ListItem({
     title,
     description,
     detail,
-    actionItems,
+    //actionItems,
+    children,
     ...rest
 }: ListItemProps) {
     return (
@@ -24,7 +25,7 @@ export default function ListItem({
                 <div className="list-sub">{description}</div>
             </div>
             {detail && <div className="list-detail">{detail}</div>}
-            {actionItems && <SuspendedMenu {...actionItems} />}
+            {children}
         </div>
 
     );

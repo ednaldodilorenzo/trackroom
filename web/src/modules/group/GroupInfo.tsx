@@ -10,6 +10,7 @@ import { BsArrowLeftSquare } from "react-icons/bs";
 import toast from "react-hot-toast";
 import { useLoading } from "@/hooks/useLoading";
 import { useHeaderConfig } from "@/hooks/useHeaderConfig";
+import SuspendedMenu from "@/components/suspendedmenu/SuspendedMenu";
 
 
 export default function GroupInfo() {
@@ -64,65 +65,52 @@ export default function GroupInfo() {
 
                             return <>
                                 {groupUsers && groupUsers.length > 0 ? (
-                                    groupUsers.map((loadedUser) => <ListItem key={loadedUser.id} title={loadedUser.name} description={loadedUser.userName} detail={loadedUser.isAdmin ? "Administrador" : "Membro"} actionItems={!currentGroup.isAdmin ? undefined : loadedUser.isAdmin ? {
-                                        items: [
-                                            {
-                                                label: "Tornar membro",
-                                                onClick: () => {
-                                                    show();
-                                                    groupService.demoteFromAdmin(parseInt(currentGroup.id!!), loadedUser.id!!).then(() => {
-                                                        updateUserRole(loadedUser.id!!, false);
-                                                        toast.success("Usuário removido dos administradores com sucesso!")
-                                                    }).catch((error) => {
-                                                        toast.error(error.response.data.detail);
-                                                    }).finally(() => hide());
-                                                }
-                                            },
-                                            {
-                                                label: "Remover do grupo",
-                                                onClick: () => {
-                                                    show();
-                                                    groupService.removeMemberFromGroup(parseInt(currentGroup.id!!), loadedUser.id!!).then(() => {
-                                                        setGroupUsers((prevUsers) =>
-                                                            prevUsers.filter((user) => user.id !== loadedUser.id)
-                                                        );
-                                                        toast.success("Usuário removido do grupo com sucesso!")
-                                                    }).catch((error) => {
-                                                        toast.error(error.response.data.detail);
-                                                    }).finally(() => hide());
-                                                }
-                                            }]
-                                    } : {
-                                        items: [
-                                            {
-                                                label: "Promover a administrador",
-                                                onClick: () => {
-                                                    show();
-                                                    groupService.promoteToAdmin(parseInt(currentGroup.id!!), loadedUser.id!!).then(() => {
-                                                        updateUserRole(loadedUser.id!!, true);
-                                                        toast.success("Usuário promovido a administrador com sucesso!")
-                                                    }).catch((error) => {
-                                                        toast.error(error.response.data.detail);
-                                                    }).finally(() => hide());
-                                                }
-                                            },
-                                            {
-                                                label: "Remover do grupo",
-                                                onClick: () => {
-                                                    show();
-                                                    groupService.removeMemberFromGroup(parseInt(currentGroup.id!!), loadedUser.id!!).then(() => {
-                                                        setGroupUsers((prevUsers) =>
-                                                            prevUsers.filter((user) => user.id !== loadedUser.id)
-                                                        );
-                                                        toast.success("Usuário removido do grupo com sucesso!")
-                                                    }).catch((error) => {
-                                                        toast.error(error.response.data.detail);
-                                                    }).finally(() => hide());
-                                                }
-                                            }]
-                                    }} />)
-                                ) : (
-                                    <li>Nenhum membro encontrado...</li>
+                                    groupUsers.map((loadedUser) => <ListItem key={loadedUser.id} title={loadedUser.name} description={loadedUser.userName} detail={loadedUser.isAdmin ? "Administrador" : "Membro"}>
+                                        {currentGroup.isAdmin && (loadedUser.isAdmin ? (<SuspendedMenu>
+                                            <SuspendedMenu.Item label="Tornar membro" onClick={() => {
+                                                show();
+                                                groupService.demoteFromAdmin(parseInt(currentGroup.id!!), loadedUser.id!!).then(() => {
+                                                    updateUserRole(loadedUser.id!!, false);
+                                                    toast.success("Usuário removido dos administradores com sucesso!")
+                                                }).catch((error) => {
+                                                    toast.error(error.response.data.detail);
+                                                }).finally(() => hide());
+                                            }} />
+                                            <SuspendedMenu.Item label="Remover do grupo" onClick={() => {
+                                                show();
+                                                groupService.removeMemberFromGroup(parseInt(currentGroup.id!!), loadedUser.id!!).then(() => {
+                                                    setGroupUsers((prevUsers) =>
+                                                        prevUsers.filter((user) => user.id !== loadedUser.id)
+                                                    );
+                                                    toast.success("Usuário removido do grupo com sucesso!")
+                                                }).catch((error) => {
+                                                    toast.error(error.response.data.detail);
+                                                }).finally(() => hide());
+                                            }} />
+                                        </SuspendedMenu>) : (<SuspendedMenu>
+                                            <SuspendedMenu.Item label="Promover a administrador" onClick={() => {
+                                                show();
+                                                groupService.promoteToAdmin(parseInt(currentGroup.id!!), loadedUser.id!!).then(() => {
+                                                    updateUserRole(loadedUser.id!!, true);
+                                                    toast.success("Usuário promovido a administrador com sucesso!")
+                                                }).catch((error) => {
+                                                    toast.error(error.response.data.detail);
+                                                }).finally(() => hide());
+                                            }} />
+                                            <SuspendedMenu.Item label="Remover do grupo" onClick={() => {
+                                                show();
+                                                groupService.removeMemberFromGroup(parseInt(currentGroup.id!!), loadedUser.id!!).then(() => {
+                                                    setGroupUsers((prevUsers) =>
+                                                        prevUsers.filter((user) => user.id !== loadedUser.id)
+                                                    );
+                                                    toast.success("Usuário removido do grupo com sucesso!")
+                                                }).catch((error) => {
+                                                    toast.error(error.response.data.detail);
+                                                }).finally(() => hide());
+                                            }} />
+                                        </SuspendedMenu>))}
+                                    </ListItem>)) : (
+                                    <p className="text-center text-gray-500">Nenhum membro encontrado.</p>
                                 )}
                             </>
                         }}

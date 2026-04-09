@@ -13,13 +13,15 @@ const hideMock = vi.fn();
 const toastSuccessMock = vi.fn();
 const toastErrorMock = vi.fn();
 
-// We’ll control these per-test
-let currentGroupValue: any = { id: "7", name: "Grupo X", description: "Desc", isAdmin: false };
+let currentGroupValue: any = {
+  id: "7",
+  name: "Grupo X",
+  description: "Desc",
+  isAdmin: false,
+};
 let loaderUsersValue: any[] = [];
 
-// microtask helper
 const flush = async () => {
-  // flush queued promise callbacks (then/catch/finally)
   await Promise.resolve();
   await Promise.resolve();
 };
@@ -38,14 +40,10 @@ vi.mock("react-router-dom", async () => {
     ...actual,
     useNavigate: () => navigateMock,
     useLoaderData: () => ({ users: Promise.resolve(loaderUsersValue) }),
-
-    // unit-test friendly Await: render immediately with loaderUsersValue
     Await: ({ resolve, children }: any) => {
       void resolve;
       return children(loaderUsersValue);
     },
-
-    // simple Link mock to avoid router context requirements
     Link: ({ to, children, ...rest }: any) => (
       <a href={to} data-testid="link" {...rest}>
         {children}
@@ -70,7 +68,6 @@ vi.mock("react-hot-toast", () => ({
   },
 }));
 
-// Mock UI components
 vi.mock("@/components", () => ({
   FallbackOverlay: () => <div data-testid="fallback">Loading...</div>,
   Button: ({ children, ...props }: any) => (
@@ -80,31 +77,30 @@ vi.mock("@/components", () => ({
   ),
 }));
 
-// Capture ListItem props so we can trigger actionItems callbacks deterministically
-const listItemSpy: any[] = [];
 vi.mock("@/components/listitem/ListItem", () => ({
-  default: (props: any) => {
-    listItemSpy.push(props);
-    return (
-      <div data-testid="list-item">
-        <div data-testid="li-title">{props.title}</div>
-        <div data-testid="li-detail">{props.detail}</div>
-
-        {/* expose actions as buttons so we can click them */}
-        {props.actionItems?.items?.map((it: any, idx: number) => (
-          <button
-            type="button"
-            key={idx}
-            onClick={it.onClick}
-            aria-label={`action-${props.title}-${idx}`}
-          >
-            {it.label}
-          </button>
-        ))}
-      </div>
-    );
-  },
+  default: ({ title, description, detail, children }: any) => (
+    <div data-testid="list-item">
+      <div data-testid="li-title">{title}</div>
+      <div data-testid="li-description">{description}</div>
+      <div data-testid="li-detail">{detail}</div>
+      <div data-testid="li-children">{children}</div>
+    </div>
+  ),
 }));
+
+vi.mock("@/components/suspendedmenu/SuspendedMenu", () => {
+  const SuspendedMenu = ({ children }: any) => (
+    <div data-testid="suspended-menu">{children}</div>
+  );
+
+  SuspendedMenu.Item = ({ label, onClick }: any) => (
+    <button type="button" onClick={onClick}>
+      {label}
+    </button>
+  );
+
+  return { default: SuspendedMenu };
+});
 
 vi.mock("./group.service", () => ({
   default: {
@@ -119,9 +115,13 @@ vi.mock("./group.service", () => ({
 describe("<GroupInfo />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    listItemSpy.length = 0;
 
-    currentGroupValue = { id: "7", name: "Grupo X", description: "Desc", isAdmin: false };
+    currentGroupValue = {
+      id: "7",
+      name: "Grupo X",
+      description: "Desc",
+      isAdmin: false,
+    };
     loaderUsersValue = [];
 
     (groupService.promoteToAdmin as any).mockResolvedValue(undefined);
@@ -151,9 +151,12 @@ describe("<GroupInfo />", () => {
 
   it("does NOT show '+ Adicionar novo membro' section when currentGroup.isAdmin=false", () => {
     currentGroupValue = { ...currentGroupValue, isAdmin: false };
+
     render(<GroupInfo />);
 
-    expect(screen.queryByText("Adicionar novo membro")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("Adicionar novo membro")
+    ).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "+" })).not.toBeInTheDocument();
   });
 
@@ -171,11 +174,14 @@ describe("<GroupInfo />", () => {
     expect(navigateMock).toHaveBeenCalledWith("/groups/7/members/add");
   });
 
-  it("renders 'Nenhum membro encontrado...' when users list is empty", () => {
+  it("renders 'Nenhum membro encontrado.' when users list is empty", () => {
     loaderUsersValue = [];
+
     render(<GroupInfo />);
 
-    expect(screen.getByText("Nenhum membro encontrado...")).toBeInTheDocument();
+    expect(
+      screen.getByText("Nenhum membro encontrado.")
+    ).toBeInTheDocument();
     expect(screen.queryAllByTestId("list-item")).toHaveLength(0);
   });
 
@@ -190,13 +196,24 @@ describe("<GroupInfo />", () => {
     const items = screen.getAllByTestId("list-item");
     expect(items).toHaveLength(2);
 
-    // Ana admin
     expect(screen.getAllByTestId("li-title")[0]).toHaveTextContent("Ana");
-    expect(screen.getAllByTestId("li-detail")[0]).toHaveTextContent("Administrador");
+    expect(screen.getAllByTestId("li-detail")[0]).toHaveTextContent(
+      "Administrador"
+    );
 
-    // Bruno member
     expect(screen.getAllByTestId("li-title")[1]).toHaveTextContent("Bruno");
     expect(screen.getAllByTestId("li-detail")[1]).toHaveTextContent("Membro");
+  });
+
+  it("does not render SuspendedMenu when currentGroup.isAdmin=false", () => {
+    currentGroupValue = { ...currentGroupValue, isAdmin: false };
+    loaderUsersValue = [{ id: 1, name: "Ana", userName: "ana", isAdmin: true }];
+
+    render(<GroupInfo />);
+
+    expect(screen.queryByTestId("suspended-menu")).not.toBeInTheDocument();
+    expect(screen.queryByText("Tornar membro")).not.toBeInTheDocument();
+    expect(screen.queryByText("Remover do grupo")).not.toBeInTheDocument();
   });
 
   it("when group is admin: shows actions for admin user -> 'Tornar membro' and 'Remover do grupo'", () => {
@@ -205,29 +222,34 @@ describe("<GroupInfo />", () => {
 
     render(<GroupInfo />);
 
+    expect(screen.getByTestId("suspended-menu")).toBeInTheDocument();
     expect(screen.getByText("Tornar membro")).toBeInTheDocument();
     expect(screen.getByText("Remover do grupo")).toBeInTheDocument();
   });
 
   it("when group is admin: shows actions for non-admin user -> 'Promover a administrador' and 'Remover do grupo'", () => {
     currentGroupValue = { ...currentGroupValue, isAdmin: true };
-    loaderUsersValue = [{ id: 2, name: "Bruno", userName: "bru", isAdmin: false }];
+    loaderUsersValue = [
+      { id: 2, name: "Bruno", userName: "bru", isAdmin: false },
+    ];
 
     render(<GroupInfo />);
 
+    expect(screen.getByTestId("suspended-menu")).toBeInTheDocument();
     expect(screen.getByText("Promover a administrador")).toBeInTheDocument();
     expect(screen.getByText("Remover do grupo")).toBeInTheDocument();
   });
 
   it("promote flow: calls show(), promoteToAdmin(), updates UI to 'Administrador', shows toast, hides loader", async () => {
     currentGroupValue = { ...currentGroupValue, isAdmin: true };
-    loaderUsersValue = [{ id: 2, name: "Bruno", userName: "bru", isAdmin: false }];
+    loaderUsersValue = [
+      { id: 2, name: "Bruno", userName: "bru", isAdmin: false },
+    ];
 
     (groupService.promoteToAdmin as any).mockResolvedValueOnce(undefined);
 
     render(<GroupInfo />);
 
-    // click "Promover a administrador"
     const user = userEvent.setup();
     await user.click(screen.getByText("Promover a administrador"));
 
@@ -240,8 +262,6 @@ describe("<GroupInfo />", () => {
       "Usuário promovido a administrador com sucesso!"
     );
     expect(hideMock).toHaveBeenCalledTimes(1);
-
-    // UI should update role label
     expect(screen.getByTestId("li-detail")).toHaveTextContent("Administrador");
   });
 
@@ -265,7 +285,6 @@ describe("<GroupInfo />", () => {
       "Usuário removido dos administradores com sucesso!"
     );
     expect(hideMock).toHaveBeenCalledTimes(1);
-
     expect(screen.getByTestId("li-detail")).toHaveTextContent("Membro");
   });
 
@@ -280,7 +299,6 @@ describe("<GroupInfo />", () => {
 
     render(<GroupInfo />);
 
-    // remove Ana (first item's "Remover do grupo")
     const user = userEvent.setup();
     await user.click(screen.getAllByText("Remover do grupo")[0]);
 
@@ -294,14 +312,15 @@ describe("<GroupInfo />", () => {
     );
     expect(hideMock).toHaveBeenCalledTimes(1);
 
-    // Ana should be gone; Bruno remains
     expect(screen.queryByText("Ana")).not.toBeInTheDocument();
     expect(screen.getByText("Bruno")).toBeInTheDocument();
   });
 
   it("service error path: shows toast.error with error.response.data.detail and hides loader", async () => {
     currentGroupValue = { ...currentGroupValue, isAdmin: true };
-    loaderUsersValue = [{ id: 2, name: "Bruno", userName: "bru", isAdmin: false }];
+    loaderUsersValue = [
+      { id: 2, name: "Bruno", userName: "bru", isAdmin: false },
+    ];
 
     (groupService.promoteToAdmin as any).mockRejectedValueOnce({
       response: { data: { detail: "Falhou!" } },
@@ -321,7 +340,6 @@ describe("<GroupInfo />", () => {
   });
 });
 
-// -------------------- loader test --------------------
 describe("GroupInfo.loader", () => {
   beforeEach(() => vi.clearAllMocks());
 
