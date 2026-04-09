@@ -1,16 +1,13 @@
 import { Link } from "react-router-dom";
 import "./Header.css";
 import { BsArrowLeftSquare } from "react-icons/bs";
-import SuspendedMenu, {
-  type SuspendedMenuProps,
-} from "../suspendedmenu/SuspendedMenu";
+
 
 type HeaderConfig = {
   title: string;
   titleLink?: string;
   enableBackButton?: boolean;
   backButtonLink?: string;
-  suspendedMenuProps?: SuspendedMenuProps;
   children?: React.ReactNode;
   hidden?: boolean;
 };
@@ -19,8 +16,7 @@ export default function Header({
   title,
   titleLink,
   enableBackButton,
-  backButtonLink,
-  suspendedMenuProps,
+  backButtonLink,  
   children,
   hidden = false,
 }: HeaderConfig) {
@@ -34,10 +30,7 @@ export default function Header({
         )}
         {titleLink ? <h1><Link to={titleLink}>{title}</Link></h1> : <h1>{title}</h1>}
         {children}
-      </div>
-      {suspendedMenuProps && (
-        <SuspendedMenu items={suspendedMenuProps.items}></SuspendedMenu>
-      )}
+      </div>      
     </header>
   );
 }

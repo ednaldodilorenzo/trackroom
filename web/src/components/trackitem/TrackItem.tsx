@@ -2,14 +2,12 @@ import { BsPlayCircle } from "react-icons/bs";
 import "./TrackItem.css";
 import type { Music } from "@/model";
 import { Link } from "react-router-dom";
-import SuspendedMenu, { type SuspendedMenuProps } from "@/components/suspendedmenu/SuspendedMenu";
 
 type TrackItemProps = Music & {
   active: boolean;
   onClick: () => void;
   cipherLink?: string;
-  showMenu?: boolean;
-  suspendedMenuProps?: SuspendedMenuProps;
+  children?: React.ReactNode;
 };
 
 export default function TrackItem({
@@ -19,8 +17,7 @@ export default function TrackItem({
   active,
   cipherLink,
   onClick,
-  showMenu,
-  suspendedMenuProps,
+  children,
 }: TrackItemProps) {
   return (
     <div className={`track-item ${active ? "active" : ""}`}>
@@ -38,9 +35,7 @@ export default function TrackItem({
           Ver cifra
         </Link>
       )}
-      {showMenu && (<SuspendedMenu
-        items={suspendedMenuProps ? suspendedMenuProps.items : []}
-      />)}
+      {children}
     </div>
   );
 }

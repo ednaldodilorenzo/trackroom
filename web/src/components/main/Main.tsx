@@ -36,16 +36,18 @@ export default function Main() {
   // };
 
   return (
-    <>
+    <div className="h-dvh flex flex-col overflow-hidden">
       <Header {...headerConfig} />
-      <div className="main-page">
-        {user ? (
-          <Outlet context={outletContext} />
-        ) : (
-          <Navigate to="/login" />
-        )}
-      </div>
-      <AudioPlayer />
-    </>
+      <main className="flex-1 flex flex-col overflow-hidden">
+        <section className="flex-1 p-4 overflow-auto">
+          {user ? (
+            <Outlet context={outletContext} />
+          ) : (
+            <Navigate to="/login" />
+          )}
+        </section>
+        <AudioPlayer />
+      </main>
+    </div>
   );
 }

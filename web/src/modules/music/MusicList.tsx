@@ -14,6 +14,8 @@ import {
 import "./MusicList.css";
 import { useGroupContext } from "../group/GroupContext";
 import { BsSearch } from "react-icons/bs";
+import SuspendedMenu from "@/components/suspendedmenu/SuspendedMenu";
+import SuspendedMenuItem from "@/components/suspendedmenu/SuspendedMenuItem";
 
 export default function MusicList() {
   const { musics } = useLoaderData<{ musics: Promise<Music[]> }>();
@@ -64,26 +66,25 @@ export default function MusicList() {
                         active={currentTrack.id === item.id}
                         onClick={() => handlePlay(item)}
                         cipherLink={`/groups/${id}/musics/${item.id}/cipher`}
-                        showMenu={currentGroup.isAdmin}
-                        suspendedMenuProps={{
-                          items: [
-                            {
-                              label: "Editar",
-                              onClick: () => navigate(`/groups/${id}/musics/${item.id}`),
-                            },
-                            {
-                              label: "Excluir",
-                              onClick: async () => {
-                                if (confirm("Tem certeza que deseja excluir esta música?")) {
-                                  await musicService.delete(''+item.id!!);
-                                  navigate(0);
-                                }
-                              }
-                            },
-                          ],
-                        }}
                         {...item}
-                      />
+                      >
+                        {currentGroup.isAdmin && (<SuspendedMenu>
+                          <SuspendedMenu.Item
+                            label="Editar"
+                            onClick={() => navigate(`/groups/${id}/musics/${item.id}`)}
+                          />
+                          <SuspendedMenu.Item
+                            label="Excluir"
+                            onClick={() => {
+                              if (confirm("Tem certeza que deseja excluir esta música?")) {
+                                musicService.delete('' + item.id!!).then(() => {
+                                  navigate(0);
+                                });
+                              }
+                            }}
+                          />
+                        </SuspendedMenu>)}
+                      </TrackItem>
                     </div>
                   ))
                 ) : (

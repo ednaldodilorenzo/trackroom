@@ -2,16 +2,11 @@ import { useState, useRef, useEffect } from "react";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import SuspendedMenuItem from "./SuspendedMenuItem";
 
-interface MenuItem {
-  label: string;
-  onClick: () => void;
-}
-
 export interface SuspendedMenuProps {
-  items: MenuItem[];
+  children: React.ReactNode;
 }
 
-export default function SuspendedMenu({ items }: SuspendedMenuProps) {
+export default function SuspendedMenu({ children }: SuspendedMenuProps) {
   const [isOpen, setIsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -36,18 +31,11 @@ export default function SuspendedMenu({ items }: SuspendedMenuProps) {
 
       {isOpen && (
         <div className="origin-top-right absolute right-0 mt-2 w-56 p-3 rounded-md shadow-lg bg-white ring-opacity-5 z-50">
-          {items.map((item, index) => (
-            <SuspendedMenuItem
-              key={index}
-              label={item.label}
-              onClick={() => {
-                item.onClick();
-                handleClickOutside(new MouseEvent("mousedown", { bubbles: true }));
-              }}
-            />
-          ))}
+          {children}
         </div>
       )}
     </div>
   );
 }
+
+SuspendedMenu.Item = SuspendedMenuItem;
