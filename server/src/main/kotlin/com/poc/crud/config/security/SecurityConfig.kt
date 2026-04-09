@@ -57,7 +57,7 @@ class SecurityConfig(
         val origins = this.allowedOrigins.split(",")
         val configuration = CorsConfiguration().apply {
             allowedOrigins = origins
-            allowedMethods = listOf("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            allowedMethods = listOf("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS")
             allowedHeaders = listOf("Authorization", "Cache-Control", "Content-Type")
             allowCredentials = true
             maxAge = 3600L
