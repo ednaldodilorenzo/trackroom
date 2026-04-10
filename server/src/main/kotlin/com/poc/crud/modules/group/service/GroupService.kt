@@ -10,13 +10,13 @@ interface GroupService {
 
     fun findById(id: Long, withDependencies: Boolean = false, userId: Long): GroupMembershipDTO
 
-    fun findUsersByGroupId(userId: Long, id: Long): List<UserDTO>
+    fun findUsersByGroupId(id: Long): List<UserDTO>
 
-    fun updateGroup(userId: Long, groupId: Long, groupData: PutGroupDTO): Long?
+    fun updateGroup(groupId: Long, groupData: PutGroupDTO): Long?
 
     fun addGroupMembers(principalId: Long, groupId: Long, members: List<UserDTO>)
 
-    fun promoteMemberToAdmin(principalId: Long, groupId: Long, userId: Long)
+    fun promoteMemberToAdmin(groupId: Long, userId: Long)
 
     fun demoteMemberFromAdmin(principalId: Long, groupId: Long, userId: Long)
 

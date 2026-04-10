@@ -19,7 +19,7 @@ interface MusicService {
 
     fun confirmMusicUpload(musicId: Long)
 
-    fun updateMusic(id: Long, music: PatchMusicReqDTO, userId: Long): PostMusicRespDTO
+    fun updateMusic(id: Long, dto: PatchMusicReqDTO): PostMusicRespDTO
 
     fun getById(id: Long): MusicDTO
 }

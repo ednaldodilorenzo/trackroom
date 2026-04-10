@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ProblemDetail
 import org.springframework.http.ResponseEntity
 import org.springframework.http.converter.HttpMessageNotReadableException
+import org.springframework.security.authorization.AuthorizationDeniedException
 import org.springframework.validation.FieldError
 import org.springframework.web.bind.MethodArgumentNotValidException
 import org.springframework.web.bind.annotation.ControllerAdvice
@@ -44,5 +45,10 @@ class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException::class)
     fun handleMalformedJson(ex: HttpMessageNotReadableException): ResponseEntity<String> {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Malformed JSON")
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException::class)
+    fun handleAuthorizationDenied(ex: AuthorizationDeniedException): ResponseEntity<String> {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).body(ex.message!!)
     }
 }

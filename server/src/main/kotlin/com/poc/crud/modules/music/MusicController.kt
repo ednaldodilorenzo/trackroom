@@ -5,8 +5,6 @@ import com.poc.crud.modules.music.service.MusicService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
-import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.*
 
 @RestController
@@ -47,9 +45,9 @@ class MusicController(
 
     @PatchMapping("/{id}")
     fun updateMusic(
-        @AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long, @RequestBody music: PatchMusicReqDTO
+        @PathVariable id: Long, @RequestBody music: PatchMusicReqDTO
     ): ResponseEntity<PostMusicRespDTO> {
-        return ResponseEntity.ok(this.musicService.updateMusic(id, music, jwt.id.toLong()))
+        return ResponseEntity.ok(this.musicService.updateMusic(id, music))
     }
 
     @PostMapping("/confirm/{id}")

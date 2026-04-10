@@ -34,12 +34,12 @@ class GroupController(
         groupService.addGroupMembers(jwt.id.toLong(), id, memberList)
 
     @GetMapping("/{id}/users")
-    fun getUserByGroup(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long): ResponseEntity<List<UserDTO>> =
-        ResponseEntity.ok(groupService.findUsersByGroupId(jwt.id.toLong(), id))
+    fun getUserByGroup(@PathVariable id: Long): ResponseEntity<List<UserDTO>> =
+        ResponseEntity.ok(groupService.findUsersByGroupId(id))
 
     @PostMapping("/{id}/users/{userId}/admin")
-    fun addAdmin(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long, @PathVariable userId: Long) =
-        groupService.promoteMemberToAdmin(jwt.id.toLong(), id, userId)
+    fun addAdmin(@PathVariable id: Long, @PathVariable userId: Long) =
+        groupService.promoteMemberToAdmin(id, userId)
 
     @PostMapping("/{id}/users/{userId}/member")
     fun removeAdmin(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long, @PathVariable userId: Long) =
@@ -51,8 +51,7 @@ class GroupController(
 
     @PutMapping("/{id}")
     fun put(
-        @AuthenticationPrincipal jwt: Jwt,
         @PathVariable id: Long,
         @RequestBody putDto: PutGroupDTO
-    ): ResponseEntity<Long> = ResponseEntity.ok(groupService.updateGroup(jwt.id.toLong(), id, putDto))
+    ): ResponseEntity<Long> = ResponseEntity.ok(groupService.updateGroup(id, putDto))
 }

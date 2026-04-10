@@ -21,26 +21,28 @@ export default function GroupData() {
   const navigate = useNavigate();
   const ctx = useOutletContext<any>();
 
-  return <>
-    <Suspense>
-      <Await resolve={group}>
-        {loadedGroup => {
-          useHeaderConfig({
-            title: loadedGroup.name,
-            titleLink: `/groups/${loadedGroup.id}/info`,
-            enableBackButton: true,
-            backButtonLink: "/",
-            children: <Button onClick={() => navigate(`/groups/${loadedGroup.id}/edit`)}><BsFillPencilFill /></Button>,
-            hidden: false,
-          });
+  return  <Suspense>
+    <Await resolve={group}>
+      {loadedGroup => {
+        useHeaderConfig({
+          title: loadedGroup.name,
+          titleLink: `/groups/${loadedGroup.id}/info`,
+          enableBackButton: true,
+          backButtonLink: "/",
+          children: loadedGroup.isAdmin && (
+            <Button onClick={() => navigate(`/groups/${loadedGroup.id}/edit`)}>
+              <BsFillPencilFill />
+            </Button>
+          ),
+          hidden: false,
+        });
 
-          setCurrentGroup(loadedGroup);
+        setCurrentGroup(loadedGroup);
 
-          return <Outlet context={ctx} />; // or some JSX if you want to render something specific for the group data page
-        }}
-      </Await>
-    </Suspense>
-  </>;
+        return <Outlet context={ctx} />; // or some JSX if you want to render something specific for the group data page
+      }}
+    </Await>
+  </Suspense>
 }
 
 export const groupLoader = ({

@@ -12,6 +12,7 @@ import com.poc.crud.repository.GroupRepository
 import com.poc.crud.repository.MusicRepository
 import com.poc.crud.repository.UserGroupRepository
 import jakarta.transaction.Transactional
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 
 
@@ -23,10 +24,13 @@ class MusicServiceImpl(
     private val cipherFileStorage: CipherFileStorage,
     private val userGroupRepository: UserGroupRepository,
 ) : MusicService {
+
+    @PreAuthorize("@musicSecurity.canHandleGroupMusic(authentication, #p0)")
     override fun getAllMusic(groupId: Long?): Set<MusicDTO> =
         musicRepository.findAllByGroupId(groupId ?: 0L).map { MusicDTO(it) }.toSet()
 
     @Transactional
+    @PreAuthorize("@groupSecurity.hasGroupAdminPrivileges(authentication, #dto.groupId)")
     override fun insertMusic(dto: PostMusicReqDTO): PostMusicRespDTO {
         val group = groupRepository.findById(dto.groupId).orElseThrow {
             APIException(
@@ -85,18 +89,19 @@ class MusicServiceImpl(
     }
 
     @Transactional
-    override fun updateMusic(id: Long, dto: PatchMusicReqDTO, userId: Long): PostMusicRespDTO {
+    @PreAuthorize("@groupSecurity.hasGroupAdminPrivileges(authentication, #dto.groupId)")
+    override fun updateMusic(id: Long, dto: PatchMusicReqDTO): PostMusicRespDTO {
         val music = this.musicRepository.findById(id)
             .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Music not found with id: $id") }
 
-        val userGroup = this.userGroupRepository.findById(UserGroupId(userId, dto.groupId))
-            .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Grupo do usuário não encontrado: $id") }
-
-        if (!userGroup.isAdmin) {
-            throw APIException(
-                ExceptionType.FORBIDDEN, "Usuário não tem permissão para alteração de música no grupo corrente."
-            )
-        }
+//        val userGroup = this.userGroupRepository.findById(UserGroupId(userId, dto.groupId))
+//            .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Grupo do usuário não encontrado: $id") }
+//
+//        if (!userGroup.isAdmin) {
+//            throw APIException(
+//                ExceptionType.FORBIDDEN, "Usuário não tem permissão para alteração de música no grupo corrente."
+//            )
+//        }
 
         dto.name?.let { music.name = it }
         dto.description?.let { music.description = it }
