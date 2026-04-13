@@ -22,7 +22,6 @@ class MusicServiceImpl(
     private val groupRepository: GroupRepository,
     private val musicFileStorage: MusicFileStorage,
     private val cipherFileStorage: CipherFileStorage,
-    private val userGroupRepository: UserGroupRepository,
 ) : MusicService {
 
     @PreAuthorize("@musicSecurity.canHandleGroupMusic(authentication, #p0)")
@@ -93,15 +92,6 @@ class MusicServiceImpl(
     override fun updateMusic(id: Long, dto: PatchMusicReqDTO): PostMusicRespDTO {
         val music = this.musicRepository.findById(id)
             .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Music not found with id: $id") }
-
-//        val userGroup = this.userGroupRepository.findById(UserGroupId(userId, dto.groupId))
-//            .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Grupo do usuário não encontrado: $id") }
-//
-//        if (!userGroup.isAdmin) {
-//            throw APIException(
-//                ExceptionType.FORBIDDEN, "Usuário não tem permissão para alteração de música no grupo corrente."
-//            )
-//        }
 
         dto.name?.let { music.name = it }
         dto.description?.let { music.description = it }

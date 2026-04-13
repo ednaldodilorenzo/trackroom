@@ -21,7 +21,7 @@ class GroupServiceImpl(
     private val userGroupRepository: UserGroupRepository,
 ) : GroupService {
     override fun findGroupsByUserId(userId: Long): List<GroupDTO> {
-        return groupRepository.findAll().map { GroupDTO(it, false) }
+        return groupRepository.findGroupsByUserId(userId).map { GroupDTO(it, false) }
     }
 
     @Transactional
@@ -83,15 +83,6 @@ class GroupServiceImpl(
         val group = groupRepository.findById(groupId)
             .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Group not found", RuntimeException()) }
 
-        // 2) Ensure principal is admin of this group
-//        val principalMembership = userGroupRepository.findById(UserGroupId(principalId, groupId))
-//            .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Membership not found", RuntimeException()) }
-//
-//        if (!principalMembership.isAdmin) {
-//            throw APIException(ExceptionType.FORBIDDEN, "User is not admin", RuntimeException())
-//        }
-
-        // 3) Extract + validate member ids
         val memberIds = members.mapNotNull { it.id }.distinct()
         if (memberIds.isEmpty()) return
 
@@ -139,18 +130,6 @@ class GroupServiceImpl(
     @Transactional
     @PreAuthorize("@groupSecurity.hasGroupAdminPrivileges(authentication, #p1)")
     override fun demoteMemberFromAdmin(principalId: Long, groupId: Long, userId: Long) {
-        // 1) Ensure the group exists (optional but usually nice for error clarity)
-//        groupRepository.findById(groupId)
-//            .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Group not found", RuntimeException()) }
-
-        // 2) Ensure principal is admin of this group
-//        val principalMembership = userGroupRepository.findById(UserGroupId(principalId, groupId))
-//            .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Membership not found", RuntimeException()) }
-
-//        if (!principalMembership.isAdmin) {
-//            throw APIException(ExceptionType.FORBIDDEN, "User is not admin", RuntimeException())
-//        }
-
         if (principalId == userId) {
             throw APIException(ExceptionType.BUSINESS_ERROR, "User cannot demote yourself", RuntimeException())
         }
@@ -170,16 +149,6 @@ class GroupServiceImpl(
     @Transactional
     @PreAuthorize("@groupSecurity.hasGroupAdminPrivileges(authentication, #p1)")
     override fun deleteMemberFromGroup(principalId: Long, groupId: Long, memberId: Long) {
-//        groupRepository.findById(groupId)
-//            .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Group not found", RuntimeException()) }
-
-//        val principalMembership = userGroupRepository.findById(UserGroupId(principalId, groupId))
-//            .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Membership not found", RuntimeException()) }
-//
-//        if (!principalMembership.isAdmin) {
-//            throw APIException(ExceptionType.FORBIDDEN, "User is not admin", RuntimeException())
-//        }
-
         if (principalId == memberId) {
             throw APIException(ExceptionType.BUSINESS_ERROR, "Usuário não pode remover a si mesmo!", RuntimeException())
         }
