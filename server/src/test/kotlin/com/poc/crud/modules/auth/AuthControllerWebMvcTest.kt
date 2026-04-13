@@ -58,7 +58,7 @@ class AuthControllerWebMvcTest {
         }
     """.trimIndent()
 
-        var result = mockMvc.post("/auth/v1/login") {
+        mockMvc.post("/auth/v1/login") {
             contentType = MediaType.APPLICATION_JSON
             content = malformedJson
         }.andExpect {
@@ -71,7 +71,7 @@ class AuthControllerWebMvcTest {
         }
     """.trimIndent()
 
-        result = mockMvc.post("/auth/v1/login") {
+        mockMvc.post("/auth/v1/login") {
             contentType = MediaType.APPLICATION_JSON
             content = malformedJson
         }.andExpect {
@@ -85,7 +85,7 @@ class AuthControllerWebMvcTest {
         }
     """.trimIndent()
 
-        result = mockMvc.post("/auth/v1/login") {
+        mockMvc.post("/auth/v1/login") {
             contentType = MediaType.APPLICATION_JSON
             content = malformedJson
         }.andExpect {
@@ -99,7 +99,7 @@ class AuthControllerWebMvcTest {
         }
     """.trimIndent()
 
-        result = mockMvc.post("/auth/v1/login") {
+        mockMvc.post("/auth/v1/login") {
             contentType = MediaType.APPLICATION_JSON
             content = malformedJson
         }.andExpect {
@@ -113,7 +113,7 @@ class AuthControllerWebMvcTest {
         }
     """.trimIndent()
 
-        result = mockMvc.post("/auth/v1/login") {
+        mockMvc.post("/auth/v1/login") {
             contentType = MediaType.APPLICATION_JSON
             content = malformedJson
         }.andExpect {
