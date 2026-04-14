@@ -27,7 +27,7 @@ class GroupServiceImpl(
     @Transactional
     override fun insertGroup(
         userId: Long, groupData: PostGroupDTO
-    ): Long? {
+    ): Long {
         val newGroup = Group(
             name = groupData.name, description = groupData.description, cover = groupData.cover
         )
@@ -44,7 +44,7 @@ class GroupServiceImpl(
         )
         userGroupRepository.save(newUserGroup)
 
-        return group.id
+        return group.id!!
     }
 
     @PreAuthorize("@groupSecurity.hasGroupUserPrivileges(authentication, #p0)")

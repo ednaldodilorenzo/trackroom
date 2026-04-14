@@ -77,7 +77,13 @@ class GroupControllerTest {
 
     @Test
     fun `post should create a new group and return ID`() {
-        val postDto = PostGroupDTO(name = "New Group", description = "Test Group Description", cover = "Cover")
+        val postPayload = """
+            {
+                "name": "Test Group",
+                "description": "Test Group Description",
+                "cover": "Cover"
+            }
+        """.trimIndent()
         every { groupService.insertGroup(123L, any()) } returns 1L
 
         mockMvc.perform(
@@ -89,12 +95,93 @@ class GroupControllerTest {
                         .plusSeconds(3600))
                 })
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(postDto))
+                .content(postPayload)
         )
-            .andExpect(status().isOk)
-            .andExpect(content().string("1"))
+            .andExpect(status().isCreated)
+            .andExpect(header().string("Location", "/v1/groups/1"))
 
         verify { groupService.insertGroup(123L, any()) }
+    }
+
+    @Test
+    fun `post with no mandatory fields`() {
+        var postPayload = """
+            {
+                "description": "Test Group Description",
+                "cover": "Cover"
+            }
+        """.trimIndent()
+
+        mockMvc.perform(
+            post("/v1/groups")
+                .with(jwt().jwt {
+                    it.claim("jti", "123")
+                        .issuedAt(Instant.now())
+                        .expiresAt(Instant.now()
+                            .plusSeconds(3600))
+                })
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(postPayload)
+        )
+            .andExpect(status().isBadRequest)
+
+        postPayload = """
+            {
+                "name": "Test Group Description",
+                "cover": "Cover"
+            }
+        """.trimIndent()
+
+        mockMvc.perform(
+            post("/v1/groups")
+                .with(jwt().jwt {
+                    it.claim("jti", "123")
+                        .issuedAt(Instant.now())
+                        .expiresAt(Instant.now()
+                            .plusSeconds(3600))
+                })
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(postPayload)
+        )
+            .andExpect(status().isBadRequest)
+
+        postPayload = """
+            {
+                "name": "Test Group Description",
+                "description": "Test Group Description",                
+            }
+        """.trimIndent()
+
+        mockMvc.perform(
+            post("/v1/groups")
+                .with(jwt().jwt {
+                    it.claim("jti", "123")
+                        .issuedAt(Instant.now())
+                        .expiresAt(Instant.now()
+                            .plusSeconds(3600))
+                })
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(postPayload)
+        )
+            .andExpect(status().isBadRequest)
+
+        postPayload = """
+            {                                
+            }
+        """.trimIndent()
+
+        mockMvc.perform(
+            post("/v1/groups")
+                .with(jwt().jwt {
+                    it.claim("jti", "123")
+                        .issuedAt(Instant.now())
+                        .expiresAt(Instant.now()
+                            .plusSeconds(3600))
+                })
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(postPayload)
+        )
+            .andExpect(status().isBadRequest)
     }
 
     @Test

@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
 import org.springframework.web.bind.annotation.*
+import java.net.URI
 
 @RestController
 @RequestMapping("/v1/groups")
@@ -26,8 +27,8 @@ class GroupController(
         ResponseEntity.ok(groupService.findById(id, withDependencies, jwt.id.toLong()))
 
     @PostMapping("")
-    fun post(@AuthenticationPrincipal jwt: Jwt, @RequestBody @Valid groupData: PostGroupDTO): Long? =
-        groupService.insertGroup(jwt.id.toLong(), groupData)
+    fun post(@AuthenticationPrincipal jwt: Jwt, @RequestBody @Valid groupData: PostGroupDTO): ResponseEntity<Long> =
+        ResponseEntity.created(URI("/v1/groups/${groupService.insertGroup(jwt.id.toLong(), groupData)}")).build()
 
     @PostMapping("/{id}/members")
     fun addMembers(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long, @RequestBody memberList: List<UserDTO>) =
@@ -38,8 +39,7 @@ class GroupController(
         ResponseEntity.ok(groupService.findUsersByGroupId(id))
 
     @PostMapping("/{id}/users/{userId}/admin")
-    fun addAdmin(@PathVariable id: Long, @PathVariable userId: Long) =
-        groupService.promoteMemberToAdmin(id, userId)
+    fun addAdmin(@PathVariable id: Long, @PathVariable userId: Long) = groupService.promoteMemberToAdmin(id, userId)
 
     @PostMapping("/{id}/users/{userId}/member")
     fun removeAdmin(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long, @PathVariable userId: Long) =
@@ -51,7 +51,6 @@ class GroupController(
 
     @PutMapping("/{id}")
     fun put(
-        @PathVariable id: Long,
-        @RequestBody putDto: PutGroupDTO
+        @PathVariable id: Long, @RequestBody putDto: PutGroupDTO
     ): ResponseEntity<Long> = ResponseEntity.ok(groupService.updateGroup(id, putDto))
 }
