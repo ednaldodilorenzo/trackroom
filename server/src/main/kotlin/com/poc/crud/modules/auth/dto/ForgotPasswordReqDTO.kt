@@ -1,5 +1,7 @@
 package com.poc.crud.modules.auth.dto
 
+import com.poc.crud.core.validation.ConfirmPassword
+import com.poc.crud.core.validation.ConfirmPasswordInterface
 import jakarta.validation.constraints.NotBlank
 import jakarta.validation.constraints.NotNull
 
@@ -10,9 +12,10 @@ data class ForgotPasswordReqDTO(
     val email: String
 )
 
+@ConfirmPassword
 data class PasswordRecoverReqDTO(
     @field:NotBlank("Senha deve ser informada")
-    val password: String,
+    override val password: String,
     @field:NotBlank("Confirmação de senha deve ser informada")
-    val confirmPassword: String
-)
+    override val confirmPassword: String
+): ConfirmPasswordInterface
