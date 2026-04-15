@@ -26,14 +26,14 @@ class MusicController(
     @GetMapping("/{id}/url")
     fun getMusicUrl(@PathVariable id: Long): ResponseEntity<String> = ResponseEntity.ok(musicService.getMusicUrl(id))
 
-    @GetMapping("/{id}/cipher", consumes = [MediaType.TEXT_PLAIN_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
+    @GetMapping("/{id}/cipher")
     fun getMusicCipherData(@PathVariable id: Long): ResponseEntity<MusicCipherResponseDTO> {
         // Placeholder implementation for cipher retrieval
         val cipherData = musicService.getMusicCipherData(id)
         return ResponseEntity.ok(cipherData)
     }
 
-    @PutMapping("/{id}/cipher")
+    @PutMapping("/{id}/cipher", consumes = [MediaType.TEXT_PLAIN_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun postMusicCipher(@PathVariable id: Long, @RequestBody cipher: String): ResponseEntity<String> {
         musicService.updateMusicCipherFile(id, cipher)
         return ResponseEntity.ok("Cipher for music ID $id has been stored.")
