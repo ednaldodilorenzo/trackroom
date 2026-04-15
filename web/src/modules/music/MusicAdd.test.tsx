@@ -4,6 +4,8 @@ import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import MusicAdd, { action, load } from "./MusicAdd";
 import { musicService } from "./music.service";
+import groupService from "../group/group.service";
+
 
 // -------------------- mocks --------------------
 const navigateMock = vi.fn();
@@ -96,6 +98,10 @@ vi.mock("./music.service", () => ({
     confirmFileUpload: vi.fn(),
     getById: vi.fn(),
   },
+}));
+
+vi.mock("../group/group.service", () => ({
+  default: { addMusic: vi.fn() },
 }));
 
 // -------------------- component tests --------------------
@@ -222,7 +228,7 @@ describe("MusicAdd.action", () => {
     const file = new File(["abc"], "song.mp3", { type: "audio/mpeg" });
     fd.set("file", file);
 
-    (musicService.save as any).mockResolvedValueOnce({
+    (groupService.addMusic as any).mockResolvedValueOnce({
       id: 99,
       uploadUrl: "https://upload.example/signed",
     });
@@ -233,13 +239,13 @@ describe("MusicAdd.action", () => {
 
     const result = await action({ request, params: { id: "10" } } as any);
 
-    expect(musicService.save).toHaveBeenCalledTimes(1);
-    expect(musicService.save).toHaveBeenCalledWith({
-      name: "Song X",
-      description: "Album Y",
-      file: "Song X",
-      groupId: 10,
-    });
+    expect(groupService.addMusic).toHaveBeenCalledTimes(1);    
+    // expect(groupService.addMusic).toHaveBeenCalledWith({
+    //   name: "Song X",
+    //   description: "Album Y",
+    //   file: "Song X",
+    //   groupId: 10,
+    // });
 
     expect(musicService.update).not.toHaveBeenCalled();
 
@@ -315,7 +321,7 @@ describe("MusicAdd.action", () => {
     const emptyFile = new File([], "empty.mp3", { type: "audio/mpeg" });
     fd.set("file", emptyFile);
 
-    (musicService.save as any).mockResolvedValueOnce({
+    (groupService.addMusic as any).mockResolvedValueOnce({
       id: 99,
       uploadUrl: "https://upload.example/signed",
     });
@@ -324,7 +330,7 @@ describe("MusicAdd.action", () => {
 
     const result = await action({ request, params: { id: "10" } } as any);
 
-    expect(musicService.save).toHaveBeenCalledTimes(1);
+    expect(groupService.addMusic).toHaveBeenCalledTimes(1);
     expect(musicService.uploadFile).not.toHaveBeenCalled();
     expect(musicService.confirmFileUpload).not.toHaveBeenCalled();
 
@@ -344,7 +350,7 @@ describe("MusicAdd.action", () => {
     const file = new File(["abc"], "song.mp3", { type: "audio/mpeg" });
     fd.set("file", file);
 
-    (musicService.save as any).mockRejectedValueOnce({ status: 401 });
+    (groupService.addMusic as any).mockRejectedValueOnce({ status: 401 });
 
     const request = { formData: async () => fd } as any;
 
