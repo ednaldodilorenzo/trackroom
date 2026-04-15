@@ -24,16 +24,16 @@ class MusicServiceImpl(
     private val cipherFileStorage: CipherFileStorage,
 ) : MusicService {
 
-    @PreAuthorize("@musicSecurity.canHandleGroupMusic(authentication, #p0)")
-    override fun getAllMusic(groupId: Long?): Set<MusicDTO> =
-        musicRepository.findAllByGroupId(groupId ?: 0L).map { MusicDTO(it) }.toSet()
+    @PreAuthorize("@groupSecurity.hasGroupUserPrivileges(authentication, #p0)")
+    override fun getAllMusic(groupId: Long): Set<MusicDTO> =
+        musicRepository.findAllByGroupId(groupId).map { MusicDTO(it) }.toSet()
 
     @Transactional
-    @PreAuthorize("@groupSecurity.hasGroupAdminPrivileges(authentication, #dto.groupId)")
-    override fun insertMusic(dto: PostMusicReqDTO): PostMusicRespDTO {
-        val group = groupRepository.findById(dto.groupId).orElseThrow {
+    @PreAuthorize("@groupSecurity.hasGroupAdminPrivileges(authentication, #p0)")
+    override fun insertMusic(groupId: Long, dto: PostMusicReqDTO): PostMusicRespDTO {
+        val group = groupRepository.findById(groupId).orElseThrow {
             APIException(
-                ExceptionType.NOT_FOUND, "Group not found with id: ${dto.groupId}", RuntimeException("")
+                ExceptionType.NOT_FOUND, "Group not found with id: ${groupId}", RuntimeException("")
             )
         }
 
@@ -104,6 +104,7 @@ class MusicServiceImpl(
         )
     }
 
+    @PreAuthorize("@musicSecurity.hasMusicAccess(authentication, #p0)")
     override fun getById(id: Long): MusicDTO {
         val music = this.musicRepository.findById(id)
             .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Musica com id: $id não encontrada") }

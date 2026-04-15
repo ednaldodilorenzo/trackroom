@@ -17,15 +17,11 @@ data class PostMusicReqDTO(
     val description: String,
 
     val file: String,
-
-    @NotNull
-    val groupId: Long,
 ) {
     constructor(music: Music, ) : this(
         id = null,
         name = "",
         description = "",
         file = "",
-        groupId = 0L
     )
 }

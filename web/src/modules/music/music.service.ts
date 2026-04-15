@@ -1,14 +1,11 @@
-import { Requester, request, type Params } from "@/utils/requester";
+import { Requester, request } from "@/utils/requester";
 import { type AxiosInstance } from "axios";
 import type { Music, MusicMetaData } from "@/model";
 
 class MusicService extends Requester {
   constructor(instance: AxiosInstance) {
     super(instance, "/v1/musics");
-  }
-
-  getAll = (params: Params): Promise<Music[]> =>
-    this.get<Music[]>("", params).then((resp) => resp.data);
+  }  
 
   getById = (id: number): Promise<Music> =>
     this.get<Music>(`/${id}`).then((resp) => resp.data);

@@ -1,5 +1,6 @@
 import { FallbackOverlay, RegisterForm, TextField } from "@/components";
 import { musicService } from "./music.service";
+import groupService from "../group/group.service";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { useForm } from "react-hook-form";
 import type { Music } from "@/model";
@@ -96,9 +97,9 @@ export async function action({ request, params }: ActionFunctionArgs) {
   if (!(fileEntry instanceof File)) {
     throw new Error("Arquivo inválido ou ausente");
   }
-
+  
   try {
-    const musicResp = musicId ? await musicService.update(parseInt(musicId), payload) : await musicService.save(payload);
+    const musicResp = musicId ? await musicService.update(parseInt(musicId), payload) : await groupService.addMusic(parseInt(id!!), payload);
 
     if (fileEntry.size > 0) {
       await musicService.uploadFile(musicResp.uploadUrl, fileEntry);

@@ -1,4 +1,4 @@
-import type { Group, User } from "@/model";
+import type { Group, Music, User } from "@/model";
 import { Requester, request } from "@/utils/requester";
 import { type AxiosInstance } from "axios";
 
@@ -29,6 +29,14 @@ class GroupService extends Requester {
   demoteFromAdmin = (groupId: number, userId: number) => this.post<void, any>({}, {}, "/v1/groups", `/${groupId}/users/${userId}/member`);
 
   removeMemberFromGroup = (groupId: number, userId: number) => this.delete(`/${groupId}/members/${userId}`);
+
+  getMusics = (groupId: number): Promise<Music[]> =>
+    this.get<Music[]>(`/${groupId}/musics`).then((resp) => resp.data);
+
+  addMusic = (groupId: number, data: Music): Promise<{ id: number; uploadUrl: string }> =>
+    this.post<{ id: number; uploadUrl: string }, Music>(data, {}, "/v1/groups", `/${groupId}/musics`).then(
+      (resp) => resp.data
+    );
 }
 
 export default new GroupService(request);

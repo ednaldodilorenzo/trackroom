@@ -1,6 +1,9 @@
 package com.poc.crud.modules.music
 
-import com.poc.crud.modules.music.dto.*
+import com.poc.crud.modules.music.dto.MusicCipherResponseDTO
+import com.poc.crud.modules.music.dto.MusicDTO
+import com.poc.crud.modules.music.dto.PatchMusicReqDTO
+import com.poc.crud.modules.music.dto.PostMusicRespDTO
 import com.poc.crud.modules.music.service.MusicService
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
@@ -15,7 +18,7 @@ class MusicController(
 
     @GetMapping("")
     fun getAll(@RequestParam(required = false) groupId: Long?): ResponseEntity<Set<MusicDTO>> =
-        ResponseEntity(musicService.getAllMusic(groupId), HttpStatus.OK)
+        ResponseEntity(musicService.getAllMusic(groupId!!), HttpStatus.OK)
 
     @GetMapping("/{id}")
     fun getById(@PathVariable id: Long): ResponseEntity<MusicDTO> = ResponseEntity.ok(this.musicService.getById(id))
@@ -23,7 +26,7 @@ class MusicController(
     @GetMapping("/{id}/url")
     fun getMusicUrl(@PathVariable id: Long): ResponseEntity<String> = ResponseEntity.ok(musicService.getMusicUrl(id))
 
-    @GetMapping("/{id}/cipher")
+    @GetMapping("/{id}/cipher", consumes = [MediaType.TEXT_PLAIN_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun getMusicCipherData(@PathVariable id: Long): ResponseEntity<MusicCipherResponseDTO> {
         // Placeholder implementation for cipher retrieval
         val cipherData = musicService.getMusicCipherData(id)
@@ -35,13 +38,6 @@ class MusicController(
         musicService.updateMusicCipherFile(id, cipher)
         return ResponseEntity.ok("Cipher for music ID $id has been stored.")
     }
-
-    @PostMapping("", consumes = [MediaType.APPLICATION_JSON_VALUE], produces = [MediaType.APPLICATION_JSON_VALUE])
-    fun post(
-        @RequestBody music: PostMusicReqDTO,
-    ): PostMusicRespDTO? = musicService.insertMusic(
-        music
-    )
 
     @PatchMapping("/{id}")
     fun updateMusic(

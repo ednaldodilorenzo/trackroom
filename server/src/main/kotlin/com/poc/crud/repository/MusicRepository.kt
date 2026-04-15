@@ -17,4 +17,14 @@ interface MusicRepository : JpaRepository<Music, Long> {
     """
     )
     fun findAllByGroupId(groupId: Long): Set<Music>
+
+    @Query("""
+        SELECT COUNT(m) > 0
+        FROM UserGroup ug
+          JOIN ug.group g
+          JOIN g.musics m
+        WHERE ug.user.id = :userId
+          AND m.id = :musicId
+        """)
+    fun existsMusicInUserGroups(userId: Long, musicId: Long): Boolean
 }

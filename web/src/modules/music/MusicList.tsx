@@ -7,6 +7,7 @@ import { useLoaderData, Await, useNavigate, useParams } from "react-router-dom";
 import FallbackOverlay from "@/components/fallbackoverlay/FallBackOverlay";
 import type { Music } from "@/model";
 import { musicService } from "./music.service";
+import groupService from "@/modules/group/group.service";
 import {
   useAudioPlayerContext,
   type Track,
@@ -104,7 +105,8 @@ export const musicsLoader = ({
   params,
 }: LoaderFunctionArgs): { musics: Promise<Music[]> } => {
   const id = params.id;
+  console.log("Loading musics for group id:", id);
   return {
-    musics: musicService.getAll({ groupId: id }),
+    musics: groupService.getMusics(parseInt(id!!)),
   };
 };

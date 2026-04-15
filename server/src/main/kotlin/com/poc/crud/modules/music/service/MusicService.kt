@@ -7,9 +7,9 @@ import com.poc.crud.modules.music.dto.PostMusicReqDTO
 import com.poc.crud.modules.music.dto.PostMusicRespDTO
 
 interface MusicService {
-    fun getAllMusic(groupId: Long?): Set<MusicDTO>
+    fun getAllMusic(groupId: Long): Set<MusicDTO>
 
-    fun insertMusic(dto: PostMusicReqDTO): PostMusicRespDTO
+    fun insertMusic(groupId: Long, dto: PostMusicReqDTO): PostMusicRespDTO
 
     fun getMusicUrl(musicId: Long): String
 

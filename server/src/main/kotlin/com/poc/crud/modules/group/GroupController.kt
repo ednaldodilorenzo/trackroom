@@ -2,6 +2,10 @@ package com.poc.crud.modules.group
 
 import com.poc.crud.modules.group.dto.*
 import com.poc.crud.modules.group.service.GroupService
+import com.poc.crud.modules.music.dto.MusicDTO
+import com.poc.crud.modules.music.dto.PostMusicReqDTO
+import com.poc.crud.modules.music.dto.PostMusicRespDTO
+import com.poc.crud.modules.music.service.MusicService
 import jakarta.validation.Valid
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
@@ -12,7 +16,8 @@ import java.net.URI
 @RestController
 @RequestMapping("/v1/groups")
 class GroupController(
-    val groupService: GroupService
+    val groupService: GroupService,
+    val musicService: MusicService,
 ) {
     @GetMapping("")
     fun getAllByUser(@AuthenticationPrincipal jwt: Jwt): ResponseEntity<List<GroupDTO>> =
@@ -53,4 +58,20 @@ class GroupController(
     fun put(
         @PathVariable id: Long, @RequestBody putDto: PutGroupDTO
     ): ResponseEntity<Long> = ResponseEntity.ok(groupService.updateGroup(id, putDto))
+
+    @GetMapping("/{id}/musics")
+    fun getGroupMusics(@PathVariable id: Long): Set<MusicDTO> {
+        return musicService.getAllMusic(groupId = id)
+    }
+
+    @PostMapping("/{id}/musics")
+    fun insertGroupMusic(
+        @PathVariable id: Long,
+        @RequestBody @Valid musicDTO: PostMusicReqDTO
+    ): ResponseEntity<PostMusicRespDTO> {
+        val result = musicService.insertMusic(
+            id, musicDTO
+        )
+        return ResponseEntity.created(URI("/v1/musics/${result.id}")).body(result)
+    }
 }

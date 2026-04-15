@@ -83,7 +83,7 @@ class GroupServiceImpl(
         val group = groupRepository.findById(groupId)
             .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Group not found", RuntimeException()) }
 
-        val memberIds = members.mapNotNull { it.id }.distinct()
+        val memberIds = members.map { it.id }.distinct()
         if (memberIds.isEmpty()) return
 
         val users = userRepository.findAllById(memberIds).toList()

@@ -4,7 +4,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 
 @Embeddable
-class UserGroupId(
+data class UserGroupId(
     @Column(name = "user_id")
     val userId: Long,
 

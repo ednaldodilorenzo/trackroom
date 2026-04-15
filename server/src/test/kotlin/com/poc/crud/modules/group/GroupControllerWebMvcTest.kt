@@ -1,10 +1,13 @@
 package com.poc.crud.modules.group
 
 import com.ninjasquad.springmockk.MockkBean
-import com.poc.crud.config.security.SecurityConfig
+import com.poc.crud.core.exception.APIException
+import com.poc.crud.core.exception.ExceptionType
 import com.poc.crud.modules.group.dto.GroupDTO
-import com.poc.crud.modules.group.dto.PostGroupDTO
 import com.poc.crud.modules.group.service.GroupService
+import com.poc.crud.modules.music.dto.MusicDTO
+import com.poc.crud.modules.music.dto.PostMusicRespDTO
+import com.poc.crud.modules.music.service.MusicService
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -35,9 +38,7 @@ class GroupControllerTest {
     class TestSecurityConfig {
         @Bean
         fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-            return http
-                .csrf { it.disable() }
-                .authorizeHttpRequests { it.anyRequest().permitAll() }
+            return http.csrf { it.disable() }.authorizeHttpRequests { it.anyRequest().permitAll() }
                 .oauth2ResourceServer { it.jwt { } } // Enables JWT principal support
                 .build()
         }
@@ -55,24 +56,24 @@ class GroupControllerTest {
     @MockkBean
     private lateinit var groupService: GroupService
 
+    @MockkBean
+    private lateinit var musicService: MusicService
+
     @Test
     fun `getAllByUser should return list of groups`() {
-        val groups = listOf(GroupDTO(id = 1L, name = "Test Group", description = "Test Group Description", cover = "Cover"))
+        val groups =
+            listOf(GroupDTO(id = 1L, name = "Test Group", description = "Test Group Description", cover = "Cover"))
 
         // Mocking the service call. Note the .with(jwt()) to satisfy @AuthenticationPrincipal
         every { groupService.findGroupsByUserId(123L) } returns groups
 
         mockMvc.perform(
-            get("/v1/groups")
-                .with(jwt().jwt {
-                    it.claim("jti", "123")
-                    .issuedAt(Instant.now())
-                    .expiresAt(Instant.now()
-                    .plusSeconds(3600))
+            get("/v1/groups").with(jwt().jwt {
+                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                            Instant.now().plusSeconds(3600)
+                        )
                 }) // Matches jwt.id.toLong()
-        )
-            .andExpect(status().isOk)
-            .andExpect(jsonPath("$[0].name").value("Test Group"))
+        ).andExpect(status().isOk).andExpect(jsonPath("$[0].name").value("Test Group"))
     }
 
     @Test
@@ -87,18 +88,12 @@ class GroupControllerTest {
         every { groupService.insertGroup(123L, any()) } returns 1L
 
         mockMvc.perform(
-            post("/v1/groups")
-                .with(jwt().jwt {
-                    it.claim("jti", "123")
-                        .issuedAt(Instant.now())
-                        .expiresAt(Instant.now()
-                        .plusSeconds(3600))
-                })
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(postPayload)
-        )
-            .andExpect(status().isCreated)
-            .andExpect(header().string("Location", "/v1/groups/1"))
+            post("/v1/groups").with(jwt().jwt {
+                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                            Instant.now().plusSeconds(3600)
+                        )
+                }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
+        ).andExpect(status().isCreated).andExpect(header().string("Location", "/v1/groups/1"))
 
         verify { groupService.insertGroup(123L, any()) }
     }
@@ -113,17 +108,12 @@ class GroupControllerTest {
         """.trimIndent()
 
         mockMvc.perform(
-            post("/v1/groups")
-                .with(jwt().jwt {
-                    it.claim("jti", "123")
-                        .issuedAt(Instant.now())
-                        .expiresAt(Instant.now()
-                            .plusSeconds(3600))
-                })
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(postPayload)
-        )
-            .andExpect(status().isBadRequest)
+            post("/v1/groups").with(jwt().jwt {
+                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                            Instant.now().plusSeconds(3600)
+                        )
+                }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
+        ).andExpect(status().isBadRequest)
 
         postPayload = """
             {
@@ -133,17 +123,12 @@ class GroupControllerTest {
         """.trimIndent()
 
         mockMvc.perform(
-            post("/v1/groups")
-                .with(jwt().jwt {
-                    it.claim("jti", "123")
-                        .issuedAt(Instant.now())
-                        .expiresAt(Instant.now()
-                            .plusSeconds(3600))
-                })
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(postPayload)
-        )
-            .andExpect(status().isBadRequest)
+            post("/v1/groups").with(jwt().jwt {
+                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                            Instant.now().plusSeconds(3600)
+                        )
+                }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
+        ).andExpect(status().isBadRequest)
 
         postPayload = """
             {
@@ -153,17 +138,12 @@ class GroupControllerTest {
         """.trimIndent()
 
         mockMvc.perform(
-            post("/v1/groups")
-                .with(jwt().jwt {
-                    it.claim("jti", "123")
-                        .issuedAt(Instant.now())
-                        .expiresAt(Instant.now()
-                            .plusSeconds(3600))
-                })
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(postPayload)
-        )
-            .andExpect(status().isBadRequest)
+            post("/v1/groups").with(jwt().jwt {
+                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                            Instant.now().plusSeconds(3600)
+                        )
+                }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
+        ).andExpect(status().isBadRequest)
 
         postPayload = """
             {                                
@@ -171,17 +151,12 @@ class GroupControllerTest {
         """.trimIndent()
 
         mockMvc.perform(
-            post("/v1/groups")
-                .with(jwt().jwt {
-                    it.claim("jti", "123")
-                        .issuedAt(Instant.now())
-                        .expiresAt(Instant.now()
-                            .plusSeconds(3600))
-                })
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(postPayload)
-        )
-            .andExpect(status().isBadRequest)
+            post("/v1/groups").with(jwt().jwt {
+                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                            Instant.now().plusSeconds(3600)
+                        )
+                }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
+        ).andExpect(status().isBadRequest)
     }
 
     @Test
@@ -189,16 +164,119 @@ class GroupControllerTest {
         every { groupService.deleteMemberFromGroup(123L, 1L, 456L) } returns Unit
 
         mockMvc.perform(
-            delete("/v1/groups/1/members/456")
-                .with(jwt().jwt {
-                    it.claim("jti", "123")
-                        .issuedAt(Instant.now())
-                        .expiresAt(Instant.now()
-                        .plusSeconds(3600))
+            delete("/v1/groups/1/members/456").with(jwt().jwt {
+                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                            Instant.now().plusSeconds(3600)
+                        )
                 })
-        )
-            .andExpect(status().isOk)
+        ).andExpect(status().isOk)
 
         verify { groupService.deleteMemberFromGroup(123L, 1L, 456L) }
+    }
+
+    @Test
+    fun `getGroupMusics should return list of musics`() {
+        val musics = setOf(MusicDTO(1L, "Test Music", "description", "file"))
+
+        // Mocking the service call. Note the .with(jwt()) to satisfy @AuthenticationPrincipal
+        every { musicService.getAllMusic(1L) } returns musics
+
+        mockMvc.perform(
+            get("/v1/groups/1/musics").with(jwt().jwt {
+                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                            Instant.now().plusSeconds(3600)
+                        )
+                }) // Matches jwt.id.toLong()
+        ).andExpect(status().isOk).andExpect(jsonPath("$[0].name").value("Test Music"))
+    }
+
+    @Test
+    fun `post music should return ID and url`() {
+        val postPayload = """
+            {
+                "name": "Test Music",
+                "description": "Test Music Description",
+                "file": "file.mp3"
+            }
+        """.trimIndent()
+        every { musicService.insertMusic(1L, any()) } returns PostMusicRespDTO(1L, "http://music.test.com")
+
+        mockMvc.perform(
+            post("/v1/groups/1/musics").with(jwt().jwt {
+                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                            Instant.now().plusSeconds(3600)
+                        )
+                }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
+        ).andExpect(status().isCreated).andExpect(header().string("Location", "/v1/musics/1"))
+
+        verify { musicService.insertMusic(1L, any()) }
+    }
+
+    @Test
+    fun `post music should return bad request if request is invalid`() {
+        var postPayload = """
+            {
+                "description": "Test Music Description",
+                "file": "file.mp3"
+            }
+        """.trimIndent()
+
+        mockMvc.perform(
+            post("/v1/groups/1/musics").with(jwt().jwt {
+                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                            Instant.now().plusSeconds(3600)
+                        )
+                }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
+        ).andExpect(status().isBadRequest)
+
+        postPayload = """
+            {
+                "name": "Test Music Description",                
+                "file": "file.mp3"
+            }
+        """.trimIndent()
+
+        mockMvc.perform(
+            post("/v1/groups/1/musics").with(jwt().jwt {
+                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                            Instant.now().plusSeconds(3600)
+                        )
+                }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
+        ).andExpect(status().isBadRequest)
+
+        postPayload = """
+            {
+                "name": "Test Music Description",                
+                "description": "Test Music Description",
+            }
+        """.trimIndent()
+
+        mockMvc.perform(
+            post("/v1/groups/1/musics").with(jwt().jwt {
+                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                            Instant.now().plusSeconds(3600)
+                        )
+                }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
+        ).andExpect(status().isBadRequest)
+
+        postPayload = """
+            {
+                "name": "Test Music",
+                "description": "Test Music Description",
+                "file": "file.mp3"
+            }
+        """.trimIndent()
+
+        every { musicService.insertMusic(1L, any()) } throws APIException(
+            ExceptionType.NOT_FOUND, "Group not found with id: 1", RuntimeException("")
+        )
+
+        mockMvc.perform(
+            post("/v1/groups/1/musics").with(jwt().jwt {
+                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                            Instant.now().plusSeconds(3600)
+                        )
+                }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
+        ).andExpect(status().isNotFound)
     }
 }
