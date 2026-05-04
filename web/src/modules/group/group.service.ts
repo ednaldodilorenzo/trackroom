@@ -1,5 +1,6 @@
-import type { Group, Music, User } from "@/model";
-import { Requester, request } from "@/utils/requester";
+import type { Group, Music, Playlist, User } from "@/model";
+import type { Page } from "@/model/Page";
+import { Requester, request, type Params } from "@/utils/requester";
 import { type AxiosInstance } from "axios";
 
 class GroupService extends Requester {
@@ -30,13 +31,25 @@ class GroupService extends Requester {
 
   removeMemberFromGroup = (groupId: number, userId: number) => this.delete(`/${groupId}/members/${userId}`);
 
-  getMusics = (groupId: number): Promise<Music[]> =>
-    this.get<Music[]>(`/${groupId}/musics`).then((resp) => resp.data);
+  getMusics = (groupId: number, params?: Params): Promise<Page<Music>> => {
+    return this.get<Page<Music>>(`/${groupId}/musics`, params).then((resp) => resp.data);
+  }
 
   addMusic = (groupId: number, data: Music): Promise<{ id: number; uploadUrl: string }> =>
     this.post<{ id: number; uploadUrl: string }, Music>(data, {}, "/v1/groups", `/${groupId}/musics`).then(
       (resp) => resp.data
     );
+
+  getPlaylists = (groupId: number, params?: Params): Promise<Page<Playlist>> => 
+    this.get<Page<Playlist>>(`/${groupId}/playlists`, params).then((resp) => resp.data);
+
+  addPlaylist = (groupId: number, data: Playlist): Promise<Playlist> =>
+    this.post<Playlist, Playlist>(data, {}, "/v1/groups", `/${groupId}/playlists`).then(
+      (resp) => resp.data
+    );
+  
+
+  deleteGroupMusic = (groupId: number, musicId: number) => this.delete(`/${groupId}/musics/${musicId}`);
 }
 
 export default new GroupService(request);

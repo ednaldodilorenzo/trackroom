@@ -26,4 +26,8 @@ class CipherFileStorage(private val fileStorage: FileStorage) {
             bytes.size.toLong(),
         )
     }
+
+    fun deleteCipher(musicId: Long) {
+        fileStorage.deleteFile(BUCKET_NAME, "cipher-$musicId.dat")
+    }
 }

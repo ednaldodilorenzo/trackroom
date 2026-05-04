@@ -2,7 +2,9 @@ package com.poc.crud.core.security
 
 
 import com.poc.crud.core.type.Email
+import com.poc.crud.model.UserPrincipal
 import com.poc.crud.repository.UserRepository
+import org.springframework.security.core.authority.SimpleGrantedAuthority
 import org.springframework.security.core.userdetails.User
 import org.springframework.security.core.userdetails.UserDetails
 import org.springframework.security.core.userdetails.UserDetailsService
@@ -19,10 +21,11 @@ class CustomUserDetailsService(
         val user = userRepository.findByEmailAndActiveTrue(Email(username!!))
             .orElseThrow { UsernameNotFoundException("Usuário ativo não encontrado!") }
 
-        return user.let {
-            User.builder().username(it.email.address)
-                .password(it.password) // not used in JWT, but required by interface
-                .authorities(it.id.toString()).build()
-        }
+        return UserPrincipal(
+            id = user.id!!,
+            email = user.email.address,
+            passwordValue = user.password!!,
+            grantedAuthorities = listOf(SimpleGrantedAuthority("ROLE_USER"))
+        )
     }
 }

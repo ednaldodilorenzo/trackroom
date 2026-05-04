@@ -43,7 +43,16 @@ export class Requester {
     url: string = this.baseUri
   ): Promise<AxiosResponse<T>> {
     // Let axios handle query-string encoding
-    return this.instance.get<T>(`${url}${uri}`, { params });
+    let queryParams = "";
+    if(Object.keys(params).length > 0) {
+      queryParams += "?";
+      for (const [key, value] of Object.entries(params)) {
+        queryParams += `${encodeURIComponent(key)}=${encodeURIComponent(String(value))}&`;
+      }
+      queryParams = queryParams.slice(0, -1); // Remove trailing '&'
+    }
+    console.log(queryParams);
+    return this.instance.get<T>(`${url}${uri}${queryParams}`);
   }
 
   post<T, D>(

@@ -41,10 +41,4 @@ interface GroupRepository : JpaRepository<Group, Long> {
         @Param("groupId") groupId: Long,
         @Param("userId") userId: Long
     ): Optional<GroupMembershipDTO>
-
-
-    fun findByIdAndUserGroups_User_Id(
-        id: Long,
-        userId: Long
-    ): Optional<Group>
 }

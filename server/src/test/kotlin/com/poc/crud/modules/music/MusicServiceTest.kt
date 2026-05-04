@@ -3,9 +3,7 @@ package com.poc.crud.modules.music
 import com.poc.crud.core.exception.APIException
 import com.poc.crud.infrastructure.filestorage.CipherFileStorage
 import com.poc.crud.infrastructure.filestorage.MusicFileStorage
-import com.poc.crud.model.Group
-import com.poc.crud.model.Music
-import com.poc.crud.model.MusicUploadStatus
+import com.poc.crud.model.*
 import com.poc.crud.modules.music.dto.MusicCipherResponseDTO
 import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.music.dto.PatchMusicReqDTO
@@ -14,21 +12,12 @@ import com.poc.crud.modules.music.service.MusicService
 import com.poc.crud.modules.music.service.MusicServiceImpl
 import com.poc.crud.repository.GroupRepository
 import com.poc.crud.repository.MusicRepository
-import io.mockk.every
-import io.mockk.just
-import io.mockk.mockk
-import io.mockk.runs
-import io.mockk.slot
-import io.mockk.verify
-import io.mockk.confirmVerified
-import org.junit.jupiter.api.Assertions.assertDoesNotThrow
-import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertNotNull
-import org.junit.jupiter.api.Assertions.assertTrue
+import io.mockk.*
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
-import java.util.Optional
+import java.util.*
 
 class MusicServiceTest {
 
@@ -54,10 +43,10 @@ class MusicServiceTest {
 
     @Test
     fun `getAllMusic deve retornar musicas do grupo mapeadas para DTO`() {
-        val music1 = Music(1L, "Test Music", "Test Description", "test.mp3", emptySet())
-        val music2 = Music(2L, "Test Music", "Test Description", "test.mp3", emptySet())
+        val music1 = Music(1L, "Test Music", "Test Description", "test.mp3", mutableSetOf())
+        val music2 = Music(2L, "Test Music", "Test Description", "test.mp3", mutableSetOf())
 
-        every { musicRepository.findAllByGroupId(10L) } returns setOf(music1, music2)
+        every { musicRepository.findAllByGroupId(10L) } returns listOf(music1, music2)
 
         val result = service.getAllMusic(10L)
 
@@ -68,7 +57,7 @@ class MusicServiceTest {
 
     @Test
     fun `getAllMusic deve retornar conjunto vazio quando nao houver musicas`() {
-        every { musicRepository.findAllByGroupId(10L) } returns emptySet()
+        every { musicRepository.findAllByGroupId(10L) } returns emptyList()
 
         val result = service.getAllMusic(10L)
 
@@ -79,14 +68,10 @@ class MusicServiceTest {
 
     @Test
     fun `insertMusic deve salvar musica adicionar ao grupo e retornar id com upload url`() {
-        val group = mockk<Group>()
-        val groupMusics = mutableSetOf<Music>()
-        every { group.musics } returns groupMusics
+        val group = Group(1L, "Test Group", "Test Description", "cover", true)
 
         val dto = PostMusicReqDTO(
-            name = "Música A",
-            description = "Descrição A",
-            file = "music-a.mp3"
+            name = "Música A", description = "Descrição A", file = "music-a.mp3"
         )
 
         val capturedMusic = slot<Music>()
@@ -104,8 +89,8 @@ class MusicServiceTest {
         assertEquals("Música A", capturedMusic.captured.name)
         assertEquals("Descrição A", capturedMusic.captured.description)
         assertEquals("music-a.mp3", capturedMusic.captured.file)
-        assertEquals(setOf(group), capturedMusic.captured.groups)
-        assertTrue(groupMusics.contains(savedMusic))
+        assertTrue(group.groupMusics
+            .contains(GroupMusic(GroupMusicId(group.id, savedMusic.id), group, savedMusic)))
 
         verify(exactly = 1) { groupRepository.findById(99L) }
         verify(exactly = 1) { musicRepository.save(any()) }
@@ -116,9 +101,7 @@ class MusicServiceTest {
     @Test
     fun `insertMusic deve lançar excecao quando grupo nao existir`() {
         val dto = PostMusicReqDTO(
-            name = "Música A",
-            description = "Descrição A",
-            file = "music-a.mp3"
+            name = "Música A", description = "Descrição A", file = "music-a.mp3"
         )
 
         every { groupRepository.findById(99L) } returns Optional.empty()
@@ -223,9 +206,7 @@ class MusicServiceTest {
         every { musicFileStorage.getMusicUploadUrl(15L, "audio/mpeg") } returns "https://upload/15"
 
         val dto = PatchMusicReqDTO(
-            groupId = 99L,
-            name = "Novo Nome",
-            description = "Nova Descrição"
+            groupId = 99L, name = "Novo Nome", description = "Nova Descrição"
         )
 
         val result = service.updateMusic(15L, dto)
@@ -246,9 +227,7 @@ class MusicServiceTest {
         every { musicFileStorage.getMusicUploadUrl(15L, "audio/mpeg") } returns "https://upload/15"
 
         val dto = PatchMusicReqDTO(
-            groupId = 99L,
-            name = "Novo Nome",
-            description = null
+            groupId = 99L, name = "Novo Nome", description = null
         )
 
         val result = service.updateMusic(15L, dto)
@@ -269,9 +248,7 @@ class MusicServiceTest {
         every { musicFileStorage.getMusicUploadUrl(15L, "audio/mpeg") } returns "https://upload/15"
 
         val dto = PatchMusicReqDTO(
-            groupId = 99L,
-            name = null,
-            description = "Nova Descrição"
+            groupId = 99L, name = null, description = "Nova Descrição"
         )
 
         val result = service.updateMusic(15L, dto)
@@ -292,9 +269,7 @@ class MusicServiceTest {
         every { musicFileStorage.getMusicUploadUrl(15L, "audio/mpeg") } returns "https://upload/15"
 
         val dto = PatchMusicReqDTO(
-            groupId = 99L,
-            name = null,
-            description = null
+            groupId = 99L, name = null, description = null
         )
 
         val result = service.updateMusic(15L, dto)
@@ -313,9 +288,7 @@ class MusicServiceTest {
         every { musicRepository.findById(15L) } returns Optional.empty()
 
         val dto = PatchMusicReqDTO(
-            groupId = 99L,
-            name = "Novo Nome",
-            description = "Nova Descrição"
+            groupId = 99L, name = "Novo Nome", description = "Nova Descrição"
         )
 
         val ex = assertThrows<APIException> {

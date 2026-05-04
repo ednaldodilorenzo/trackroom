@@ -8,6 +8,8 @@ import com.poc.crud.modules.group.service.GroupService
 import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.music.dto.PostMusicRespDTO
 import com.poc.crud.modules.music.service.MusicService
+import com.poc.crud.modules.playlist.dto.ListPlaylistDTO
+import com.poc.crud.modules.playlist.service.PlaylistService
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.verify
@@ -58,6 +60,9 @@ class GroupControllerTest {
 
     @MockkBean
     private lateinit var musicService: MusicService
+
+    @MockkBean
+    private lateinit var playlistService: PlaylistService
 
     @Test
     fun `getAllByUser should return list of groups`() {
@@ -278,5 +283,21 @@ class GroupControllerTest {
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
         ).andExpect(status().isNotFound)
+    }
+
+    @Test
+    fun `getGroupPlaylists should return list of playlists`() {
+        val playlists = listOf(ListPlaylistDTO(1L, "Test Playlist"), ListPlaylistDTO(2L, "Test Playlist 2"))
+
+        // Mocking the service call. Note the .with(jwt()) to satisfy @AuthenticationPrincipal
+        every { playlistService.findGroupPlaylists(1L) } returns playlists
+
+        mockMvc.perform(
+            get("/v1/groups/1/playlists").with(jwt().jwt {
+                it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                    Instant.now().plusSeconds(3600)
+                )
+            }) // Matches jwt.id.toLong()
+        ).andExpect(status().isOk).andExpect(jsonPath("$[0].title").value("Test Playlist"))
     }
 }

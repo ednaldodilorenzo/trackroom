@@ -5,11 +5,14 @@ spring:
     driver-class-name: org.postgresql.Driver
   jpa:
     show-sql: true
+    defer-datasource-initialization: true
   devtools:
     restart:
       enabled: true
   liquibase:
     enabled: true
+    change-log: classpath:/db/changelog/db.changelog-master.yaml
+    default-schema: public
   mail:
     properties:
       mail:
@@ -24,6 +27,8 @@ spring:
 logging:
   level:
     org.springframework.security: DEBUG
+    org.springframework.boot.autoconfigure.liquibase: DEBUG
+    org.liquibase: DEBUG
 
 server:
   servlet:

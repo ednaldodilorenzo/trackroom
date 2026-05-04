@@ -3,6 +3,7 @@ package com.poc.crud.model
 import jakarta.persistence.*
 
 @Entity
+@Table(name = "user_group")
 data class UserGroup(
     @EmbeddedId
     val userGroupId: UserGroupId,

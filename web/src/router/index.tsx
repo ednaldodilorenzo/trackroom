@@ -4,6 +4,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { GroupProvider } from "@/modules/group/GroupContext";
 import Confirmation from "@/modules/auth/signup/Confirmation";
 
+
 const Login = lazy(() => import("@/modules/auth/login/Login"));
 const Signup = lazy(() => import("@/modules/auth/signup/Signup"));
 const Home = lazy(() => import("@/modules/home/Home"));
@@ -16,6 +17,11 @@ const GroupAddMember = lazy(() => import("@/modules/group/GroupAddMember"));
 const GroupInfo = lazy(() => import("@/modules/group/GroupInfo"));
 const ForgotPassword = lazy(() => import("@/modules/auth/password-recover/ForgotPassword"));
 const PasswordReset = lazy(() => import("@/modules/auth/password-recover/PasswordReset"));
+const GroupHome = lazy(() => import("@/modules/group/GroupHome"));
+const PlaylistAdd = lazy(() => import("@/modules/playlist/PlaylistAdd"));
+const PlayListList = lazy(() => import("@/modules/playlist/PlaylistList"));
+const PlaylistDetail = lazy(() => import("@/modules/playlist/PlaylistDetail"));
+const PlayListAddSong = lazy(() => import("@/modules/playlist/PlayListAddSong"));
 
 export const router = createBrowserRouter(
   [
@@ -84,6 +90,14 @@ export const router = createBrowserRouter(
           },
           children: [
             {
+              path: "home",
+              element: <GroupHome />,
+              loader: async (args) => {
+                const mod = await import("@/modules/group/GroupHome");
+                return mod.loader(args);
+              },
+            },
+            {
               path: "edit",
               element: <GroupAdd />,
               action: async (args) => {
@@ -134,6 +148,30 @@ export const router = createBrowserRouter(
                 const mod = await import("@/modules/music/MusicCipher");
                 return mod.action(args);
               },
+            },
+            {
+              path: "playlists",
+              element: <PlayListList />,
+              loader: async (args) => {
+                const mod = await import("@/modules/playlist/PlaylistList");
+                return mod.loader(args);
+              },
+            },
+            {
+              path: "playlists/add",
+              element: <PlaylistAdd />,
+              action: async (args) => {
+                const mod = await import("@/modules/playlist/PlaylistAdd");
+                return mod.action(args);
+              },
+            },
+            {
+              path: "playlists/:playlistId",
+              element: <PlaylistDetail />,
+            },
+            {
+              path: "playlists/:playlistId/add-songs",
+              element: <PlayListAddSong />,
             },
             {
               path: "info",

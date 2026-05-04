@@ -14,4 +14,6 @@ interface FileStorage {
     fun getFileUrl(bucketName: String, fileName: String): String
 
     fun getUploadUrl(bucketName: String, fileName: String, contentType: String): String
+
+    fun deleteFile(bucketName: String, fileName: String)
 }

@@ -5,6 +5,8 @@ import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.music.dto.PatchMusicReqDTO
 import com.poc.crud.modules.music.dto.PostMusicRespDTO
 import com.poc.crud.modules.music.service.MusicService
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.http.MediaType
 import org.springframework.http.ResponseEntity
@@ -17,8 +19,8 @@ class MusicController(
 ) {
 
     @GetMapping("")
-    fun getAll(@RequestParam(required = false) groupId: Long?): ResponseEntity<Set<MusicDTO>> =
-        ResponseEntity(musicService.getAllMusic(groupId!!), HttpStatus.OK)
+    fun getAll(@RequestParam(required = false) groupId: Long?, pageable: Pageable): ResponseEntity<Page<MusicDTO>> =
+        ResponseEntity(musicService.getAllMusic(groupId!!, pageable), HttpStatus.OK)
 
     @GetMapping("/{id}")
     fun getById(@PathVariable id: Long): ResponseEntity<MusicDTO> = ResponseEntity.ok(this.musicService.getById(id))

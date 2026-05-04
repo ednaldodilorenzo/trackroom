@@ -13,13 +13,10 @@ data class Group(
     var description: String,
     val cover: String,
     val active: Boolean = true,
-    @ManyToMany(fetch = FetchType.LAZY)
-    @JoinTable(
-        name = "group_music",
-        joinColumns = [JoinColumn(name = "group_id")],
-        inverseJoinColumns = [JoinColumn(name = "music_id")]
-    )
-    var musics: MutableSet<Music> = mutableSetOf(),
+
+    @OneToMany(mappedBy = "group", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val groupMusics: MutableList<GroupMusic> = mutableListOf(),
+
     @OneToMany(mappedBy = "group", fetch = FetchType.LAZY)
     val userGroups: Set<UserGroup> = emptySet(),
 ) {
@@ -31,4 +28,8 @@ data class Group(
     }
 
     override fun hashCode(): Int = id?.hashCode() ?: 0
+
+    fun addMusic(music: Music) {
+        this.groupMusics.add(GroupMusic(GroupMusicId(this.id, music.id), this, music))
+    }
 }

@@ -8,6 +8,7 @@ import java.io.InputStream
 
 import software.amazon.awssdk.core.sync.RequestBody
 import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest
 import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.model.GetObjectResponse
 import software.amazon.awssdk.services.s3.model.PutObjectRequest
@@ -79,5 +80,10 @@ class S3FileStorage(
 
         val presignedPutObject = s3Presigner.presignPutObject(presignRequest)
         return presignedPutObject.url().toString()
+    }
+
+    override fun deleteFile(bucketName: String, fileName: String) {
+        val request = DeleteObjectRequest.builder().bucket(bucketName).key(fileName).build()
+        s3Client.deleteObject(request);
     }
 }

@@ -5,7 +5,7 @@ import { BsFillPeopleFill } from "react-icons/bs";
 
 export default function TrackCard({ name, description, id }: Group) {
   return (
-    <Link to={`/groups/${id}/musics`}>
+    <Link to={`/groups/${id}/home`}>
       <div className="track-card">
         <BsFillPeopleFill size={30} className="track-cover" />
 

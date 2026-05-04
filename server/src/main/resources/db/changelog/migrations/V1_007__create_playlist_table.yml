@@ -1,0 +1,87 @@
+databaseChangeLog:
+  - changeSet:
+      id: V1_007
+      author: Ednaldo
+      changes:
+        - addPrimaryKey:
+            tableName: group_music
+            columnNames: music_id, group_id
+            constraintName: pk_group_music
+
+        - createTable:
+            tableName: playlists
+            columns:
+              - column:
+                  name: id
+                  type: BIGINT
+                  autoIncrement: true
+                  constraints:
+                    nullable: false
+                    primaryKey: true
+                    primaryKeyName: pk_playlists
+
+              - column:
+                  name: title
+                  type: VARCHAR(100)
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: group_id
+                  type: INT
+                  constraints:
+                    nullable: false
+
+        - addUniqueConstraint:
+            tableName: playlists
+            columnNames: id, group_id
+            constraintName: uq_playlists_id_group_id
+
+        - createTable:
+            tableName: playlist_music_group
+            columns:
+              - column:
+                  name: playlist_id
+                  type: BIGINT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: music_id
+                  type: INT
+                  constraints:
+                    nullable: false
+
+              - column:
+                  name: group_id
+                  type: INT
+                  constraints:
+                    nullable: false
+
+        - addPrimaryKey:
+            tableName: playlist_music_group
+            columnNames: playlist_id, music_id, group_id
+            constraintName: pk_playlist_music_group
+
+        - addUniqueConstraint:
+            tableName: playlist_music_group
+            columnNames: music_id, group_id
+            constraintName: uq_playlist_music_group_music_id_group_id
+
+        - addForeignKeyConstraint:
+            baseTableName: playlist_music_group
+            baseColumnNames: playlist_id, group_id
+            referencedTableName: playlists
+            referencedColumnNames: id, group_id
+            constraintName: fk_playlist_music_group_playlists
+            onDelete: CASCADE
+            onUpdate: RESTRICT
+
+        - addForeignKeyConstraint:
+            baseTableName: playlist_music_group
+            baseColumnNames: music_id, group_id
+            referencedTableName: group_music
+            referencedColumnNames: music_id, group_id
+            constraintName: fk_playlist_music_group_group_music
+            onDelete: CASCADE
+            onUpdate: RESTRICT

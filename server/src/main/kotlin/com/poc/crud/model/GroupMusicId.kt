@@ -1,3 +1,15 @@
 package com.poc.crud.model
 
-data class GroupMusicId()
+import jakarta.persistence.Column
+import jakarta.persistence.Embeddable
+
+@Embeddable
+data class GroupMusicId(
+
+    @Column(name = "group_id")
+    var groupId: Long? = null,
+
+    @Column(name = "music_id")
+    var musicId: Long? = null
+
+)

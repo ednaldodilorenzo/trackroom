@@ -1,9 +1,6 @@
 import { Suspense, useMemo, useState } from "react";
-import { type LoaderFunctionArgs } from "react-router-dom";
-import Button from "@/components/button/Button";
-import { TextField } from "@/components";
-import TrackItem from "@/components/trackitem/TrackItem";
-import { useLoaderData, Await, useNavigate, useParams } from "react-router-dom";
+import { TextField, Button } from "@/components";
+import { useLoaderData, Await, useNavigate, useParams, type LoaderFunctionArgs } from "react-router-dom";
 import FallbackOverlay from "@/components/fallbackoverlay/FallBackOverlay";
 import type { Music } from "@/model";
 import { musicService } from "./music.service";
@@ -15,12 +12,14 @@ import {
 import "./MusicList.css";
 import { useGroupContext } from "../group/GroupContext";
 import { BsSearch } from "react-icons/bs";
-import SuspendedMenu from "@/components/suspendedmenu/SuspendedMenu";
+import type { Page } from "@/model/Page";
+import TrackList from "./track/TraskList";
+
 
 export default function MusicList() {
-  const { musics } = useLoaderData<{ musics: Promise<Music[]> }>();
-  const { setCurrentTrack, setIsPlaying, currentTrack } =
-    useAudioPlayerContext();
+  const { musics } = useLoaderData<{ musics: Promise<Page<Music>> }>();
+  const { setCurrentTrack, setIsPlaying } =
+    useAudioPlayerContext();  
   const navigate = useNavigate();
   const { id } = useParams();
   const { currentGroup } = useGroupContext();
@@ -41,69 +40,48 @@ export default function MusicList() {
   return (
     <>
       <TextField endIcon={<BsSearch />} onChange={(e) => setSearch(e.target.value)} value={search} label="" name="searchMusic" />
+      <h2 className="section-title">Músicas</h2>
       {currentGroup.isAdmin && (
         <div className="my-6">
           <Button className="me-2" onClick={() => navigate(`/groups/${id}/musics/add`)}>+</Button> Adicionar uma música
         </div>
       )}
-      <Suspense fallback={<FallbackOverlay />}>
-        <Await resolve={musics}>
-          {loadedMusics => {
-            const filteredMusics = useMemo(() => {
-              if (!search.trim()) return loadedMusics;
+      <TrackList>
+        <Suspense fallback={<FallbackOverlay />}>
+          <Await resolve={musics}>
+            {loadedMusics => {
+              const filteredMusics = useMemo(() => {
+                if (!search.trim()) return loadedMusics.content;
 
-              return loadedMusics.filter((music) =>
-                music.name.toLowerCase().includes(search.toLowerCase())
-              );
-            }, [loadedMusics, search]);
+                return loadedMusics.content.filter((music) =>
+                  music.name.toLowerCase().includes(search.toLowerCase())
+                );
+              }, [loadedMusics, search]);
 
-            return (
-              <>
-                {filteredMusics.length > 0 ? (
-                  filteredMusics.map((item: Music) => (
-                    <div className="track-list" key={item.id}>
-                      <TrackItem
-                        active={currentTrack.id === item.id}
-                        onClick={() => handlePlay(item)}
-                        cipherLink={`/groups/${id}/musics/${item.id}/cipher`}
-                        {...item}
-                      >
-                        {currentGroup.isAdmin && (<SuspendedMenu>
-                          <SuspendedMenu.Item
-                            label="Editar"
-                            onClick={() => navigate(`/groups/${id}/musics/${item.id}`)}
-                          />
-                          <SuspendedMenu.Item
-                            label="Excluir"
-                            onClick={() => {
-                              if (confirm("Tem certeza que deseja excluir esta música?")) {
-                                musicService.delete('' + item.id!!).then(() => {
-                                  navigate(0);
-                                });
-                              }
-                            }}
-                          />
-                        </SuspendedMenu>)}
-                      </TrackItem>
+              return (
+                <>
+                  {filteredMusics.length > 0 ? (
+                    filteredMusics.map((item: Music) => (
+                      <TrackList.Item key={item.id} music={item} handlePlay={handlePlay} />
+                    ))
+                  ) : (
+                    <div className="track-list">
+                      <h2>Nenhuma música encontrada...</h2>
                     </div>
-                  ))
-                ) : (
-                  <div className="track-list">
-                    <h2>Nenhuma música encontrada...</h2>
-                  </div>
-                )}
-              </>
-            );
-          }}
-        </Await>
-      </Suspense>
+                  )}
+                </>
+              );
+            }}
+          </Await>
+        </Suspense>
+      </TrackList>
     </>
   );
 }
 
 export const musicsLoader = ({
   params,
-}: LoaderFunctionArgs): { musics: Promise<Music[]> } => {
+}: LoaderFunctionArgs): { musics: Promise<Page<Music>> } => {
   const id = params.id;
   console.log("Loading musics for group id:", id);
   return {

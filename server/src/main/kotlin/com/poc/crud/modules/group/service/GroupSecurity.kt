@@ -2,6 +2,7 @@ package com.poc.crud.modules.group.service
 
 import com.poc.crud.core.exception.APIException
 import com.poc.crud.core.exception.ExceptionType
+import com.poc.crud.core.security.JwtConstants
 import com.poc.crud.model.UserGroupId
 import com.poc.crud.repository.UserGroupRepository
 import org.springframework.security.core.Authentication
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Component
 class GroupSecurity(private val userGroupRepository: UserGroupRepository) {
     fun hasGroupAdminPrivileges(authentication: Authentication, groupId: Long): Boolean {
         val jwt = authentication.principal as Jwt
-        val userId = jwt.id.toLong()
+        val userId = jwt.getClaim<Number>(JwtConstants.Claims.USER_ID).toLong()
 
         val userGroup = userGroupRepository.findById(UserGroupId(userId, groupId)).orElseThrow {
             APIException(
@@ -25,7 +26,7 @@ class GroupSecurity(private val userGroupRepository: UserGroupRepository) {
 
     fun hasGroupUserPrivileges(authentication: Authentication, groupId: Long): Boolean {
         val jwt = authentication.principal as Jwt
-        val userId = jwt.id.toLong()
+        val userId = jwt.getClaim<Number>(JwtConstants.Claims.USER_ID).toLong()
 
         return userGroupRepository.existsById(UserGroupId(userId, groupId))
     }

@@ -63,6 +63,7 @@ export default function MusicAdd() {
                 const form = e?.target as HTMLFormElement;
                 const formData = new FormData(form);
                 submit(formData, { method: "post", encType: "multipart/form-data" });
+                navigate(-1);
               })}
               cancelHandler={() => navigate(`/groups/${id}/musics`)}
             >
@@ -112,7 +113,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
     }
   }
 
-  return redirect(`/groups/${id}/musics`);
+  return "success";
 }
 
 export async function load({ params }: LoaderFunctionArgs) {

@@ -14,4 +14,8 @@ class MusicFileStorage(
     fun getMusicUploadUrl(id: Long, contentType: String): String {
         return fileStorage.getUploadUrl("musics", "music-$id.mp3", contentType)
     }
+
+    fun deleteMusicFile(musicId: Long) {
+        fileStorage.deleteFile("musics", "music-$musicId.mp3")
+    }
 }

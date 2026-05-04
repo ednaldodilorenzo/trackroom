@@ -1,5 +1,6 @@
 package com.poc.crud.core.security
 
+import com.poc.crud.model.UserPrincipal
 import io.jsonwebtoken.Claims
 import io.jsonwebtoken.Jws
 import io.jsonwebtoken.Jwts
@@ -22,10 +23,11 @@ class TokenServiceImpl(
         val keyBytes = Decoders.BASE64.decode(securityKey)
         // Use SecretKeySpec to ensure cross-library compatibility
         val key = SecretKeySpec(keyBytes, "HmacSHA256")
+        val principal = authentication.principal as UserPrincipal
 
         return Jwts.builder()
             .subject(authentication.name)
-            .id(authentication.authorities.firstOrNull()?.authority)
+            .claim(JwtConstants.Claims.USER_ID, principal.id)
             .issuedAt(Date())
             .expiration(Date(System.currentTimeMillis() + 60 * 60 * 1000))
             .signWith(key) // JJWT 0.12.x+ will automatically use HS256 for this key
