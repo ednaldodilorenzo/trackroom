@@ -50,6 +50,9 @@ class GroupService extends Requester {
   
 
   deleteGroupMusic = (groupId: number, musicId: number) => this.delete(`/${groupId}/musics/${musicId}`);
+
+  getGroupPlaylistWithMusics = (groupId: number, playlistId: number): Promise<Playlist> =>
+    this.get<Playlist>(`/${groupId}/playlists/${playlistId}`, { withMusics: true }).then((resp) => resp.data);
 }
 
 export default new GroupService(request);

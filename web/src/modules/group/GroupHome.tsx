@@ -12,7 +12,6 @@ import {
 import "@/modules/music/MusicList.css";
 import { useGroupContext } from "../group/GroupContext";
 import type { Page } from "@/model/Page";
-import ListItem from "@/components/listitem/ListItem";
 import { BiChevronRight } from "react-icons/bi";
 import Button from "@/components/button/Button";
 import TrackList from "@/modules/music/track/TraskList";
@@ -54,7 +53,33 @@ export default function GroupHome() {
                       (
                         <>
                           {loadedPlaylists.content.map((item: Playlist) => (
-                            <ListItem key={item.id} title={item.title} description="Descrição da playlist" detail="5 músicas" />
+                            <button
+                              key={item.id}
+                              onClick={() => navigate(`/groups/${id}/playlists/${item.id}`)}
+                              type="button"
+                              className={`w-full flex items-center gap-3 px-4 py-4 text-left hover:bg-gray-50 transition`}
+                            >
+                              <div className="w-11 h-11 rounded-2xl bg-violet-100 text-violet-700 flex items-center justify-center text-xl shrink-0">
+                                ♫
+                              </div>
+
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center gap-2">
+                                  <p className="font-bold text-gray-900 truncate">{item.title}</p>
+                                  {true && (
+                                    <span className="text-xs bg-violet-100 text-violet-700 font-semibold px-2 py-0.5 rounded-full shrink-0">
+                                      Fixada
+                                    </span>
+                                  )}
+                                </div>
+
+                                <p className="text-sm text-gray-500">
+                                  {item.musicCount} música{item.musicCount !== 1 ? "s" : ""}
+                                </p>
+                              </div>
+
+                              <span className="text-gray-400 text-2xl leading-none">›</span>
+                            </button>
                           ))}
 
                           {loadedPlaylists.totalElements!! > 5 && <Link to={`/groups/${id}/playlists`} className="p-2 cursor-pointer text-sm text-violet-700 font-semibold flex items-center">

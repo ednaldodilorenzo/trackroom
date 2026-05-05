@@ -9,7 +9,7 @@ import com.poc.crud.modules.music.dto.PostMusicRespDTO
 import com.poc.crud.modules.music.service.MusicService
 import com.poc.crud.modules.playlist.dto.CreatePlaylistReqDTO
 import com.poc.crud.modules.playlist.dto.CreatePlaylistRespDTO
-import com.poc.crud.modules.playlist.dto.ListPlaylistDTO
+import com.poc.crud.modules.playlist.dto.PlaylistMusicCountDto
 import com.poc.crud.modules.playlist.service.PlaylistService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -97,7 +97,7 @@ class GroupController(
     @GetMapping("/{id}/playlists")
     fun getGroupPlaylists(
         @PathVariable id: Long, @PageableDefault(size = 10, page = 0) pageable: Pageable
-    ): Page<ListPlaylistDTO> = this.playlistService.findGroupPlaylists(id, pageable)
+    ): Page<PlaylistMusicCountDto> = this.playlistService.findGroupPlaylists(id, pageable)
 
     @PostMapping("/{id}/playlists")
     fun postGroupPlaylist(
@@ -108,6 +108,9 @@ class GroupController(
     }
 
     @DeleteMapping("/{id}/musics/{musicId}")
-    fun delete(@PathVariable id: Long, @PathVariable musicId: Long) =
-        this.musicService.deleteMusic(id, musicId)
+    fun delete(@PathVariable id: Long, @PathVariable musicId: Long) = this.musicService.deleteMusic(id, musicId)
+
+    @GetMapping("/{id}/playlists/{playlistId}")
+    fun getGroupPlaylist(@PathVariable id: Long, @PathVariable playlistId: Long) =
+        this.playlistService.findPlayListWithMusics(id, playlistId)
 }

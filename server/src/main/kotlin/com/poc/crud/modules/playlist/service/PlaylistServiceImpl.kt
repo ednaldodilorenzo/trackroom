@@ -6,7 +6,8 @@ import com.poc.crud.model.Playlist
 import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.playlist.dto.CreatePlaylistReqDTO
 import com.poc.crud.modules.playlist.dto.CreatePlaylistRespDTO
-import com.poc.crud.modules.playlist.dto.ListPlaylistDTO
+import com.poc.crud.modules.playlist.dto.PlaylistMusicCountDto
+import com.poc.crud.modules.playlist.dto.PlaylistWithMusicsDTO
 import com.poc.crud.repository.GroupRepository
 import com.poc.crud.repository.MusicRepository
 import com.poc.crud.repository.PlaylistRepository
@@ -42,15 +43,26 @@ class PlaylistServiceImpl(
     }
 
     @PreAuthorize("@groupSecurity.hasGroupUserPrivileges(authentication, #p0)")
-    override fun findGroupPlaylists(groupId: Long, pageable: Pageable): Page<ListPlaylistDTO> {
+    override fun findGroupPlaylists(groupId: Long, pageable: Pageable): Page<PlaylistMusicCountDto> {
         return if (pageable.isPaged) {
-            this.playlistRepository.findAllByGroup_Id(groupId, pageable).map { ListPlaylistDTO(it) }
+            this.playlistRepository.findAllByGroupIdWithMusicCount(groupId, pageable)
         } else {
-            val list = this.playlistRepository.findAllByGroup_Id(groupId).map { ListPlaylistDTO(it) }
+            val list = this.playlistRepository.findAllByGroupIdWithMusicCount(groupId)
             PageImpl(list)
         }
     }
 
-    override fun findPlaylistMusics(playlistId: Long): List<MusicDTO>
-        = this.musicRepository.findAllByPlaylistId(playlistId).map { MusicDTO(it) }
+    override fun findPlaylistMusics(playlistId: Long): List<MusicDTO> =
+        this.musicRepository.findAllByPlaylistId(playlistId).map { MusicDTO(it) }
+
+    override fun findPlayListWithMusics(
+        groupId: Long, playlistId: Long
+    ): PlaylistWithMusicsDTO =
+        this.playlistRepository.findByIdAndGroupIdWithMusics(groupId, playlistId).map {
+            PlaylistWithMusicsDTO(it.id!!, it.title, it.items.map { plGroupMusic ->
+                MusicDTO(
+                    plGroupMusic.groupMusic?.music!!
+                )
+            }.toSet())
+        }.orElseThrow { APIException(ExceptionType.NOT_FOUND, "Playlist not found with id: $playlistId for group $groupId") }
 }

@@ -6,77 +6,64 @@ import { useForm } from "react-hook-form";
 import type { Music } from "@/model";
 import {
   useParams,
-  redirect,
   useSubmit,
   useNavigate,
-  useNavigation,
-  type ActionFunctionArgs,
-  type LoaderFunctionArgs,
   useLoaderData,
   Await,
+  type ActionFunctionArgs,
+  type LoaderFunctionArgs,
 } from "react-router-dom";
 import * as yup from "yup";
 import toast from "react-hot-toast";
-import { useLoading } from "@/hooks/useLoading";
 import { Suspense } from "react";
 
-const schema = yup
-  .object({
-    name: yup.string().required("Nome é obrigatório"),
-    description: yup.string().required("Álbum é requerido"),
-  })
-  .required();
+const schema = yup.object({
+  name: yup.string().required("Nome é obrigatório"),
+  description: yup.string().required("Álbum é requerido"),
+}).required();
 
 type FormData = yup.InferType<typeof schema>;
 
-export default function MusicAdd() {
-
-  const { music } = useLoaderData<{ music: Promise<Music> }>();
-
+function MusicForm({ loadedMusic }: { loadedMusic: Music | null }) {
   const submit = useSubmit();
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { show, hide } = useLoading();
-
-  const navigation = useNavigation();
-
-  navigation.state === "submitting" ? show() : hide();
+  const { control, handleSubmit } = useForm<FormData>({
+    resolver: yupResolver(schema),
+    values: loadedMusic
+      ? { name: loadedMusic.name, description: loadedMusic.description }
+      : undefined,
+  });
 
   return (
-    <>
-      <Suspense fallback={<FallbackOverlay />}>
-        <Await resolve={music}>
-          {loadedMusic => {
-            const { control, handleSubmit } = useForm<FormData>({
-              resolver: yupResolver(schema),
-              values: loadedMusic ? {
-                name: loadedMusic.name,
-                description: loadedMusic.description,
-              } : undefined,
-            });
+    <RegisterForm
+      encType="multipart/form-data"
+      title={loadedMusic ? "Editar Música" : "Nova Música"}
+      formSubmit={handleSubmit((_, e) => {        
+        const formData = new FormData(e?.target as HTMLFormElement);
+        submit(formData, { method: "post", encType: "multipart/form-data" });
+        navigate(-1);
+      })}
+      cancelHandler={() => navigate(`/groups/${id}/musics`)}
+    >
+      <TextField label="Nome" name="name" control={control} />
+      <TextField label="Álbum" name="description" control={control} />
+      <label htmlFor="file-music">Arquivo</label>
+      <input id="file-music" name="file" accept="audio/*" type="file" />
+    </RegisterForm>
+  );
+}
 
-            return (<RegisterForm
-              encType="multipart/form-data"
-              title={loadedMusic ? "Editar Música" : "Nova Música"}
-              formSubmit={handleSubmit((_, e) => {
-                const form = e?.target as HTMLFormElement;
-                const formData = new FormData(form);
-                submit(formData, { method: "post", encType: "multipart/form-data" });
-                navigate(-1);
-              })}
-              cancelHandler={() => navigate(`/groups/${id}/musics`)}
-            >
-              <TextField label="Nome" name="name" control={control} />
-              <TextField label="Álbum" name="description" control={control} />
-              <label htmlFor="file-music">Arquivo</label>
-              <input id="file-music" name="file" accept="audio/*" type="file" />
-            </RegisterForm>)
-          }
-          }
-        </Await>
-      </Suspense>
-    </>
+export default function MusicAdd() {
+  const { music } = useLoaderData<{ music: Promise<Music> }>();
+
+  return (
+    <Suspense fallback={<FallbackOverlay />}>
+      <Await resolve={music}>
+        {(loadedMusic) => <MusicForm loadedMusic={loadedMusic} />}
+      </Await>
+    </Suspense>
   );
 }
 

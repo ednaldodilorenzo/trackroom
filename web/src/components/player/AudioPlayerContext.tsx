@@ -1,3 +1,5 @@
+import type { Music } from "@/model/Music";
+import { musicService } from "@/modules/music/music.service";
 import type { Dispatch, SetStateAction, ReactNode } from "react";
 import { createContext, useState, useContext, useRef } from "react";
 
@@ -20,6 +22,7 @@ interface AudioPlayerContextType {
   setTimeProgress: Dispatch<SetStateAction<number>>;
   duration: number;
   setDuration: Dispatch<SetStateAction<number>>;
+  handlePlay: (music: Music) => Promise<void>;
 }
 
 const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(
@@ -27,6 +30,17 @@ const AudioPlayerContext = createContext<AudioPlayerContextType | undefined>(
 );
 
 export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
+  async function handlePlay(music: Music) {
+    const url = await musicService.getFileUrl(music.id!!);
+    const track: Track = {
+      id: music.id,
+      title: music.name,
+      src: url,
+      author: music.description,
+    };
+    setCurrentTrack(track);
+    setIsPlaying(true);
+  }
   const [currentTrack, setCurrentTrack] = useState<Track>({
     title: "",
     src: "",
@@ -48,7 +62,9 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
     setTimeProgress,
     duration,
     setDuration,
+    handlePlay,
   };
+
 
   return (
     <AudioPlayerContext.Provider value={contextValue}>

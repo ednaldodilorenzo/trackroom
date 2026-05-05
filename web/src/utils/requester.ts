@@ -51,7 +51,7 @@ export class Requester {
       }
       queryParams = queryParams.slice(0, -1); // Remove trailing '&'
     }
-    console.log(queryParams);
+    
     return this.instance.get<T>(`${url}${uri}${queryParams}`);
   }
 
