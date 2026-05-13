@@ -19,7 +19,6 @@ import type { Group } from "@/model/Group";
 import { useGroupContext } from "./GroupContext";
 
 const schema = yup.object({
-  id: yup.string().nullable().optional(),
   name: yup.string().trim().required("Nome obrigatório"),
   description: yup.string().trim().required("Descrição obrigatória"),
 });
@@ -47,7 +46,6 @@ export default function GroupAdd() {
     resolver: yupResolver(schema),
     mode: "onChange",
     values: id ? {
-      id: groupContext?.currentGroup?.id,
       name: groupContext?.currentGroup?.name || "",
       description: groupContext?.currentGroup?.description || "",
     } : undefined,
