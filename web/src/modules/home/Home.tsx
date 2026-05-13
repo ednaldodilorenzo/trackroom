@@ -1,59 +1,233 @@
-import { Suspense } from "react";
-import { TrackCard, /*TrackItem,*/ Button, FallbackOverlay } from "@/components";
-import type { Group } from "@/model";
-import "./Home.css";
+import { Suspense, useMemo, useState } from "react";
 import {
-  useNavigate,
   Await,
   useLoaderData,
-} from "react-router-dom"; // useLoaderData not used in this snippet
+  useNavigate,
+} from "react-router-dom";
+import { BiPlus, BiSearch } from "react-icons/bi";
+
+import { Button, FallbackOverlay } from "@/components";
+import type { Group } from "@/model";
 import homeService from "./home.service";
-import { useHeader } from "@/hooks/useHeader";
 import { useHeaderConfig } from "@/hooks/useHeaderConfig";
+import "./Home.css";
+
+type HomeLoaderData = {
+  groups: Promise<Group[]>;
+};
 
 export default function Home() {
-
   const navigate = useNavigate();
-
-  const { groups } = useLoaderData();
-  const { setHeaderConfig } = useHeader();
-  console.log("Home useHeader got:", { setHeaderConfig });
+  const { groups } = useLoaderData() as HomeLoaderData;
+  const [search, setSearch] = useState("");
 
   useHeaderConfig({
     title: "Minha Biblioteca",
     enableBackButton: false,
   });
 
+  function goToCreateGroup() {
+    navigate("/groups/add");
+  }
+
+  function goToGroup(groupId: number | string | undefined) {
+    if (!groupId) return;
+    navigate(`/groups/${groupId}/home`);
+  }
+
   return (
-    <>
-      <h2 className="section-title">Meus Grupos</h2>
+    <div className="space-y-6 pb-8">
+      <section className="bg-white rounded-3xl shadow-sm p-5">
+        <h2 className="section-title mb-0">Meus grupos</h2>
+        <p className="text-sm text-gray-500 mt-1 mb-4">
+          Acesse músicas, playlists e cifras organizadas por grupo.
+        </p>
+
+        <div className="relative">
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+            placeholder="Buscar grupo"
+            className="w-full h-12 rounded-xl border border-gray-300 bg-white px-4 pr-11 outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
+          />
+          <BiSearch
+            size={22}
+            className="absolute right-3 top-3 text-gray-500 pointer-events-none"
+          />
+        </div>
+      </section>
 
       <Suspense fallback={<FallbackOverlay />}>
         <Await resolve={groups}>
-          {(loadedGroups) =>
-            loadedGroups.length > 0 ? (
-              <div className="track-card-list">
-                {loadedGroups.map((item: Group) => (
-                  <TrackCard data-testid="track-card" key={item.id} {...item} />
-                ))}
-              </div>
-            ) : (
-              <div>Nenhum grupo cadastrado...</div>
-            )
-          }
+          {(loadedGroups: Group[]) => (
+            <GroupsContent
+              groups={loadedGroups}
+              search={search}
+              onCreateGroup={goToCreateGroup}
+              onOpenGroup={goToGroup}
+            />
+          )}
         </Await>
       </Suspense>
-
-      <Button
-        className="suspended-button"
-        onClick={() => navigate("/groups/add")}
-      >
-        + Novo Grupo
-      </Button>
-    </>
+    </div>
   );
 }
 
-export const groupsLoader = (): { groups: Promise<Group[]> } => ({
+function GroupsContent({
+  groups,
+  search,
+  onCreateGroup,
+  onOpenGroup,
+}: {
+  groups: Group[];
+  search: string;
+  onCreateGroup: () => void;
+  onOpenGroup: (groupId: number | string | undefined) => void;
+}) {
+  const filteredGroups = useMemo(() => {
+    const normalizedSearch = search.trim().toLowerCase();
+
+    if (!normalizedSearch) return groups;
+
+    return groups.filter((group) =>
+      group.name?.toLowerCase().includes(normalizedSearch)
+    );
+  }, [groups, search]);
+
+  if (groups.length === 0) {
+    return (
+      <section className="grid grid-cols-1 gap-4">
+        <EmptyGroupsState onCreateGroup={onCreateGroup} />
+        <CreateGroupCard onClick={onCreateGroup} />
+      </section>
+    );
+  }
+
+  if (filteredGroups.length === 0) {
+    return (
+      <section className="space-y-4">
+        <EmptySearchState search={search} />
+
+        <div className="grid grid-cols-2 gap-4">
+          <CreateGroupCard onClick={onCreateGroup} />
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="grid grid-cols-2 gap-4">
+      {filteredGroups.map((group) => (
+        <GroupCard
+          key={group.id}
+          group={group}
+          onClick={() => onOpenGroup(group.id)}
+        />
+      ))}
+
+      <CreateGroupCard onClick={onCreateGroup} />
+    </section>
+  );
+}
+
+function GroupCard({
+  group,
+  onClick,
+}: {
+  group: Group;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      data-testid="track-card"
+      className="group min-h-[154px] cursor-pointer rounded-3xl bg-white shadow-sm border border-gray-100 p-4 text-left flex flex-col justify-between hover:shadow-md hover:-translate-y-0.5 transition"
+    >
+      <div className="flex items-start justify-between gap-2">
+        <div className="w-12 h-12 rounded-2xl bg-violet-100 text-violet-700 flex items-center justify-center text-xl font-bold shrink-0">
+          {getGroupInitial(group)}
+        </div>
+
+        <span className="text-xs font-semibold text-violet-700 bg-violet-50 rounded-full px-2 py-1">
+          Grupo
+        </span>
+      </div>
+
+      <div className="mt-5">
+        <h3 className="font-bold text-gray-900 leading-snug line-clamp-2">
+          {group.name}
+        </h3>
+        <p className="text-sm text-gray-500 mt-2 line-clamp-2">
+          Músicas, playlists e cifras
+        </p>
+      </div>
+    </button>
+  );
+}
+
+function CreateGroupCard({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="min-h-[154px] rounded-3xl border-2 border-dashed border-violet-200 bg-violet-50/70 p-4 text-center flex flex-col items-center justify-center hover:bg-violet-100 hover:border-violet-300 transition"
+    >
+      <div className="w-12 h-12 rounded-2xl bg-violet-700 text-white flex items-center justify-center text-2xl shadow-sm mb-3">
+        <BiPlus size={26} />
+      </div>
+
+      <h3 className="font-bold text-violet-800">Novo grupo</h3>
+      <p className="text-sm text-violet-700/75 mt-1">Criar biblioteca</p>
+    </button>
+  );
+}
+
+function EmptyGroupsState({ onCreateGroup }: { onCreateGroup: () => void }) {
+  return (
+    <section className="bg-white rounded-3xl shadow-sm px-6 py-10 text-center">
+      <div className="w-16 h-16 rounded-full bg-violet-100 text-violet-700 mx-auto flex items-center justify-center text-3xl mb-4">
+        ♫
+      </div>
+
+      <h3 className="font-bold text-lg text-gray-900">Nenhum grupo cadastrado</h3>
+      <p className="text-sm text-gray-500 mt-2 mb-5">
+        Crie seu primeiro grupo para organizar músicas, playlists e cifras.
+      </p>
+
+      <Button onClick={onCreateGroup}>
+        <span className="inline-flex items-center gap-1">
+          <BiPlus size={18} /> Criar grupo
+        </span>
+      </Button>
+    </section>
+  );
+}
+
+function EmptySearchState({ search }: { search: string }) {
+  return (
+    <section className="bg-white rounded-3xl shadow-sm px-6 py-8 text-center">
+      <div className="w-14 h-14 rounded-full bg-gray-100 text-gray-400 mx-auto flex items-center justify-center text-3xl mb-4">
+        <BiSearch size={28} />
+      </div>
+
+      <h3 className="font-bold text-lg text-gray-900">Nenhum grupo encontrado</h3>
+      <p className="text-sm text-gray-500 mt-2">
+        Não encontramos grupos com o nome “{search}”.
+      </p>
+    </section>
+  );
+}
+
+function getGroupInitial(group: Group) {
+  const name = group.name?.trim();
+
+  if (!name) return "♫";
+
+  return name.charAt(0).toUpperCase();
+}
+
+export const groupsLoader = (): HomeLoaderData => ({
   groups: homeService.getGroups(),
 });

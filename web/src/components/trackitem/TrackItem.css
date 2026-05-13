@@ -16,6 +16,10 @@
   color: var(--md-primary);
 }
 
+.track-item > button:disabled {
+  color: lightgray;
+}
+
 .track-item:hover {
   background: rgba(0,0,0,0.04);
 }

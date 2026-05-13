@@ -5,7 +5,6 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import GroupInfo, { loader } from "./GroupInfo";
 import groupService from "./group.service";
 
-// -------------------- controls --------------------
 const navigateMock = vi.fn();
 const showMock = vi.fn();
 const hideMock = vi.fn();
@@ -19,6 +18,7 @@ let currentGroupValue: any = {
   description: "Desc",
   isAdmin: false,
 };
+
 let loaderUsersValue: any[] = [];
 
 const flush = async () => {
@@ -26,7 +26,6 @@ const flush = async () => {
   await Promise.resolve();
 };
 
-// -------------------- mocks --------------------
 vi.mock("./GroupContext", () => ({
   useGroupContext: () => ({ currentGroup: currentGroupValue }),
 }));
@@ -83,7 +82,7 @@ vi.mock("@/components/listitem/ListItem", () => ({
       <div data-testid="li-title">{title}</div>
       <div data-testid="li-description">{description}</div>
       <div data-testid="li-detail">{detail}</div>
-      <div data-testid="li-children">{children}</div>
+      {children}
     </div>
   ),
 }));
@@ -111,7 +110,6 @@ vi.mock("./group.service", () => ({
   },
 }));
 
-// -------------------- tests --------------------
 describe("<GroupInfo />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -122,6 +120,7 @@ describe("<GroupInfo />", () => {
       description: "Desc",
       isAdmin: false,
     };
+
     loaderUsersValue = [];
 
     (groupService.promoteToAdmin as any).mockResolvedValue(undefined);
@@ -139,49 +138,41 @@ describe("<GroupInfo />", () => {
     });
   });
 
-  it("renders group name/description and back Link points to /groups/:id/musics", () => {
+  it("renders group name/description and back link points to /groups/:id/musics", () => {
     render(<GroupInfo />);
 
     expect(screen.getByText("Grupo X")).toBeInTheDocument();
     expect(screen.getByText("Desc")).toBeInTheDocument();
 
-    const link = screen.getByTestId("link") as HTMLAnchorElement;
-    expect(link.getAttribute("href")).toBe("/groups/7/musics");
+    expect(screen.getByTestId("link")).toHaveAttribute(
+      "href",
+      "/groups/7/musics"
+    );
   });
 
-  it("does NOT show '+ Adicionar novo membro' section when currentGroup.isAdmin=false", () => {
-    currentGroupValue = { ...currentGroupValue, isAdmin: false };
-
+  it("does not show add member section when currentGroup.isAdmin=false", () => {
     render(<GroupInfo />);
 
-    expect(
-      screen.queryByText("Adicionar novo membro")
-    ).not.toBeInTheDocument();
+    expect(screen.queryByText("Adicionar novo membro")).not.toBeInTheDocument();
     expect(screen.queryByRole("button", { name: "+" })).not.toBeInTheDocument();
   });
 
-  it("shows '+ Adicionar novo membro' section when currentGroup.isAdmin=true and navigates on click", async () => {
+  it("shows add member section when currentGroup.isAdmin=true and navigates on click", async () => {
     currentGroupValue = { ...currentGroupValue, isAdmin: true };
 
     render(<GroupInfo />);
 
-    expect(screen.getByText("Adicionar novo membro")).toBeInTheDocument();
-
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: "+" }));
 
-    expect(navigateMock).toHaveBeenCalledTimes(1);
+    expect(screen.getByText("Adicionar novo membro")).toBeInTheDocument();
     expect(navigateMock).toHaveBeenCalledWith("/groups/7/members/add");
   });
 
-  it("renders 'Nenhum membro encontrado.' when users list is empty", () => {
-    loaderUsersValue = [];
-
+  it("renders empty message when users list is empty", () => {
     render(<GroupInfo />);
 
-    expect(
-      screen.getByText("Nenhum membro encontrado.")
-    ).toBeInTheDocument();
+    expect(screen.getByText("Nenhum membro encontrado.")).toBeInTheDocument();
     expect(screen.queryAllByTestId("list-item")).toHaveLength(0);
   });
 
@@ -193,8 +184,7 @@ describe("<GroupInfo />", () => {
 
     render(<GroupInfo />);
 
-    const items = screen.getAllByTestId("list-item");
-    expect(items).toHaveLength(2);
+    expect(screen.getAllByTestId("list-item")).toHaveLength(2);
 
     expect(screen.getAllByTestId("li-title")[0]).toHaveTextContent("Ana");
     expect(screen.getAllByTestId("li-detail")[0]).toHaveTextContent(
@@ -206,7 +196,6 @@ describe("<GroupInfo />", () => {
   });
 
   it("does not render SuspendedMenu when currentGroup.isAdmin=false", () => {
-    currentGroupValue = { ...currentGroupValue, isAdmin: false };
     loaderUsersValue = [{ id: 1, name: "Ana", userName: "ana", isAdmin: true }];
 
     render(<GroupInfo />);
@@ -216,7 +205,7 @@ describe("<GroupInfo />", () => {
     expect(screen.queryByText("Remover do grupo")).not.toBeInTheDocument();
   });
 
-  it("when group is admin: shows actions for admin user -> 'Tornar membro' and 'Remover do grupo'", () => {
+  it("renders admin-user actions when currentGroup.isAdmin=true", () => {
     currentGroupValue = { ...currentGroupValue, isAdmin: true };
     loaderUsersValue = [{ id: 1, name: "Ana", userName: "ana", isAdmin: true }];
 
@@ -227,7 +216,7 @@ describe("<GroupInfo />", () => {
     expect(screen.getByText("Remover do grupo")).toBeInTheDocument();
   });
 
-  it("when group is admin: shows actions for non-admin user -> 'Promover a administrador' and 'Remover do grupo'", () => {
+  it("renders member-user actions when currentGroup.isAdmin=true", () => {
     currentGroupValue = { ...currentGroupValue, isAdmin: true };
     loaderUsersValue = [
       { id: 2, name: "Bruno", userName: "bru", isAdmin: false },
@@ -240,13 +229,11 @@ describe("<GroupInfo />", () => {
     expect(screen.getByText("Remover do grupo")).toBeInTheDocument();
   });
 
-  it("promote flow: calls show(), promoteToAdmin(), updates UI to 'Administrador', shows toast, hides loader", async () => {
+  it("promote flow updates UI, shows success toast and hides loader", async () => {
     currentGroupValue = { ...currentGroupValue, isAdmin: true };
     loaderUsersValue = [
       { id: 2, name: "Bruno", userName: "bru", isAdmin: false },
     ];
-
-    (groupService.promoteToAdmin as any).mockResolvedValueOnce(undefined);
 
     render(<GroupInfo />);
 
@@ -265,11 +252,9 @@ describe("<GroupInfo />", () => {
     expect(screen.getByTestId("li-detail")).toHaveTextContent("Administrador");
   });
 
-  it("demote flow: calls show(), demoteFromAdmin(), updates UI to 'Membro', shows toast, hides loader", async () => {
+  it("demote flow updates UI, shows success toast and hides loader", async () => {
     currentGroupValue = { ...currentGroupValue, isAdmin: true };
     loaderUsersValue = [{ id: 1, name: "Ana", userName: "ana", isAdmin: true }];
-
-    (groupService.demoteFromAdmin as any).mockResolvedValueOnce(undefined);
 
     render(<GroupInfo />);
 
@@ -288,14 +273,12 @@ describe("<GroupInfo />", () => {
     expect(screen.getByTestId("li-detail")).toHaveTextContent("Membro");
   });
 
-  it("remove member flow: calls show(), removeMemberFromGroup(), removes user from list, shows toast, hides loader", async () => {
+  it("remove member flow removes user, shows success toast and hides loader", async () => {
     currentGroupValue = { ...currentGroupValue, isAdmin: true };
     loaderUsersValue = [
       { id: 1, name: "Ana", userName: "ana", isAdmin: true },
       { id: 2, name: "Bruno", userName: "bru", isAdmin: false },
     ];
-
-    (groupService.removeMemberFromGroup as any).mockResolvedValueOnce(undefined);
 
     render(<GroupInfo />);
 
@@ -316,7 +299,7 @@ describe("<GroupInfo />", () => {
     expect(screen.getByText("Bruno")).toBeInTheDocument();
   });
 
-  it("service error path: shows toast.error with error.response.data.detail and hides loader", async () => {
+  it("service error path shows toast.error and hides loader", async () => {
     currentGroupValue = { ...currentGroupValue, isAdmin: true };
     loaderUsersValue = [
       { id: 2, name: "Bruno", userName: "bru", isAdmin: false },

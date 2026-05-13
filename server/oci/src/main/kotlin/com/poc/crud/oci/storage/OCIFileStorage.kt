@@ -57,6 +57,10 @@ class OCIFileStorage(
         )
     }
 
+    override fun deleteFile(bucketName: String, fileName: String) {
+        TODO("Not yet implemented")
+    }
+
     private fun createPar(
         bucket: String?, key: String?, accessType: CreatePreauthenticatedRequestDetails.AccessType?, ttl: Duration?
     ): String {

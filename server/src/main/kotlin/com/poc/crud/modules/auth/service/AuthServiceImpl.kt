@@ -26,7 +26,7 @@ class AuthServiceImpl(
     private val passwordEncoder: PasswordEncoder,
     private val accountConfirmationEmailNotification: AccountConfirmationEmailPublisher,
     private val passwordResetPublisher: PasswordResetPublisher,
-    @Qualifier("database") private val cacheManager: CacheManager
+    @param:Qualifier("database") private val cacheManager: CacheManager
 ) : AuthService {
 
     @Transactional

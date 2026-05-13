@@ -2,18 +2,26 @@ package com.poc.crud.repository
 
 import com.poc.crud.model.GroupMusic
 import com.poc.crud.model.GroupMusicId
+import com.poc.crud.modules.playlist.dto.PlaylistMusicOptionDTO
 import org.springframework.data.jpa.repository.JpaRepository
 import org.springframework.data.jpa.repository.Query
 import org.springframework.stereotype.Repository
 
 @Repository
-interface GroupMusicRepository: JpaRepository<GroupMusic, GroupMusicId> {
+interface GroupMusicRepository : JpaRepository<GroupMusic, GroupMusicId> {
 
-    @Query("""
+    @Query(
+        """
         SELECT COUNT(gm) > 0
         FROM GroupMusic gm
         WHERE gm.music.id = :musicId 
             AND gm.group.id <> :groupId
-    """)
+    """
+    )
     fun existsMusicInGroupOtherThan(musicId: Long, groupId: Long): Boolean
+
+    fun findAllByGroup_IdAndMusic_IdIn(
+        groupId: Long,
+        musicIds: Collection<Long>
+    ): List<GroupMusic>
 }

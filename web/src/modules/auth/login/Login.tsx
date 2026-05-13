@@ -1,20 +1,21 @@
 import "../Auth.css";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
-import { Button, Form, TextField } from "@/components";
-import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
+import * as yup from "yup";
 import {
-  useNavigation,
   redirect,
-  useSubmit,
   useActionData,
+  useNavigation,
+  useSubmit,
   type ActionFunctionArgs,
 } from "react-router-dom";
+
+import { Button, Form, TextField } from "@/components";
 import { useLoading } from "@/hooks/useLoading";
 import { store } from "@/store";
 import { authService } from "../authSevice";
-import { Link } from "react-router-dom";
-
 
 const schema = yup.object({
   email: yup.string().required("Email obrigatório").email("Email inválido"),
@@ -26,95 +27,155 @@ const schema = yup.object({
 
 type FormData = yup.InferType<typeof schema>;
 
-export default function Login() {
-  const actionData = useActionData();
-  const submit = useSubmit();
-  const { show, hide } = useLoading();
+type LoginActionData = {
+  error?: string;
+  status?: number;
+};
 
+export default function Login() {
+  const actionData = useActionData() as LoginActionData | undefined;
+  const submit = useSubmit();
   const navigation = useNavigation();
+  const { show, hide } = useLoading();
   const logoPath = "/pwa-512x512.png";
 
-  navigation.state === "submitting" ? show() : hide();
+  const isSubmitting = navigation.state === "submitting";
 
-  const { control, handleSubmit } = useForm<FormData>({
+  const {
+    control,
+    handleSubmit,
+    formState: { isValid },
+  } = useForm<FormData>({
     resolver: yupResolver(schema),
+    mode: "onChange",
+    defaultValues: {
+      email: "",
+      password: "",
+    },
   });
 
-  return (
-    <main className="min-h-100vh grid w-full grow grid-cols-1 place-items-center"><div className="w-full max-w-[26rem] p-4 sm:px-5">
-      <div className="text-center">
-        <img src={logoPath} alt="Logo" className="mx-auto h-12 w-12" />
-        <div className="mt-4">
-          <h2 className="text-2xl font-semibold text-gray-600 dark:text-dark-100">Bem Vindo de volta</h2>
-          <p className="text-gray-400 dark:text-dark-300">Por favor entre para continuar</p>
-        </div>
-      </div>
-      <div className="relative break-words print:border bg-white card rounded-lg border border-gray-200 dark:border-dark-600 print:border-0 mt-5 rounded-lg p-5 lg:p-7">
-        <Form
-          onSubmit={handleSubmit((data: FormData) =>
-            submit(data, { method: "post" })
-          )}
-        >
-          {actionData && (
-            <ul>
-              <li>Login ou senha inválida!</li>
-            </ul>
-          )}
-          <TextField label="Email" name="email" type="email" control={control} />
+  useEffect(() => {
+    if (isSubmitting) {
+      show();
+    } else {
+      hide();
+    }
+  }, [isSubmitting, show, hide]);
 
-          <TextField
-            label="Senha"
-            name="password"
-            type="password"
-            control={control}
+  function onSubmit(data: FormData) {
+    submit(data, { method: "post" });
+  }
+
+  return (
+    <main className="min-h-screen bg-gray-100 grid place-items-center px-4 py-8">
+      <div className="w-full max-w-md">
+        <section className="text-center mb-6">
+          <img
+            src={logoPath}
+            alt="Logo"
+            className="mx-auto h-16 w-16 rounded-2xl shadow-sm"
           />
 
-          <div className="mt-4 flex items-center justify-between space-x-2">
-            <label className="input-label inline-flex items-center gap-2">
-              <input className="form-checkbox this:primary border-gray-400/70 bg-origin-border before:bg-center before:bg-no-repeat before:[background-size:100%_100%] before:[background-image:var(--tw-thumb)] checked:border-this checked:bg-this indeterminate:border-this indeterminate:bg-this hover:border-this focus:border-this dark:border-dark-400 dark:checked:border-this-light dark:checked:bg-this-light dark:indeterminate:border-this-light dark:indeterminate:bg-this-light dark:hover:border-this-light dark:focus:border-this-light" type="checkbox" />
-              <span className="label">Lembrar me</span>
-            </label>
-            <Link className="text-xs text-gray-400 transition-colors hover:text-gray-800 focus:text-gray-800 dark:text-dark-300 dark:hover:text-dark-100 dark:focus:text-dark-100" to="/forgot-password">Esqueceu a Senha?</Link>
+          <div className="mt-4">
+            <h1 className="text-2xl font-bold text-gray-900">
+              Bem-vindo de volta
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              Entre para acessar suas músicas, grupos e playlists.
+            </p>
           </div>
+        </section>
 
-          <div style={{ marginTop: "32px" }}>
-            <Button className="w-full" type="submit">Entrar</Button>
+        <section className="bg-white rounded-3xl shadow-sm border border-gray-100 p-5 sm:p-6">
+          <Form onSubmit={handleSubmit(onSubmit)}>
+            {actionData?.error && (
+              <div className="mb-4 rounded-2xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-700">
+                Email ou senha inválidos.
+              </div>
+            )}
+
+            <div className="space-y-4">
+              <TextField
+                label="Email"
+                name="email"
+                type="email"
+                control={control}
+              />
+
+              <TextField
+                label="Senha"
+                name="password"
+                type="password"
+                control={control}
+              />
+            </div>
+
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <label className="inline-flex items-center gap-2 text-sm text-gray-600 cursor-pointer">
+                <input
+                  type="checkbox"
+                  name="remember"
+                  className="h-4 w-4 rounded border-gray-300 text-violet-700 focus:ring-violet-500"
+                />
+                <span>Lembrar-me</span>
+              </label>
+
+              <Link
+                to="/forgot-password"
+                className="text-sm font-medium text-violet-700 hover:text-violet-800"
+              >
+                Esqueceu a senha?
+              </Link>
+            </div>
+
+            <Button
+              className="w-full mt-8"
+              type="submit"
+              disabled={!isValid || isSubmitting}
+            >
+              {isSubmitting ? "Entrando..." : "Entrar"}
+            </Button>
+          </Form>
+
+          <div className="mt-6 border-t border-gray-100 pt-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-sm">
+            <span className="text-gray-500">Ainda não possui uma conta?</span>
+            <Link
+              to="/signup"
+              className="font-semibold text-violet-700 hover:text-violet-800"
+            >
+              Criar conta
+            </Link>
           </div>
-        </Form>
-        <div className="mt-2"></div>
-        <div
-          style={{
-            marginTop: "16px",
-            fontSize: "14px",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <a href="#">Ainda não possui uma conta?</a>
-          <Link to="/signup">Criar conta</Link>
-        </div>
+        </section>
       </div>
-    </div></main>
+    </main>
   );
 }
 
 export async function loginLoader() {
-  // already authed? skip login
   const { user } = store.getState().auth || {};
+
   if (user) return redirect("/main");
+
   return null;
 }
 
 export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
-  const payload = Object.fromEntries(formData.entries());
-  const result = await authService.login(payload.email.toString(), payload.password.toString());
+  const email = formData.get("email")?.toString() ?? "";
+  const password = formData.get("password")?.toString() ?? "";
+
+  const result = await authService.login(email, password);
 
   if (result) {
     const url = new URL(request.url);
     const from = url.searchParams.get("from") || "/";
-    return redirect(from); // go back where the user tried to go
+
+    return redirect(from);
   }
 
-  return { error: "Login failed", status: 400 };
+  return {
+    error: "Login failed",
+    status: 400,
+  };
 }

@@ -10,8 +10,8 @@ data class PlaylistMusicGroupId(
     var playlistId: Long? = null,
 
     @Column(name = "music_id")
-    var musicId: Int? = null,
+    var musicId: Long? = null,
 
     @Column(name = "group_id")
-    var groupId: Int? = null
+    var groupId: Long? = null
 )

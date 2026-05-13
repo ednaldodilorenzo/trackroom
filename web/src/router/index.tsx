@@ -176,6 +176,10 @@ export const router = createBrowserRouter(
             {
               path: "playlists/:playlistId/add-songs",
               element: <PlayListAddSong />,
+              loader: async (args) => {
+                const mod = await import("@/modules/playlist/PlayListAddSong");
+                return mod.loader(args);
+              },
             },
             {
               path: "info",

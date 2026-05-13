@@ -7,9 +7,10 @@ import com.poc.crud.model.Playlist
 import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.playlist.dto.CreatePlaylistReqDTO
 import com.poc.crud.modules.playlist.dto.CreatePlaylistRespDTO
-import com.poc.crud.modules.playlist.dto.ListPlaylistDTO
+import com.poc.crud.modules.playlist.dto.PlaylistMusicCountDto
 import com.poc.crud.modules.playlist.service.PlaylistService
 import com.poc.crud.modules.playlist.service.PlaylistServiceImpl
+import com.poc.crud.repository.GroupMusicRepository
 import com.poc.crud.repository.GroupRepository
 import com.poc.crud.repository.MusicRepository
 import com.poc.crud.repository.PlaylistRepository
@@ -22,7 +23,10 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertDoesNotThrow
 import org.junit.jupiter.api.assertThrows
-import java.util.Optional
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
+import java.util.*
 
 class PlaylistServiceTest {
 
@@ -30,13 +34,16 @@ class PlaylistServiceTest {
     private lateinit var playlistRepository: PlaylistRepository
     private lateinit var groupRepository: GroupRepository
     private lateinit var musicRepository: MusicRepository
+    private lateinit var groupMusicRepository: GroupMusicRepository
+
 
     @BeforeEach
     fun setUp() {
         playlistRepository = mockk()
         groupRepository = mockk()
         musicRepository = mockk()
-        service = PlaylistServiceImpl(playlistRepository, groupRepository, musicRepository)
+        groupMusicRepository = mockk()
+        service = PlaylistServiceImpl(playlistRepository, groupRepository, musicRepository, groupMusicRepository)
     }
 
     @Test
@@ -77,18 +84,19 @@ class PlaylistServiceTest {
 
     @Test
     fun `findGroupPlaylists should find all playlists in  group`() {
-        val group = Group(1L, "Test Group", "Test Description", "cover", true)
-        val playlist1 = Playlist(1L, "Playlist 1", group)
-        val playlist2 = Playlist(2L, "Playlist 2", group)
+        val dto1 = PlaylistMusicCountDto(1L, "Playlist 1", 1)
+        val dto2 = PlaylistMusicCountDto(2L, "Playlist 1", 2)
+        val pageable = PageRequest.of(0, 10)
 
-        every { playlistRepository.findAllByGroup_Id(1L) } returns listOf(playlist1, playlist2)
+        every { playlistRepository.findAllByGroupIdWithMusicCount(1L) } returns listOf(dto1, dto2)
+        every { playlistRepository.findAllByGroupIdWithMusicCount(1L, pageable) } returns PageImpl(listOf(dto1, dto2))
 
-        var result: List<ListPlaylistDTO> = emptyList()
+        var result: Page<PlaylistMusicCountDto> = PageImpl(emptyList())
 
         assertDoesNotThrow {
-            result = service.findGroupPlaylists(1L)
+            result = service.findGroupPlaylists(1L, pageable)
         }
-        assertEquals(2, result.size)
+        assertEquals(2, result.content.size)
     }
 
     @Test
@@ -96,12 +104,12 @@ class PlaylistServiceTest {
         val music1 = Music(1L, "Test Music", "Test Description", "test.mp3", mutableSetOf())
         val music2 = Music(2L, "Test Music", "Test Description", "test.mp3", mutableSetOf())
 
-        every { musicRepository.findAllByPlaylistId(1L) } returns listOf(music1, music2)
+        every { musicRepository.findAllByPlaylistIdAndGroupId(1L, 1L) } returns listOf(music1, music2)
 
         var result: List<MusicDTO> = emptyList()
 
         assertDoesNotThrow {
-            result = service.findPlaylistMusics(1L)
+            result = service.findPlaylistMusics(1L, 1L)
         }
         assertEquals(2, result.size)
     }

@@ -19,7 +19,7 @@ export default function PlaylistList() {
 
   function handleOpenPlaylist(playlistId: number) {
     // React Router example:
-    navigate(`/groups/${groupId}/playlists/${playlistId}`);    
+    navigate(`/groups/${groupId}/playlists/${playlistId}`);
   }
 
   return (
@@ -52,9 +52,9 @@ export default function PlaylistList() {
             {(resolvedPlaylists) => {
               const filteredPlaylists = useMemo(() => {
                 const normalizedQuery = query.trim().toLowerCase();
-                
+
                 if (!normalizedQuery) return resolvedPlaylists.content;
-                
+
                 return resolvedPlaylists.content.filter((playlist) =>
                   playlist.title.toLowerCase().includes(normalizedQuery)
                 );
@@ -130,7 +130,7 @@ export default function PlaylistList() {
                             </div>
 
                             <p className="text-sm text-gray-500">
-                              {0} música{1 !== 1 ? "s" : ""}
+                              {playlist.musicCount} música{playlist.musicCount !== 1 ? "s" : ""}
                             </p>
                           </div>
 

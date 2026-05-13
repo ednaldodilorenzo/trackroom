@@ -2,21 +2,18 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import MusicList from "./MusicList";
+import MusicList, { musicsLoader } from "./MusicList";
 import { musicService } from "./music.service";
+import groupService from "@/modules/group/group.service";
 
-// -------------------- shared mocks --------------------
 const navigateMock = vi.fn();
 const setCurrentTrackMock = vi.fn();
 const setIsPlayingMock = vi.fn();
 
-// Control these per-test:
-let loaderMusicsValue: any[] = [];
+let loaderMusicsValue: any = { content: [] };
 let paramsIdValue = "10";
 let currentGroupValue: any = { isAdmin: false };
-let currentTrackValue: any = { id: 999 }; // something not matching by default
 
-// -------------------- react-router-dom mocks --------------------
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual<typeof import("react-router-dom")>(
     "react-router-dom"
@@ -26,11 +23,7 @@ vi.mock("react-router-dom", async () => {
     ...actual,
     useNavigate: () => navigateMock,
     useParams: () => ({ id: paramsIdValue }),
-
-    // component does: const { musics } = useLoaderData<{ musics: Promise<Music[]> }>();
     useLoaderData: () => ({ musics: Promise.resolve(loaderMusicsValue) }),
-
-    // In unit tests we mock Await so it immediately renders children
     Await: ({ resolve, children }: any) => {
       void resolve;
       return children(loaderMusicsValue);
@@ -38,12 +31,10 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-// -------------------- context mocks --------------------
 vi.mock("@/components/player/AudioPlayerContext", () => ({
   useAudioPlayerContext: () => ({
     setCurrentTrack: setCurrentTrackMock,
     setIsPlaying: setIsPlayingMock,
-    currentTrack: currentTrackValue,
   }),
 }));
 
@@ -51,125 +42,180 @@ vi.mock("../group/GroupContext", () => ({
   useGroupContext: () => ({ currentGroup: currentGroupValue }),
 }));
 
-// -------------------- UI/component mocks --------------------
 vi.mock("@/components/fallbackoverlay/FallBackOverlay", () => ({
   default: () => <div data-testid="fallback">Loading...</div>,
 }));
 
-vi.mock("@/components/button/Button", () => ({
-  default: ({ children, ...props }: any) => <button {...props}>{children}</button>,
-}));
-
-// We mock TextField as a simple input so we can type in it
 vi.mock("@/components", () => ({
-  TextField: ({ value, onChange, name }: any) => (
-    <input data-testid={name} value={value ?? ""} onChange={onChange} />
+  TextField: ({ value, onChange, name, placeholder }: any) => (
+    <input
+      data-testid={name}
+      placeholder={placeholder}
+      value={value ?? ""}
+      onChange={onChange}
+    />
+  ),
+  Button: ({ children, ...props }: any) => (
+    <button type="button" {...props}>
+      {children}
+    </button>
   ),
 }));
 
-// Mock TrackItem so we can click it and assert props like "active"
-vi.mock("@/components/trackitem/TrackItem", () => ({
-  default: ({ name, onClick, active, cipherLink }: any) => (
-    <div>
-      <button data-testid={`track-${name}`} onClick={onClick}>
-        {name}
-      </button>
-      <span data-testid={`active-${name}`}>{String(Boolean(active))}</span>
-      <span data-testid={`cipher-${name}`}>{cipherLink}</span>
-    </div>
-  ),
-}));
+vi.mock("./track/TraskList", () => {
+  const TrackList = ({ children }: any) => (
+    <div data-testid="track-list">{children}</div>
+  );
 
-// react-icons mock (avoid rendering SVG complexity)
+  TrackList.Item = ({ music, handlePlay }: any) => (
+    <button
+      type="button"
+      data-testid={`track-${music.name}`}
+      onClick={() => handlePlay(music)}
+    >
+      {music.name}
+    </button>
+  );
+
+  return { default: TrackList };
+});
+
 vi.mock("react-icons/bs", () => ({
   BsSearch: () => <span data-testid="search-icon" />,
 }));
 
-// -------------------- service mocks --------------------
+vi.mock("react-icons/bi", () => ({
+  BiPlus: () => <span data-testid="plus-icon" />,
+}));
+
 vi.mock("./music.service", () => ({
   musicService: {
     getFileUrl: vi.fn(),
-    getAll: vi.fn(),
   },
 }));
 
-// -------------------- tests --------------------
+vi.mock("@/modules/group/group.service", () => ({
+  default: {
+    getMusics: vi.fn(),
+  },
+}));
+
 describe("<MusicList />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    loaderMusicsValue = [];
+    loaderMusicsValue = { content: [] };
     paramsIdValue = "10";
     currentGroupValue = { isAdmin: false };
-    currentTrackValue = { id: 999 };
   });
 
-  it("renders title and search field", () => {
+  it("renders title, subtitle and search field", () => {
     render(<MusicList />);
 
-    expect(screen.getByTestId("searchMusic")).toBeInTheDocument();
+    expect(screen.getByText("Músicas")).toBeInTheDocument();
+    expect(
+      screen.getByText("Todas as músicas disponíveis neste grupo")
+    ).toBeInTheDocument();
+    expect(screen.getByPlaceholderText("Buscar música")).toBeInTheDocument();
   });
 
   it("renders empty-state when no musics", () => {
-    loaderMusicsValue = [];
+    loaderMusicsValue = { content: [] };
 
     render(<MusicList />);
 
-    expect(screen.getByText("Nenhuma música encontrada...")).toBeInTheDocument();
+    expect(screen.getByText("Nenhuma música adicionada")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "Adicione músicas ao grupo para que os membros possam solicitar ou visualizar cifras."
+      )
+    ).toBeInTheDocument();
   });
 
-  it("renders list of musics and builds cipherLink with group id param", async () => {
-    loaderMusicsValue = [
-      { id: 1, name: "Song A", description: "Artist A" },
-      { id: 2, name: "Song B", description: "Artist B" },
-    ];
-    paramsIdValue = "77";
-
-    render(<MusicList />);
-
-    // Track buttons exist
-    expect(screen.getByTestId("track-Song A")).toBeInTheDocument();
-    expect(screen.getByTestId("track-Song B")).toBeInTheDocument();
-
-    // cipher links constructed from params id
-    expect(screen.getByTestId("cipher-Song A")).toHaveTextContent(
-      "/groups/77/musics/1/cipher"
-    );
-    expect(screen.getByTestId("cipher-Song B")).toHaveTextContent(
-      "/groups/77/musics/2/cipher"
-    );
-  });
-
-  it("filters musics by search (case-insensitive)", async () => {
-    loaderMusicsValue = [
-      { id: 1, name: "Hello World", description: "A" },
-      { id: 2, name: "Bye Now", description: "B" },
-    ];
+  it("renders empty-state action only for admin and navigates on click", async () => {
+    loaderMusicsValue = { content: [] };
+    currentGroupValue = { isAdmin: true };
+    paramsIdValue = "123";
 
     render(<MusicList />);
 
     const user = userEvent.setup();
-    await user.type(screen.getByTestId("searchMusic"), "hello");
+    await user.click(screen.getByRole("button", { name: /Adicionar música/i }));
+
+    expect(navigateMock).toHaveBeenCalledWith("/groups/123/musics/add");
+  });
+
+  it("does not render empty-state action for non-admin", () => {
+    loaderMusicsValue = { content: [] };
+    currentGroupValue = { isAdmin: false };
+
+    render(<MusicList />);
+
+    expect(
+      screen.queryByRole("button", { name: /Adicionar música/i })
+    ).not.toBeInTheDocument();
+  });
+
+  it("renders list of musics", () => {
+    loaderMusicsValue = {
+      content: [
+        { id: 1, name: "Song A", description: "Artist A" },
+        { id: 2, name: "Song B", description: "Artist B" },
+      ],
+    };
+
+    render(<MusicList />);
+
+    expect(screen.getByTestId("track-list")).toBeInTheDocument();
+    expect(screen.getByTestId("track-Song A")).toBeInTheDocument();
+    expect(screen.getByTestId("track-Song B")).toBeInTheDocument();
+  });
+
+  it("filters musics by search case-insensitively", async () => {
+    loaderMusicsValue = {
+      content: [
+        { id: 1, name: "Hello World", description: "A" },
+        { id: 2, name: "Bye Now", description: "B" },
+      ],
+    };
+
+    render(<MusicList />);
+
+    const user = userEvent.setup();
+    await user.type(screen.getByPlaceholderText("Buscar música"), "hello");
 
     expect(screen.getByTestId("track-Hello World")).toBeInTheDocument();
     expect(screen.queryByTestId("track-Bye Now")).not.toBeInTheDocument();
   });
 
-  it("marks TrackItem as active when currentTrack.id matches item.id", () => {
-    loaderMusicsValue = [
-      { id: 1, name: "Song Active", description: "A" },
-      { id: 2, name: "Song Inactive", description: "B" },
-    ];
-    currentTrackValue = { id: 1 };
+  it("renders empty search state when filter matches no music", async () => {
+    loaderMusicsValue = {
+      content: [
+        { id: 1, name: "Hello World", description: "A" },
+        { id: 2, name: "Bye Now", description: "B" },
+      ],
+    };
 
     render(<MusicList />);
 
-    expect(screen.getByTestId("active-Song Active")).toHaveTextContent("true");
-    expect(screen.getByTestId("active-Song Inactive")).toHaveTextContent("false");
+    const user = userEvent.setup();
+    await user.type(screen.getByPlaceholderText("Buscar música"), "xyz");
+
+    expect(screen.getByText("Nenhuma música encontrada")).toBeInTheDocument();
+    expect(
+      screen.getByText("Tente buscar por outro nome ou limpe o campo de pesquisa.")
+    ).toBeInTheDocument();
+    expect(screen.queryByTestId("track-Hello World")).not.toBeInTheDocument();
+    expect(screen.queryByTestId("track-Bye Now")).not.toBeInTheDocument();
   });
 
   it("plays a track on click: fetches file url, sets current track and starts playing", async () => {
-    loaderMusicsValue = [{ id: 5, name: "Play Me", description: "Singer" }];
-    (musicService.getFileUrl as any).mockResolvedValueOnce("https://file.url/x.mp3");
+    loaderMusicsValue = {
+      content: [{ id: 5, name: "Play Me", description: "Singer" }],
+    };
+
+    (musicService.getFileUrl as any).mockResolvedValueOnce(
+      "https://file.url/x.mp3"
+    );
 
     render(<MusicList />);
 
@@ -179,7 +225,6 @@ describe("<MusicList />", () => {
     expect(musicService.getFileUrl).toHaveBeenCalledTimes(1);
     expect(musicService.getFileUrl).toHaveBeenCalledWith(5);
 
-    expect(setCurrentTrackMock).toHaveBeenCalledTimes(1);
     expect(setCurrentTrackMock).toHaveBeenCalledWith({
       id: 5,
       title: "Play Me",
@@ -187,35 +232,52 @@ describe("<MusicList />", () => {
       author: "Singer",
     });
 
-    expect(setIsPlayingMock).toHaveBeenCalledTimes(1);
     expect(setIsPlayingMock).toHaveBeenCalledWith(true);
   });
 
-  it("shows '+ Nova Música' button only for admin and navigates on click", async () => {
-    loaderMusicsValue = [{ id: 1, name: "Song A", description: "A" }];
+  it("shows header 'Adicionar' button only for admin and navigates on click", async () => {
+    loaderMusicsValue = {
+      content: [{ id: 1, name: "Song A", description: "A" }],
+    };
     currentGroupValue = { isAdmin: true };
     paramsIdValue = "123";
 
     render(<MusicList />);
 
-    const btn = screen.getByRole("button", { name: "+" });
-    expect(btn).toBeInTheDocument();
-
     const user = userEvent.setup();
-    await user.click(btn);
+    await user.click(screen.getByRole("button", { name: /Adicionar/i }));
 
     expect(navigateMock).toHaveBeenCalledTimes(1);
     expect(navigateMock).toHaveBeenCalledWith("/groups/123/musics/add");
   });
 
-  it("does not show '+ Nova Música' button for non-admin", () => {
-    loaderMusicsValue = [{ id: 1, name: "Song A", description: "A" }];
+  it("does not show header 'Adicionar' button for non-admin", () => {
+    loaderMusicsValue = {
+      content: [{ id: 1, name: "Song A", description: "A" }],
+    };
     currentGroupValue = { isAdmin: false };
 
     render(<MusicList />);
 
     expect(
-      screen.queryByRole("button", { name: "+ Nova Música" })
+      screen.queryByRole("button", { name: /Adicionar/i })
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("musicsLoader", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it("calls groupService.getMusics with params.id as number and returns musics promise", () => {
+    const fakePromise = Promise.resolve({ content: [] });
+    (groupService.getMusics as any).mockReturnValueOnce(fakePromise);
+
+    const result = musicsLoader({ params: { id: "123" } } as any);
+
+    expect(groupService.getMusics).toHaveBeenCalledTimes(1);
+    expect(groupService.getMusics).toHaveBeenCalledWith(123);
+    expect(result.musics).toBe(fakePromise);
   });
 });

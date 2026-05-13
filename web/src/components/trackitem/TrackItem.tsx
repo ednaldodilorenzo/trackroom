@@ -8,6 +8,7 @@ type TrackItemProps = Music & {
   onClick: () => void;
   cipherLink?: string;
   children?: React.ReactNode;
+  canPlay: boolean;
 };
 
 export default function TrackItem({
@@ -18,11 +19,12 @@ export default function TrackItem({
   cipherLink,
   onClick,
   children,
+  canPlay = true,
 }: TrackItemProps) {
   return (
     <div className={`track-item ${active ? "active" : ""}`}>
       {id && (
-        <button>
+        <button disabled={!canPlay}>
           <BsPlayCircle onClick={onClick} size="2em" />
         </button>
       )}

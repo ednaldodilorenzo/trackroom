@@ -4,6 +4,8 @@ interface Music {
   description: string;
   file: string;
   groupId: number;
+  selected?: boolean;
+  uploaded?: boolean;
 }
 
 interface MusicMetaData {

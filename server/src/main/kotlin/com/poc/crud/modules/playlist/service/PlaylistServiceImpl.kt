@@ -3,11 +3,15 @@ package com.poc.crud.modules.playlist.service
 import com.poc.crud.core.exception.APIException
 import com.poc.crud.core.exception.ExceptionType
 import com.poc.crud.model.Playlist
+import com.poc.crud.model.PlaylistMusicGroup
+import com.poc.crud.model.PlaylistMusicGroupId
 import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.playlist.dto.CreatePlaylistReqDTO
 import com.poc.crud.modules.playlist.dto.CreatePlaylistRespDTO
 import com.poc.crud.modules.playlist.dto.PlaylistMusicCountDto
-import com.poc.crud.modules.playlist.dto.PlaylistWithMusicsDTO
+import com.poc.crud.modules.playlist.dto.PlaylistMusicOptionDTO
+import com.poc.crud.modules.playlist.dto.UpdatePlaylistMusicsDTO
+import com.poc.crud.repository.GroupMusicRepository
 import com.poc.crud.repository.GroupRepository
 import com.poc.crud.repository.MusicRepository
 import com.poc.crud.repository.PlaylistRepository
@@ -23,6 +27,7 @@ class PlaylistServiceImpl(
     private val playlistRepository: PlaylistRepository,
     private val groupRepository: GroupRepository,
     private val musicRepository: MusicRepository,
+    private val groupMusicRepository: GroupMusicRepository,
 ) : PlaylistService {
 
     @Transactional
@@ -52,17 +57,56 @@ class PlaylistServiceImpl(
         }
     }
 
-    override fun findPlaylistMusics(playlistId: Long): List<MusicDTO> =
-        this.musicRepository.findAllByPlaylistId(playlistId).map { MusicDTO(it) }
+    override fun findPlaylistMusics(groupId: Long, playlistId: Long): List<MusicDTO> =
+        this.musicRepository.findAllByPlaylistIdAndGroupId(groupId, playlistId).map { MusicDTO(it) }
 
-    override fun findPlayListWithMusics(
-        groupId: Long, playlistId: Long
-    ): PlaylistWithMusicsDTO =
-        this.playlistRepository.findByIdAndGroupIdWithMusics(groupId, playlistId).map {
-            PlaylistWithMusicsDTO(it.id!!, it.title, it.items.map { plGroupMusic ->
-                MusicDTO(
-                    plGroupMusic.groupMusic?.music!!
+    override fun findById(groupId: Long, playlistId: Long): PlaylistMusicCountDto =
+        this.playlistRepository.findByIdAndGroup_Id(playlistId, groupId).map { PlaylistMusicCountDto(it.id, it.title) }
+            .orElseThrow {
+                APIException(
+                    ExceptionType.NOT_FOUND, ""
                 )
-            }.toSet())
-        }.orElseThrow { APIException(ExceptionType.NOT_FOUND, "Playlist not found with id: $playlistId for group $groupId") }
+            }
+
+    override fun findPlaylistMusicOptions(
+        groupId: Long, playlistId: Long
+    ): List<PlaylistMusicOptionDTO> = this.musicRepository.findPlaylistMusicOptions(groupId, playlistId)
+
+    @Transactional
+    override fun updatePlaylistMusics(
+        groupId: Long,
+        playlistId: Long,
+        dto: UpdatePlaylistMusicsDTO
+    ) {
+        val playlist = playlistRepository.findByIdAndGroupId(playlistId, groupId).orElseThrow { APIException(ExceptionType.NOT_FOUND, "Playlist") }
+
+        val selectedMusicIds = dto.musicIds
+
+        // remove músicas que não estão mais selecionadas
+        playlist.items.removeIf { item ->
+            item.groupMusic?.music?.id !in selectedMusicIds
+        }
+
+        val currentMusicIds = playlist.items
+            .mapNotNull { it.groupMusic?.music?.id }
+            .toSet()
+
+        val toAddIds = selectedMusicIds - currentMusicIds
+
+        val groupMusics = groupMusicRepository.findAllByGroup_IdAndMusic_IdIn(groupId, toAddIds)
+
+        val newItems = groupMusics.map { groupMusic ->
+            PlaylistMusicGroup(
+                id = PlaylistMusicGroupId(
+                    playlistId = playlistId,
+                    musicId = groupMusic.music.id!!,
+                    groupId = groupId,
+                ),
+                playlist = playlist,
+                groupMusic = groupMusic
+            )
+        }
+
+        playlist.items.addAll(newItems)
+    }
 }

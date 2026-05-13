@@ -14,7 +14,7 @@ interface PlaylistRepository : JpaRepository<Playlist, Long> {
 
     fun findAllByGroup_Id(groupId: Long): List<Playlist>
 
-    fun findAllByGroup_Id(groupId: Long, pageable: Pageable): Page<Playlist>
+    fun findByIdAndGroupId(playlistId: Long, groupId: Long): Optional<Playlist>
 
     @Query(
         """
@@ -64,4 +64,6 @@ interface PlaylistRepository : JpaRepository<Playlist, Long> {
     fun findByIdAndGroupIdWithMusics(
         groupId: Long, playlistId: Long
     ): Optional<Playlist>
+
+    fun findByIdAndGroup_Id(playlistId: Long, groupId: Long): Optional<Playlist>
 }

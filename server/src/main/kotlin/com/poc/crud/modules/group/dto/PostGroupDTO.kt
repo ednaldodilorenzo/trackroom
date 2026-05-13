@@ -5,26 +5,26 @@ import jakarta.validation.constraints.NotNull
 
 
 data class PostGroupDTO(
-    @NotNull
-    @NotBlank
+    @param:NotNull(message = "Name cannot be empty")
+    @param:NotBlank(message = "Name cannot be empty")
     val name: String,
 
-    @NotNull
-    @NotBlank
+    @param:NotNull(message = "Description cannot be empty")
+    @param:NotBlank(message = "Description cannot be empty")
     val description: String,
     val cover: String
 )
 
 data class PutGroupDTO(
-    @param:NotNull
+    @param:NotNull(message = "Id cannot be empty")
     val id: Long,
 
-    @param:NotNull
-    @param:NotBlank
+    @param:NotNull(message = "Name cannot be empty")
+    @param:NotBlank(message = "Name cannot be empty")
     val name: String,
 
-    @param:NotNull
-    @param:NotBlank
+    @param:NotNull(message = "Description cannot be empty")
+    @param:NotBlank(message = "Description cannot be empty")
     val description: String,
     val cover: String
 )

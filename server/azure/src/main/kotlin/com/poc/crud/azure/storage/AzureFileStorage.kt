@@ -62,4 +62,9 @@ class AzureFileStorage(
         val sasToken = blobClient.generateSas(sasValues)
         return "${blobClient.blobUrl}?$sasToken"
     }
+
+    override fun deleteFile(bucketName: String, fileName: String) {
+        val blobClient = blobServiceClient.getBlobContainerClient(bucketName).getBlobClient(fileName)
+        blobClient.delete()
+    }
 }

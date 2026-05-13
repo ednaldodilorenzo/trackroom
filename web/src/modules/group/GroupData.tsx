@@ -39,7 +39,7 @@ export default function GroupData() {
 
         setCurrentGroup(loadedGroup);
 
-        return <Outlet context={ctx} />; // or some JSX if you want to render something specific for the group data page
+        return <Outlet context={ctx} />;
       }}
     </Await>
   </Suspense>

@@ -26,6 +26,7 @@ export default function TrackListItem({ music, handlePlay }: TrackListItemProps)
             <TrackItem
                 active={currentTrack.id === music.id}
                 onClick={() => handlePlay(music)}
+                canPlay={music.uploaded!}
                 cipherLink={`/groups/${currentGroup.id}/musics/${music.id}/cipher`}
                 {...music}
             >

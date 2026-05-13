@@ -8,12 +8,12 @@ data class PostMusicReqDTO(
 
     val id: Long? = null,
 
-    @NotNull
-    @NotBlank
+    @param:NotNull(message = "Name cannot be empty")
+    @param:NotBlank(message = "Name cannot be empty")
     val name: String,
 
-    @NotNull
-    @NotBlank
+    @param:NotNull(message = "Description cannot be empty")
+    @param:NotBlank(message = "Description cannot be empty")
     val description: String,
 
     val file: String,

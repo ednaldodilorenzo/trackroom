@@ -13,11 +13,14 @@ import io.mockk.mockk
 import io.mockk.runs
 import io.mockk.verify
 import org.junit.jupiter.api.Test
+import org.mockito.ArgumentMatchers
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.http.MediaType
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -62,7 +65,7 @@ class MusicControllerTest {
 
     @Test
     fun `getAll should return filtered musics when groupId is informed`() {
-        val musics = setOf(
+        val musics = listOf(
             MusicDTO(
                 id = 2L,
                 name = "Music B",
@@ -71,17 +74,19 @@ class MusicControllerTest {
             )
         )
 
-        every { musicService.getAllMusic(10L) } returns musics
+        val page = PageImpl<MusicDTO>(musics)
+
+        every { musicService.getAllMusic(10L, any<Pageable>()) } returns page
 
         mockMvc.get("/v1/musics") {
             param("groupId", "10")
         }.andExpect {
             status { isOk() }
-            jsonPath("$[0].id") { value(2) }
-            jsonPath("$[0].name") { value("Music B") }
+            jsonPath("content[0].id") { value(2) }
+            jsonPath("content[0].name") { value("Music B") }
         }
 
-        verify(exactly = 1) { musicService.getAllMusic(10L) }
+        verify(exactly = 1) { musicService.getAllMusic(10L, any<Pageable>()) }
     }
 
     @Test

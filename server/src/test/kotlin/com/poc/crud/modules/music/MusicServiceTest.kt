@@ -4,12 +4,12 @@ import com.poc.crud.core.exception.APIException
 import com.poc.crud.infrastructure.filestorage.CipherFileStorage
 import com.poc.crud.infrastructure.filestorage.MusicFileStorage
 import com.poc.crud.model.*
-import com.poc.crud.modules.music.dto.MusicCipherResponseDTO
 import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.music.dto.PatchMusicReqDTO
 import com.poc.crud.modules.music.dto.PostMusicReqDTO
 import com.poc.crud.modules.music.service.MusicService
 import com.poc.crud.modules.music.service.MusicServiceImpl
+import com.poc.crud.repository.GroupMusicRepository
 import com.poc.crud.repository.GroupRepository
 import com.poc.crud.repository.MusicRepository
 import io.mockk.*
@@ -17,6 +17,10 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
+import org.mockito.ArgumentMatchers.any
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Pageable
 import java.util.*
 
 class MusicServiceTest {
@@ -25,6 +29,7 @@ class MusicServiceTest {
     private lateinit var groupRepository: GroupRepository
     private lateinit var musicFileStorage: MusicFileStorage
     private lateinit var cipherFileStorage: CipherFileStorage
+    private lateinit var groupMusicRepository: GroupMusicRepository
     private lateinit var service: MusicService
 
     @BeforeEach
@@ -33,11 +38,13 @@ class MusicServiceTest {
         groupRepository = mockk()
         musicFileStorage = mockk()
         cipherFileStorage = mockk()
+        groupMusicRepository = mockk()
         service = MusicServiceImpl(
             musicRepository = musicRepository,
             groupRepository = groupRepository,
             musicFileStorage = musicFileStorage,
-            cipherFileStorage = cipherFileStorage
+            cipherFileStorage = cipherFileStorage,
+            groupMusicRepository = groupMusicRepository,
         )
     }
 
@@ -45,24 +52,28 @@ class MusicServiceTest {
     fun `getAllMusic deve retornar musicas do grupo mapeadas para DTO`() {
         val music1 = Music(1L, "Test Music", "Test Description", "test.mp3", mutableSetOf())
         val music2 = Music(2L, "Test Music", "Test Description", "test.mp3", mutableSetOf())
+        val pageable = PageRequest.of(0, 10)
+        val page = PageImpl(listOf(music1, music2), pageable, 2)
 
-        every { musicRepository.findAllByGroupId(10L) } returns listOf(music1, music2)
+        every { musicRepository.findAllByGroupIdPaged(10L, pageable) } returns page
 
-        val result = service.getAllMusic(10L)
+        val result = service.getAllMusic(10L, pageable)
 
-        assertEquals(2, result.size)
-        verify(exactly = 1) { musicRepository.findAllByGroupId(10L) }
+        assertEquals(2, result.content.size)
+        verify(exactly = 1) { musicRepository.findAllByGroupIdPaged(10L, pageable) }
         confirmVerified(musicRepository, groupRepository, musicFileStorage, cipherFileStorage)
     }
 
     @Test
     fun `getAllMusic deve retornar conjunto vazio quando nao houver musicas`() {
-        every { musicRepository.findAllByGroupId(10L) } returns emptyList()
+        val pageable = PageRequest.of(0, 10)
+        val page = PageImpl(emptyList<Music>(), pageable, 2)
+        every { musicRepository.findAllByGroupIdPaged(10L, pageable) } returns page
 
-        val result = service.getAllMusic(10L)
+        val result = service.getAllMusic(10L, pageable)
 
         assertTrue(result.isEmpty())
-        verify(exactly = 1) { musicRepository.findAllByGroupId(10L) }
+        verify(exactly = 1) { musicRepository.findAllByGroupIdPaged(10L, pageable) }
         confirmVerified(musicRepository, groupRepository, musicFileStorage, cipherFileStorage)
     }
 
@@ -138,7 +149,6 @@ class MusicServiceTest {
         val result = service.getMusicCipherData(5L)
 
         assertNotNull(result)
-        assertTrue(result is MusicCipherResponseDTO)
         verify(exactly = 1) { musicRepository.findById(5L) }
         verify(exactly = 1) { cipherFileStorage.getCipherFileUrl(5L) }
         verify(exactly = 1) { cipherFileStorage.getCipherUploadUrl(5L) }

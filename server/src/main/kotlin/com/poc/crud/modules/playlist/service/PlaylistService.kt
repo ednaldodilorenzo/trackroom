@@ -1,10 +1,7 @@
 package com.poc.crud.modules.playlist.service
 
 import com.poc.crud.modules.music.dto.MusicDTO
-import com.poc.crud.modules.playlist.dto.CreatePlaylistReqDTO
-import com.poc.crud.modules.playlist.dto.CreatePlaylistRespDTO
-import com.poc.crud.modules.playlist.dto.PlaylistMusicCountDto
-import com.poc.crud.modules.playlist.dto.PlaylistWithMusicsDTO
+import com.poc.crud.modules.playlist.dto.*
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
@@ -13,7 +10,13 @@ interface PlaylistService {
 
     fun findGroupPlaylists(groupId: Long, pageable: Pageable): Page<PlaylistMusicCountDto>
 
-    fun findPlaylistMusics(playlistId: Long): List<MusicDTO>
+    fun findPlaylistMusics(groupId: Long, playlistId: Long): List<MusicDTO>
 
-    fun findPlayListWithMusics(groupId: Long, playlistId: Long): PlaylistWithMusicsDTO
+    fun findById(groupId: Long, playlistId: Long): PlaylistMusicCountDto
+
+    fun findPlaylistMusicOptions(groupId: Long, playlistId: Long): List<PlaylistMusicOptionDTO>
+
+    fun updatePlaylistMusics(
+        groupId: Long, playlistId: Long, dto: UpdatePlaylistMusicsDTO
+    )
 }

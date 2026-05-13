@@ -7,9 +7,7 @@ import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.music.dto.PostMusicReqDTO
 import com.poc.crud.modules.music.dto.PostMusicRespDTO
 import com.poc.crud.modules.music.service.MusicService
-import com.poc.crud.modules.playlist.dto.CreatePlaylistReqDTO
-import com.poc.crud.modules.playlist.dto.CreatePlaylistRespDTO
-import com.poc.crud.modules.playlist.dto.PlaylistMusicCountDto
+import com.poc.crud.modules.playlist.dto.*
 import com.poc.crud.modules.playlist.service.PlaylistService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Page
@@ -112,5 +110,19 @@ class GroupController(
 
     @GetMapping("/{id}/playlists/{playlistId}")
     fun getGroupPlaylist(@PathVariable id: Long, @PathVariable playlistId: Long) =
-        this.playlistService.findPlayListWithMusics(id, playlistId)
+        this.playlistService.findById(id, playlistId)
+
+    @GetMapping("/{id}/playlists/{playlistId}/musics")
+    fun getGroupPlaylistMusics(@PathVariable id: Long, @PathVariable playlistId: Long): List<MusicDTO> =
+        this.playlistService.findPlaylistMusics(id, playlistId)
+
+    @GetMapping("/{id}/playlists/{playlistId}/musics/options")
+    fun getGroupPlaylistMusicOptions(
+        @PathVariable id: Long, @PathVariable playlistId: Long
+    ): List<PlaylistMusicOptionDTO> = this.playlistService.findPlaylistMusicOptions(id, playlistId)
+
+    @PutMapping("/{id}/playlists/{playlistId}/musics")
+    fun putGroupPlaylistMusics(
+        @PathVariable id: Long, @PathVariable playlistId: Long, @RequestBody dto: UpdatePlaylistMusicsDTO
+    ) = playlistService.updatePlaylistMusics(id, playlistId, @RequestBody dto)
 }

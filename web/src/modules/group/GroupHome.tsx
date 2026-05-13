@@ -1,152 +1,319 @@
 import { Suspense } from "react";
 import { Link, type LoaderFunctionArgs } from "react-router-dom";
-import { useLoaderData, Await, useNavigate, useParams } from "react-router-dom";
+import { Await, useLoaderData, useNavigate, useParams } from "react-router-dom";
+import { BiChevronRight, BiPlus } from "react-icons/bi";
+
 import FallbackOverlay from "@/components/fallbackoverlay/FallBackOverlay";
+import Button from "@/components/button/Button";
+import TrackList from "@/modules/music/track/TraskList";
 import type { Music, Playlist } from "@/model";
+import type { Page } from "@/model/Page";
 import { musicService } from "@/modules/music/music.service";
 import groupService from "@/modules/group/group.service";
 import {
   useAudioPlayerContext,
   type Track,
 } from "@/components/player/AudioPlayerContext";
-import "@/modules/music/MusicList.css";
 import { useGroupContext } from "../group/GroupContext";
-import type { Page } from "@/model/Page";
-import { BiChevronRight } from "react-icons/bi";
-import Button from "@/components/button/Button";
-import TrackList from "@/modules/music/track/TraskList";
+import "@/modules/music/MusicList.css";
+
+type GroupHomeLoaderData = {
+  musics: Promise<Page<Music>>;
+  playlists: Promise<Page<Playlist>>;
+};
+
+const PREVIEW_LIMIT = 5;
 
 export default function GroupHome() {
-  const { musics, playlists } = useLoaderData<{ musics: Promise<Page<Music>>; playlists: Promise<Page<Playlist>> }>();
-  const { setCurrentTrack, setIsPlaying } =
-    useAudioPlayerContext();
+  const { musics, playlists } = useLoaderData() as GroupHomeLoaderData;
+  const { setCurrentTrack, setIsPlaying } = useAudioPlayerContext();
   const navigate = useNavigate();
   const { id } = useParams();
   const { currentGroup } = useGroupContext();
 
+  const isAdmin = Boolean(currentGroup?.isAdmin);
+
   async function handlePlay(music: Music) {
     const url = await musicService.getFileUrl(music.id!!);
+
     const track: Track = {
       id: music.id,
       title: music.name,
       src: url,
       author: music.description,
     };
+
     setCurrentTrack(track);
     setIsPlaying(true);
   }
 
+  function goToCreatePlaylist() {
+    navigate(`/groups/${id}/playlists/add`);
+  }
+
+  function goToAddMusic() {
+    navigate(`/groups/${id}/musics/add`);
+  }
+
+  function goToPlaylist(playlistId: number | string | undefined) {
+    if (!playlistId) return;
+    navigate(`/groups/${id}/playlists/${playlistId}`);
+  }
+
   return (
-    <>
+    <div className="space-y-8 pb-8">
       <section>
-        <h2 className="section-title">Playlists</h2>
+        <SectionHeader
+          title="Playlists"
+          description="Sequências organizadas para momentos do grupo"
+        />
+
         <Suspense fallback={<FallbackOverlay />}>
           <Await resolve={playlists}>
-            {(loadedPlaylists) => {
+            {(loadedPlaylists: Page<Playlist>) => {
+              const hasPlaylists = loadedPlaylists.content.length > 0;
+              const shouldShowViewAll =
+                Number(loadedPlaylists.totalElements ?? 0) > PREVIEW_LIMIT;
+              const shouldShowAddPlaylist = isAdmin && !shouldShowViewAll;
+
+              if (!hasPlaylists) {
+                return (
+                  <EmptyState
+                    icon="♬"
+                    title="Nenhuma playlist criada"
+                    description="Crie playlists para organizar músicas por louvor, vigília, missa ou encontro."
+                    action={
+                      isAdmin ? (
+                        <Button onClick={goToCreatePlaylist}>
+                          <span className="inline-flex items-center gap-1">
+                            <BiPlus size={18} /> Criar playlist
+                          </span>
+                        </Button>
+                      ) : null
+                    }
+                  />
+                );
+              }
+
               return (
-                <>
-                  {(loadedPlaylists.totalElements!! <= 5 && currentGroup.isAdmin) && (<div className="my-6">
-                    <Button className="me-2" onClick={() => navigate(`/groups/${id}/playlists/add`)}>+</Button> Criar Playlist
-                  </div>)}
-                  {
-                    loadedPlaylists.content.length > 0 ?
-                      (
-                        <>
-                          {loadedPlaylists.content.map((item: Playlist) => (
-                            <button
-                              key={item.id}
-                              onClick={() => navigate(`/groups/${id}/playlists/${item.id}`)}
-                              type="button"
-                              className={`w-full flex items-center gap-3 px-4 py-4 text-left hover:bg-gray-50 transition`}
-                            >
-                              <div className="w-11 h-11 rounded-2xl bg-violet-100 text-violet-700 flex items-center justify-center text-xl shrink-0">
-                                ♫
-                              </div>
+                <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
+                  {loadedPlaylists.content.map((playlist: Playlist, index) => (
+                    <PlaylistRow
+                      key={playlist.id}
+                      playlist={playlist}
+                      isLast={
+                        index === loadedPlaylists.content.length - 1 &&
+                        !shouldShowViewAll &&
+                        !shouldShowAddPlaylist
+                      }
+                      onClick={() => goToPlaylist(playlist.id)}
+                    />
+                  ))}
 
-                              <div className="flex-1 min-w-0">
-                                <div className="flex items-center gap-2">
-                                  <p className="font-bold text-gray-900 truncate">{item.title}</p>
-                                  {true && (
-                                    <span className="text-xs bg-violet-100 text-violet-700 font-semibold px-2 py-0.5 rounded-full shrink-0">
-                                      Fixada
-                                    </span>
-                                  )}
-                                </div>
+                  {shouldShowAddPlaylist && (
+                    <InlineAddAction
+                      label="Criar nova playlist"
+                      onClick={goToCreatePlaylist}
+                    />
+                  )}
 
-                                <p className="text-sm text-gray-500">
-                                  {item.musicCount} música{item.musicCount !== 1 ? "s" : ""}
-                                </p>
-                              </div>
-
-                              <span className="text-gray-400 text-2xl leading-none">›</span>
-                            </button>
-                          ))}
-
-                          {loadedPlaylists.totalElements!! > 5 && <Link to={`/groups/${id}/playlists`} className="p-2 cursor-pointer text-sm text-violet-700 font-semibold flex items-center">
-                            Ver todas <BiChevronRight size={20} className="ml-1" />
-                          </Link>}
-                        </>
-                      ) : (
-                        <div>Nenhuma Playlist Criada</div>
-                      )
-                  }
-                </>)
+                  {shouldShowViewAll && (
+                    <ViewAllLink
+                      to={`/groups/${id}/playlists`}
+                      label="Ver todas as playlists"
+                    />
+                  )}
+                </div>
+              );
             }}
           </Await>
         </Suspense>
       </section>
-      <section className="mt-8">
-        <h2 className="section-title">Músicas</h2>
-        <TrackList>
-          <Suspense fallback={<FallbackOverlay />}>
-            <Await resolve={musics}>
-              {(loadedMusics) => {
+
+      <section>
+        <SectionHeader
+          title="Músicas"
+          description="Prévia das músicas disponíveis neste grupo"
+        />
+
+        <Suspense fallback={<FallbackOverlay />}>
+          <Await resolve={musics}>
+            {(loadedMusics: Page<Music>) => {
+              const hasMusics = loadedMusics.content.length > 0;
+              const shouldShowViewAll =
+                Number(loadedMusics.totalElements ?? 0) > PREVIEW_LIMIT;
+              const shouldShowAddMusic = isAdmin && !shouldShowViewAll;
+
+              if (!hasMusics) {
                 return (
-                  <>
-                    {loadedMusics.totalElements!! <= 5 && currentGroup.isAdmin && (
-                      <div className="my-6">
-                        <Button className="me-2" onClick={() => navigate(`/groups/${id}/musics/add`)}>+</Button> Adicionar Música
-                      </div>
-                    )}
+                  <EmptyState
+                    icon="♪"
+                    title="Nenhuma música adicionada"
+                    description="Adicione músicas ao grupo para que os membros possam solicitar ou visualizar cifras."
+                    action={
+                      isAdmin ? (
+                        <Button onClick={goToAddMusic}>
+                          <span className="inline-flex items-center gap-1">
+                            <BiPlus size={18} /> Adicionar música
+                          </span>
+                        </Button>
+                      ) : null
+                    }
+                  />
+                );
+              }
 
-                    {loadedMusics.content.length > 0 ? (
-                      <>
-                        {loadedMusics.content.map((item: Music) => (
-                          <TrackList.Item
-                            key={item.id}
-                            music={item}
-                            handlePlay={handlePlay}
-                          />
-                        ))}
+              return (
+                <div className="bg-white pb-4 px-2 rounded-3xl shadow-sm overflow-hidden">
+                  <TrackList>
+                    {loadedMusics.content.map((music: Music) => (
+                      <TrackList.Item
+                        key={music.id}
+                        music={music}
+                        handlePlay={handlePlay}
+                      />
+                    ))}
+                  </TrackList>
 
-                        {loadedMusics.totalElements!! > 5 && (
-                          <Link to={`/groups/${id}/musics`} className="p-2 cursor-pointer text-sm text-violet-700 font-semibold flex items-center">
-                            Ver todas <BiChevronRight size={20} className="ml-1" />
-                          </Link>
-                        )}
-                      </>
-                    ) : (
-                      <>
-                        <div>Nenhuma Música</div>
-                      </>
-                    )}
-                  </>)
-              }}
-            </Await>
-          </Suspense>
-        </TrackList>
+                  {shouldShowAddMusic && (
+                    <InlineAddAction
+                      label="Adicionar nova música"
+                      onClick={goToAddMusic}
+                    />
+                  )}
+
+                  {shouldShowViewAll && (
+                    <ViewAllLink
+                      to={`/groups/${id}/musics`}
+                      label="Ver todas as músicas"
+                    />
+                  )}
+                </div>
+              );
+            }}
+          </Await>
+        </Suspense>
       </section>
-    </>
+    </div>
+  );
+}
+
+function SectionHeader({
+  title,
+  description,
+}: {
+  title: string;
+  description?: string;
+}) {
+  return (
+    <div className="mb-3">
+      <h2 className="section-title mb-0">{title}</h2>
+      {description && <p className="text-sm text-gray-500 mt-1">{description}</p>}
+    </div>
+  );
+}
+
+function PlaylistRow({
+  playlist,
+  isLast,
+  onClick,
+}: {
+  playlist: Playlist;
+  isLast: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={`w-full flex items-center gap-3 px-4 py-4 text-left hover:bg-gray-50 transition ${
+        !isLast ? "border-b border-gray-100" : ""
+      }`}
+    >
+      <div className="w-11 h-11 rounded-2xl bg-violet-100 text-violet-700 flex items-center justify-center text-xl shrink-0">
+        ♫
+      </div>
+
+      <div className="flex-1 min-w-0">
+        <div className="flex items-center gap-2">
+          <p className="font-bold text-gray-900 truncate">{playlist.title}</p>
+        </div>
+
+        <p className="text-sm text-gray-500">
+          {playlist.musicCount ?? 0} música{playlist.musicCount !== 1 ? "s" : ""}
+        </p>
+      </div>
+
+      <BiChevronRight size={24} className="text-gray-400 shrink-0" />
+    </button>
+  );
+}
+
+function InlineAddAction({
+  label,
+  onClick,
+}: {
+  label: string;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="w-full px-4 py-4 border-t border-gray-100 text-violet-700 font-semibold flex items-center justify-center gap-2 hover:bg-violet-50 transition"
+    >
+      <span className="w-8 h-8 rounded-xl bg-violet-100 flex items-center justify-center">
+        <BiPlus size={22} />
+      </span>
+      {label}
+    </button>
+  );
+}
+
+function EmptyState({
+  icon,
+  title,
+  description,
+  action,
+}: {
+  icon: string;
+  title: string;
+  description: string;
+  action?: React.ReactNode;
+}) {
+  return (
+    <div className="bg-white rounded-3xl shadow-sm px-4 py-4 text-center">
+      <div className="w-16 h-16 rounded-full bg-violet-100 text-violet-700 mx-auto flex items-center justify-center text-3xl mb-4">
+        {icon}
+      </div>
+
+      <h3 className="font-bold text-lg text-gray-900">{title}</h3>
+      <p className="text-sm text-gray-500 mt-2 mb-2">{description}</p>
+
+      {action}
+    </div>
+  );
+}
+
+function ViewAllLink({ to, label }: { to: string; label: string }) {
+  return (
+    <Link
+      to={to}
+      className="w-full px-4 py-3 text-sm text-violet-700 font-semibold flex items-center justify-center gap-1 hover:bg-violet-50 border-t border-gray-100"
+    >
+      {label}
+      <BiChevronRight size={20} />
+    </Link>
   );
 }
 
 export const loader = ({
   params,
-}: LoaderFunctionArgs): { musics: Promise<Page<Music>>; playlists: Promise<Page<Playlist>> } => {
-  const id = params.id;
+}: LoaderFunctionArgs): GroupHomeLoaderData => {
+  const id = Number(params.id);
 
   return {
-    musics: groupService.getMusics(parseInt(id!!), { page: 0, size: 5 }),
-    playlists: groupService.getPlaylists(parseInt(id!!), { page: 0, size: 5 }),
+    musics: groupService.getMusics(id, { page: 0, size: PREVIEW_LIMIT }),
+    playlists: groupService.getPlaylists(id, { page: 0, size: PREVIEW_LIMIT }),
   };
 };

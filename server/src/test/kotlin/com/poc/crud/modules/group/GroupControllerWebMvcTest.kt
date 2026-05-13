@@ -3,12 +3,13 @@ package com.poc.crud.modules.group
 import com.ninjasquad.springmockk.MockkBean
 import com.poc.crud.core.exception.APIException
 import com.poc.crud.core.exception.ExceptionType
+import com.poc.crud.core.security.JwtConstants
 import com.poc.crud.modules.group.dto.GroupDTO
 import com.poc.crud.modules.group.service.GroupService
 import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.music.dto.PostMusicRespDTO
 import com.poc.crud.modules.music.service.MusicService
-import com.poc.crud.modules.playlist.dto.ListPlaylistDTO
+import com.poc.crud.modules.playlist.dto.PlaylistMusicCountDto
 import com.poc.crud.modules.playlist.service.PlaylistService
 import io.mockk.every
 import io.mockk.mockk
@@ -19,6 +20,8 @@ import org.springframework.boot.test.context.TestConfiguration
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Import
+import org.springframework.data.domain.PageImpl
+import org.springframework.data.domain.Pageable
 import org.springframework.http.MediaType
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
@@ -74,7 +77,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             get("/v1/groups").with(jwt().jwt {
-                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }) // Matches jwt.id.toLong()
@@ -94,7 +97,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups").with(jwt().jwt {
-                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -114,7 +117,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups").with(jwt().jwt {
-                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -129,7 +132,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups").with(jwt().jwt {
-                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -144,7 +147,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups").with(jwt().jwt {
-                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -157,7 +160,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups").with(jwt().jwt {
-                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -170,7 +173,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             delete("/v1/groups/1/members/456").with(jwt().jwt {
-                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 })
@@ -181,18 +184,21 @@ class GroupControllerTest {
 
     @Test
     fun `getGroupMusics should return list of musics`() {
-        val musics = setOf(MusicDTO(1L, "Test Music", "description", "file"))
+        val musics = listOf(
+            MusicDTO(1L, "Test Music", "description", "file")
+        )
+        val page = PageImpl<MusicDTO>(musics)
 
         // Mocking the service call. Note the .with(jwt()) to satisfy @AuthenticationPrincipal
-        every { musicService.getAllMusic(1L) } returns musics
+        every { musicService.getAllMusic(1L, any<Pageable>()) } returns page
 
         mockMvc.perform(
             get("/v1/groups/1/musics").with(jwt().jwt {
-                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }) // Matches jwt.id.toLong()
-        ).andExpect(status().isOk).andExpect(jsonPath("$[0].name").value("Test Music"))
+        ).andExpect(status().isOk).andExpect(jsonPath("content[0].name").value("Test Music"))
     }
 
     @Test
@@ -208,7 +214,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups/1/musics").with(jwt().jwt {
-                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -228,7 +234,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups/1/musics").with(jwt().jwt {
-                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -243,7 +249,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups/1/musics").with(jwt().jwt {
-                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -258,7 +264,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups/1/musics").with(jwt().jwt {
-                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -278,7 +284,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups/1/musics").with(jwt().jwt {
-                    it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -287,17 +293,18 @@ class GroupControllerTest {
 
     @Test
     fun `getGroupPlaylists should return list of playlists`() {
-        val playlists = listOf(ListPlaylistDTO(1L, "Test Playlist"), ListPlaylistDTO(2L, "Test Playlist 2"))
+        val playlists = listOf(PlaylistMusicCountDto(1L, "Test Playlist"), PlaylistMusicCountDto(2L, "Test Playlist 2"))
+        val page = PageImpl(playlists)
 
         // Mocking the service call. Note the .with(jwt()) to satisfy @AuthenticationPrincipal
-        every { playlistService.findGroupPlaylists(1L) } returns playlists
+        every { playlistService.findGroupPlaylists(1L, any<Pageable>()) } returns page
 
         mockMvc.perform(
             get("/v1/groups/1/playlists").with(jwt().jwt {
-                it.claim("jti", "123").issuedAt(Instant.now()).expiresAt(
+                it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                     Instant.now().plusSeconds(3600)
                 )
             }) // Matches jwt.id.toLong()
-        ).andExpect(status().isOk).andExpect(jsonPath("$[0].title").value("Test Playlist"))
+        ).andExpect(status().isOk).andExpect(jsonPath("content[0].title").value("Test Playlist"))
     }
 }

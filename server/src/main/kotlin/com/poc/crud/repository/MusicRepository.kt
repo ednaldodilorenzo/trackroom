@@ -1,6 +1,7 @@
 package com.poc.crud.repository
 
 import com.poc.crud.model.Music
+import com.poc.crud.modules.playlist.dto.PlaylistMusicOptionDTO
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.jpa.repository.JpaRepository
@@ -48,7 +49,27 @@ interface MusicRepository : JpaRepository<Music, Long> {
         JOIN p.items i
         JOIN i.groupMusic g 
         JOIN g.music m
+        WHERE g.id.groupId = :groupId
+        AND p.id = :playlistId
     """
     )
-    fun findAllByPlaylistId(playlistId: Long): List<Music>
+    fun findAllByPlaylistIdAndGroupId(groupId: Long, playlistId: Long): List<Music>
+
+    @Query(
+        """
+    SELECT new com.poc.crud.modules.playlist.dto.PlaylistMusicOptionDTO(
+        m.id,
+        m.name,
+        m.description,
+        CASE WHEN pmg.id IS NOT NULL THEN true ELSE false END
+    )   
+    FROM GroupMusic gm
+    JOIN gm.music m
+    LEFT JOIN PlaylistMusicGroup pmg
+        ON pmg.groupMusic.id = gm.id
+        AND pmg.playlist.id = :playlistId
+    WHERE gm.group.id = :groupId
+"""
+    )
+    fun findPlaylistMusicOptions(groupId: Long, playlistId: Long): List<PlaylistMusicOptionDTO>
 }

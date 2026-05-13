@@ -40,19 +40,27 @@ class GroupService extends Requester {
       (resp) => resp.data
     );
 
-  getPlaylists = (groupId: number, params?: Params): Promise<Page<Playlist>> => 
+  getPlaylists = (groupId: number, params?: Params): Promise<Page<Playlist>> =>
     this.get<Page<Playlist>>(`/${groupId}/playlists`, params).then((resp) => resp.data);
 
   addPlaylist = (groupId: number, data: Playlist): Promise<Playlist> =>
     this.post<Playlist, Playlist>(data, {}, "/v1/groups", `/${groupId}/playlists`).then(
       (resp) => resp.data
     );
-  
 
   deleteGroupMusic = (groupId: number, musicId: number) => this.delete(`/${groupId}/musics/${musicId}`);
 
-  getGroupPlaylistWithMusics = (groupId: number, playlistId: number): Promise<Playlist> =>
+  getGroupPlaylist = (groupId: number, playlistId: number): Promise<Playlist> =>
     this.get<Playlist>(`/${groupId}/playlists/${playlistId}`, { withMusics: true }).then((resp) => resp.data);
+
+  getGroupPlaylistMusics = (groupId: number, playlistId: number, params?: Params): Promise<Music[]> =>
+    this.get<Music[]>(`/${groupId}/playlists/${playlistId}/musics`, params).then((resp) => resp.data);
+
+  getGroupPlaylistMusicOptions = (groupId: number, playlistId: number): Promise<Music[]> =>
+    this.get<Music[]>(`/${groupId}/playlists/${playlistId}/musics/options`).then((resp) => resp.data);
+
+  putGroupPlaylistMusics = (groupId: number, playlistId: number, musicIds: number[]) =>
+    this.put<void, { musicIds: number[] }>({ musicIds }, `${groupId}/playlists/${playlistId}/musics`).then(() => {})
 }
 
 export default new GroupService(request);

@@ -1,114 +1,214 @@
-import { FallbackOverlay, RegisterForm, TextField } from "@/components";
-import { musicService } from "./music.service";
-import groupService from "../group/group.service";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { useForm } from "react-hook-form";
-import type { Music } from "@/model";
+import { Suspense } from "react";
 import {
+  Await,
+  redirect,
+  useLoaderData,
+  useNavigate,
   useParams,
   useSubmit,
-  useNavigate,
-  useLoaderData,
-  Await,
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
 } from "react-router-dom";
+import { yupResolver } from "@hookform/resolvers/yup";
+import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import toast from "react-hot-toast";
-import { Suspense } from "react";
 
-const schema = yup.object({
-  name: yup.string().required("Nome é obrigatório"),
-  description: yup.string().required("Álbum é requerido"),
-}).required();
+import { FallbackOverlay, TextField } from "@/components";
+import type { Music } from "@/model";
+import { musicService } from "./music.service";
+import groupService from "../group/group.service";
+
+const schema = yup
+  .object({
+    name: yup.string().trim().required("Nome é obrigatório"),
+    description: yup.string().trim().required("Álbum é obrigatório"),
+  })
+  .required();
 
 type FormData = yup.InferType<typeof schema>;
+
+type MusicAddLoaderData = {
+  music: Promise<Music | null>;
+};
 
 function MusicForm({ loadedMusic }: { loadedMusic: Music | null }) {
   const submit = useSubmit();
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { control, handleSubmit } = useForm<FormData>({
+  const isEditing = Boolean(loadedMusic?.id);
+
+  const {
+    control,
+    handleSubmit,
+    formState: { isValid, isSubmitting },
+  } = useForm<FormData>({
     resolver: yupResolver(schema),
+    mode: "onChange",
     values: loadedMusic
-      ? { name: loadedMusic.name, description: loadedMusic.description }
-      : undefined,
+      ? {
+        name: loadedMusic.name,
+        description: loadedMusic.description,
+      }
+      : {
+        name: "",
+        description: "",
+      },
   });
 
+  function handleCancel() {
+    navigate(`/groups/${id}/musics`);
+  }
+
+  function onSubmit(_: FormData, event?: React.BaseSyntheticEvent) {
+    const form = event?.target as HTMLFormElement | undefined;
+    if (!form) return;
+
+    const formData = new FormData(form);
+
+    submit(formData, {
+      method: "post",
+      encType: "multipart/form-data",
+    });
+  }
+
   return (
-    <RegisterForm
+    <form
+      onSubmit={handleSubmit(onSubmit)}
       encType="multipart/form-data"
-      title={loadedMusic ? "Editar Música" : "Nova Música"}
-      formSubmit={handleSubmit((_, e) => {        
-        const formData = new FormData(e?.target as HTMLFormElement);
-        submit(formData, { method: "post", encType: "multipart/form-data" });
-        navigate(-1);
-      })}
-      cancelHandler={() => navigate(`/groups/${id}/musics`)}
+      className="min-h-screen bg-gray-100 pb-24"
     >
-      <TextField label="Nome" name="name" control={control} />
-      <TextField label="Álbum" name="description" control={control} />
-      <label htmlFor="file-music">Arquivo</label>
-      <input id="file-music" name="file" accept="audio/*" type="file" />
-    </RegisterForm>
+      <main className="mb-4 pt-2 space-y-6">
+        <section className="bg-white rounded-3xl shadow-sm p-5">
+          <h2 className="font-bold text-lg mb-4">Informações</h2>
+
+          <div className="space-y-4">
+            <TextField label="Nome" name="name" control={control} />
+            <TextField label="Álbum" name="description" control={control} />
+          </div>
+        </section>
+
+        <section className="bg-white rounded-3xl shadow-sm p-5">
+          <h2 className="font-bold text-lg mb-2">Arquivo de áudio</h2>
+          <p className="text-sm text-gray-500 mb-4">
+            Selecione um arquivo de áudio para esta música.
+          </p>
+
+          <label
+            htmlFor="file-music"
+            className="flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-violet-200 bg-violet-50 px-4 py-8 text-center cursor-pointer hover:bg-violet-100 transition"
+          >
+            <span className="w-14 h-14 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-3xl">
+              ♪
+            </span>
+            <span className="font-bold text-violet-700">Escolher arquivo</span>
+            <span className="text-xs text-gray-500">MP3, WAV ou outro formato de áudio</span>
+          </label>
+
+          <input
+            id="file-music"
+            name="file"
+            accept="audio/*"
+            type="file"
+            data-testid="file-input"
+            className="sr-only"
+          />
+
+          {isEditing && (
+            <p className="text-xs text-gray-500 mt-3">
+              Ao editar, envie um novo arquivo somente se desejar substituir o áudio atual.
+            </p>
+          )}
+        </section>
+      </main>
+
+      <div className="bg-white border-t border-gray-200 px-4 py-3 shadow-2xl">
+        <div className="max-w-md mx-auto flex gap-3">
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="h-12 px-5 rounded-2xl cursor-pointer font-bold border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition"
+          >
+            Cancelar
+          </button>
+
+          <button
+            type="submit"
+            disabled={!isValid || isSubmitting}
+            className={`flex-1 h-12 rounded-2xl font-bold cursor-pointer transition ${isValid && !isSubmitting
+                ? "bg-violet-700 text-white shadow-md hover:bg-violet-800"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              }`}
+          >
+            {isEditing ? "Salvar alterações" : "Cadastrar música"}
+          </button>
+        </div>
+      </div>
+    </form>
   );
 }
 
 export default function MusicAdd() {
-  const { music } = useLoaderData<{ music: Promise<Music> }>();
+  const { music } = useLoaderData() as MusicAddLoaderData;
 
   return (
     <Suspense fallback={<FallbackOverlay />}>
-      <Await resolve={music}>
-        {(loadedMusic) => <MusicForm loadedMusic={loadedMusic} />}
-      </Await>
+      <Await resolve={music}>{(loadedMusic) => <MusicForm loadedMusic={loadedMusic} />}</Await>
     </Suspense>
   );
 }
 
 export async function action({ request, params }: ActionFunctionArgs) {
   const data = await request.formData();
-  const id = params.id;
-  const musicId = params.musicId;
+  const groupId = Number(params.id);
+  const musicId = params.musicId ? Number(params.musicId) : null;
 
   const payload: Music = {
-    name: data.get("name")?.toString()!!,
-    description: data.get("description")?.toString()!!,
-    file: data.get("name")?.toString()!!,
-    groupId: parseInt(id!!),
+    name: data.get("name")?.toString() ?? "",
+    description: data.get("description")?.toString() ?? "",
+    file: data.get("file") instanceof File ? (data.get("file") as File).name : "",
+    groupId,
   };
 
-  // Aqui o retorno pode ser File | string | null
-  const fileEntry = data.get("file") as File | null;
+  const fileEntry = data.get("file");
+  const hasValidFile = fileEntry instanceof File && fileEntry.size > 0;
 
-  if (!(fileEntry instanceof File)) {
-    throw new Error("Arquivo inválido ou ausente");
-  }
-  
   try {
-    const musicResp = musicId ? await musicService.update(parseInt(musicId), payload) : await groupService.addMusic(parseInt(id!!), payload);
+    const musicResp = musicId
+      ? await musicService.update(musicId, payload)
+      : await groupService.addMusic(groupId, payload);
 
-    if (fileEntry.size > 0) {
+    if (hasValidFile) {
       await musicService.uploadFile(musicResp.uploadUrl, fileEntry);
       await musicService.confirmFileUpload(musicResp.id);
     }
-    toast.success(musicId ? "Música atualizada com sucesso!" : "Música cadastrada com sucesso!");
+
+    toast.success(
+      musicId ? "Música atualizada com sucesso!" : "Música cadastrada com sucesso!"
+    );
+
+    return redirect("/groups/1/musics");
   } catch (err: any) {
-    if (err.status === 401) {
+    if (err?.status === 401) {
       return err;
     }
-  }
 
-  return "success";
+    toast.error("Não foi possível salvar a música.");
+    return null;
+  }
 }
 
-export async function load({ params }: LoaderFunctionArgs) {
+export async function load({ params }: LoaderFunctionArgs): Promise<MusicAddLoaderData> {
   const musicId = params.musicId;
+
   if (!musicId) {
-    return { music: new Promise<Music>((resolve) => resolve(null as unknown as Music)) };
+    return {
+      music: Promise.resolve(null),
+    };
   }
 
-  return { music: musicService.getById(parseInt(musicId)) };
-
+  return {
+    music: musicService.getById(Number(musicId)),
+  };
 }

@@ -63,11 +63,6 @@ databaseChangeLog:
             columnNames: playlist_id, music_id, group_id
             constraintName: pk_playlist_music_group
 
-        - addUniqueConstraint:
-            tableName: playlist_music_group
-            columnNames: music_id, group_id
-            constraintName: uq_playlist_music_group_music_id_group_id
-
         - addForeignKeyConstraint:
             baseTableName: playlist_music_group
             baseColumnNames: playlist_id, group_id
