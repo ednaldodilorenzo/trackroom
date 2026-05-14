@@ -277,7 +277,7 @@ describe("musicsLoader", () => {
     const result = musicsLoader({ params: { id: "123" } } as any);
 
     expect(groupService.getMusics).toHaveBeenCalledTimes(1);
-    expect(groupService.getMusics).toHaveBeenCalledWith(123);
+    expect(groupService.getMusics).toHaveBeenCalledWith(123, { unpaged: true });
     expect(result.musics).toBe(fakePromise);
   });
 });
