@@ -31,9 +31,8 @@ class GroupService extends Requester {
 
   removeMemberFromGroup = (groupId: number, userId: number) => this.delete(`/${groupId}/members/${userId}`);
 
-  getMusics = (groupId: number, params?: Params): Promise<Page<Music>> => {
-    return this.get<Page<Music>>(`/${groupId}/musics`, params).then((resp) => resp.data);
-  }
+  getMusics = (groupId: number, params?: Params): Promise<Page<Music>> =>
+    this.get<Page<Music>>(`/${groupId}/musics`, params).then((resp) => resp.data);
 
   addMusic = (groupId: number, data: Music): Promise<{ id: number; uploadUrl: string }> =>
     this.post<{ id: number; uploadUrl: string }, Music>(data, {}, "/v1/groups", `/${groupId}/musics`).then(
@@ -60,7 +59,7 @@ class GroupService extends Requester {
     this.get<Music[]>(`/${groupId}/playlists/${playlistId}/musics/options`).then((resp) => resp.data);
 
   putGroupPlaylistMusics = (groupId: number, playlistId: number, musicIds: number[]) =>
-    this.put<void, { musicIds: number[] }>({ musicIds }, `${groupId}/playlists/${playlistId}/musics`).then(() => {})
+    this.put<void, { musicIds: number[] }>({ musicIds }, `${groupId}/playlists/${playlistId}/musics`).then(() => { })
 }
 
 export default new GroupService(request);

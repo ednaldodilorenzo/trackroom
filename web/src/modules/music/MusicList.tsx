@@ -93,8 +93,8 @@ export default function MusicList() {
             const normalizedSearch = search.trim().toLowerCase();
             const filteredMusics = normalizedSearch
               ? loadedMusics.content.filter((music) =>
-                  music.name.toLowerCase().includes(normalizedSearch)
-                )
+                music.name.toLowerCase().includes(normalizedSearch)
+              )
               : loadedMusics.content;
 
             if (loadedMusics.content.length === 0) {
@@ -177,6 +177,6 @@ export const musicsLoader = ({
   const id = Number(params.id);
 
   return {
-    musics: groupService.getMusics(id),
+    musics: groupService.getMusics(id, { unpaged: true }),
   };
 };
