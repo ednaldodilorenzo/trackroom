@@ -1,6 +1,7 @@
 import { useAudioPlayerContext } from "@/components/player/AudioPlayerContext";
 import SuspendedMenu from "@/components/suspendedmenu/SuspendedMenu";
 import TrackItem from "@/components/trackitem/TrackItem";
+import { useLoading } from "@/hooks/useLoading";
 import type { Music } from "@/model";
 import groupService from "@/modules/group/group.service";
 import { useGroupContext } from "@/modules/group/GroupContext";
@@ -20,6 +21,7 @@ export default function TrackListItem({ music, handlePlay }: TrackListItemProps)
     const { revalidate } = useRevalidator();
     const navigate = useNavigate();
     const { currentGroup } = useGroupContext();
+    const { show, hide } = useLoading();
 
     return (
         <div className="track-list" key={music.id}>
@@ -39,9 +41,12 @@ export default function TrackListItem({ music, handlePlay }: TrackListItemProps)
                         label="Excluir"
                         onClick={() => {
                             if (confirm("Tem certeza que deseja excluir esta música?")) {
+                                show();
                                 groupService.deleteGroupMusic(parseInt(currentGroup.id!!), music.id!!).then(() => {
                                     toast.success("Música excluída com sucesso!");
                                     revalidate();
+                                }).finally(() => {
+                                    hide();
                                 });
                             }
                         }}
