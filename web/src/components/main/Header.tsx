@@ -1,4 +1,4 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import "./Header.css";
 import { BsArrowLeftSquare } from "react-icons/bs";
 
@@ -17,16 +17,16 @@ export default function Header({
   titleLink,
   enableBackButton,
   children,
+  backButtonLink,
   hidden = false,
-}: HeaderConfig) {
-  const navigate = useNavigate();
+}: HeaderConfig) {  
   return (
     <header className={`header flex justify-between align-center p-2 ${hidden ? "hidden" : ""}`}>
       <div className="flex items-center">
         {enableBackButton && (
-          <button onClick={() => navigate(-1)} className="mr-4 cursor-pointer">
+          <Link to={backButtonLink ?? "#"} className="mr-4 cursor-pointer">
             <BsArrowLeftSquare size="1.7em" />
-          </button>
+          </Link>
         )}
         {titleLink ? <h1><Link to={titleLink}>{title}</Link></h1> : <h1>{title}</h1>}
         {children}

@@ -2,14 +2,19 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import MusicAdd, { action, load } from "./MusicAdd";
+import MusicAdd, { load } from "./MusicAdd";
 import { musicService } from "./music.service";
 import groupService from "../group/group.service";
 
 const navigateMock = vi.fn();
-const submitMock = vi.fn();
+const toastSuccessMock = vi.fn();
+const toastErrorMock = vi.fn();
+const headerConfigMock = vi.fn();
 
-let paramsIdValue = "10";
+let paramsValue: any = { id: "10" };
+let locationValue: any = {
+  state: { returnTo: "/groups/10/musics" },
+};
 let loaderMusicValue: any = null;
 let isValidValue = true;
 let isSubmittingValue = false;
@@ -25,7 +30,13 @@ vi.mock("react-hook-form", () => ({
       (cb: any) =>
         async (e?: any) => {
           e?.preventDefault?.();
-          await cb({}, e);
+          await cb(
+            {
+              name: "Song X",
+              description: "Album Y",
+            },
+            e
+          );
         },
   }),
 }));
@@ -37,9 +48,9 @@ vi.mock("react-router-dom", async () => {
 
   return {
     ...actual,
-    useParams: () => ({ id: paramsIdValue }),
+    useParams: () => paramsValue,
+    useLocation: () => locationValue,
     useNavigate: () => navigateMock,
-    useSubmit: () => submitMock,
     useLoaderData: () => ({ music: Promise.resolve(loaderMusicValue) }),
     Await: ({ resolve, children }: any) => {
       void resolve;
@@ -48,8 +59,9 @@ vi.mock("react-router-dom", async () => {
   };
 });
 
-const toastSuccessMock = vi.fn();
-const toastErrorMock = vi.fn();
+vi.mock("@/hooks/useHeaderConfig", () => ({
+  useHeaderConfig: (...args: any[]) => headerConfigMock(...args),
+}));
 
 vi.mock("react-hot-toast", () => ({
   default: {
@@ -86,10 +98,39 @@ vi.mock("../group/group.service", () => ({
 describe("<MusicAdd />", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    paramsIdValue = "10";
+
+    paramsValue = { id: "10" };
+    locationValue = {
+      state: { returnTo: "/groups/10/musics" },
+    };
     loaderMusicValue = null;
     isValidValue = true;
     isSubmittingValue = false;
+
+    (groupService.addMusic as any).mockResolvedValue({
+      id: 99,
+      uploadUrl: "https://upload.example/signed",
+    });
+
+    (musicService.update as any).mockResolvedValue({
+      id: 55,
+      uploadUrl: "https://upload.example/update-signed",
+    });
+
+    (musicService.uploadFile as any).mockResolvedValue(undefined);
+    (musicService.confirmFileUpload as any).mockResolvedValue(undefined);
+  });
+
+  it("calls useHeaderConfig with returnTo and resetOnUnmount=false", () => {
+    render(<MusicAdd />);
+
+    expect(headerConfigMock).toHaveBeenCalledTimes(1);
+    expect(headerConfigMock).toHaveBeenCalledWith(
+      {
+        backButtonLink: "/groups/10/musics",
+      },
+      false
+    );
   });
 
   it("renders create mode fields and submit button", () => {
@@ -100,12 +141,9 @@ describe("<MusicAdd />", () => {
 
     expect(screen.getByLabelText("Nome")).toBeInTheDocument();
     expect(screen.getByLabelText("Álbum")).toBeInTheDocument();
-
     expect(screen.getByText("Escolher arquivo")).toBeInTheDocument();
 
-    const fileInput = screen.getByTestId("file-input") as HTMLInputElement;
-    expect(fileInput).toBeInTheDocument();
-
+    expect(screen.getByTestId("file-input")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: "Cancelar" })).toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "Cadastrar música" })
@@ -118,6 +156,7 @@ describe("<MusicAdd />", () => {
       name: "Song X",
       description: "Album Y",
     };
+    paramsValue = { id: "10", musicId: "99" };
 
     render(<MusicAdd />);
 
@@ -137,7 +176,9 @@ describe("<MusicAdd />", () => {
 
     render(<MusicAdd />);
 
-    expect(screen.getByRole("button", { name: "Cadastrar música" })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Cadastrar música" })
+    ).toBeDisabled();
   });
 
   it("disables submit button when form is submitting", () => {
@@ -145,11 +186,15 @@ describe("<MusicAdd />", () => {
 
     render(<MusicAdd />);
 
-    expect(screen.getByRole("button", { name: "Cadastrar música" })).toBeDisabled();
+    expect(
+      screen.getByRole("button", { name: "Cadastrar música" })
+    ).toBeDisabled();
   });
 
-  it("navigates back to musics list on cancel", async () => {
-    paramsIdValue = "77";
+  it("navigates to returnTo on cancel", async () => {
+    locationValue = {
+      state: { returnTo: "/groups/77/musics" },
+    };
 
     render(<MusicAdd />);
 
@@ -159,13 +204,10 @@ describe("<MusicAdd />", () => {
     expect(navigateMock).toHaveBeenCalledWith("/groups/77/musics");
   });
 
-  it("submits FormData via useSubmit with multipart options", async () => {
+  it("create submit: calls groupService.addMusic, uploads file, confirms upload, shows success and navigates to returnTo", async () => {
     render(<MusicAdd />);
 
     const user = userEvent.setup();
-
-    await user.type(screen.getByLabelText("Nome"), "Song X");
-    await user.type(screen.getByLabelText("Álbum"), "Album Y");
 
     const fileInput = screen.getByTestId("file-input") as HTMLInputElement;
     const file = new File(["abc"], "song.mp3", { type: "audio/mpeg" });
@@ -173,162 +215,7 @@ describe("<MusicAdd />", () => {
 
     await user.click(screen.getByRole("button", { name: "Cadastrar música" }));
 
-    expect(submitMock).toHaveBeenCalledTimes(1);
-
-    const [fd, options] = submitMock.mock.calls[0];
-
-    expect(options).toEqual({
-      method: "post",
-      encType: "multipart/form-data",
-    });
-
-    expect(fd).toBeInstanceOf(FormData);
-    expect((fd as FormData).get("name")).toBe("Song X");
-    expect((fd as FormData).get("description")).toBe("Album Y");
-    expect((fd as FormData).has("file")).toBe(true);
-  });
-});
-
-describe("MusicAdd.action", () => {
-  beforeEach(() => {
-    vi.clearAllMocks();
-  });
-
-  it("create: calls groupService.addMusic, uploads file, confirms, shows toast and redirects", async () => {
-    const fd = new FormData();
-    fd.set("name", "Song X");
-    fd.set("description", "Album Y");
-
-    const file = new File(["abc"], "song.mp3", { type: "audio/mpeg" });
-    fd.set("file", file);
-
-    (groupService.addMusic as any).mockResolvedValueOnce({
-      id: 99,
-      uploadUrl: "https://upload.example/signed",
-    });
-
-    const request = { formData: async () => fd } as any;
-
-    const result = await action({ request, params: { id: "10" } } as any);
-
     expect(groupService.addMusic).toHaveBeenCalledTimes(1);
-    expect(groupService.addMusic).toHaveBeenCalledWith(10, {
-      name: "Song X",
-      description: "Album Y",
-      file: "song.mp3",
-      groupId: 10,
-    });
-
-    expect(musicService.update).not.toHaveBeenCalled();
-
-    expect(musicService.uploadFile).toHaveBeenCalledWith(
-      "https://upload.example/signed",
-      file
-    );
-
-    expect(musicService.confirmFileUpload).toHaveBeenCalledWith(99);
-
-    expect(toastSuccessMock).toHaveBeenCalledWith(
-      "Música cadastrada com sucesso!"
-    );
-
-    expect(result).toBeInstanceOf(Response);
-    expect(result.status).toBe(302);
-
-    // matches current implementation
-    expect(result.headers.get("Location")).toBe("/groups/1/musics");
-  });
-
-  it("edit: calls musicService.update, uploads file, confirms, shows toast and redirects", async () => {
-    const fd = new FormData();
-    fd.set("name", "Song X");
-    fd.set("description", "Album Y");
-
-    const file = new File(["abc"], "song.mp3", { type: "audio/mpeg" });
-    fd.set("file", file);
-
-    (musicService.update as any).mockResolvedValueOnce({
-      id: 55,
-      uploadUrl: "https://upload.example/update-signed",
-    });
-
-    const request = { formData: async () => fd } as any;
-
-    const result = await action({
-      request,
-      params: { id: "10", musicId: "55" },
-    } as any);
-
-    expect(musicService.update).toHaveBeenCalledTimes(1);
-    expect(musicService.update).toHaveBeenCalledWith(55, {
-      name: "Song X",
-      description: "Album Y",
-      file: "song.mp3",
-      groupId: 10,
-    });
-
-    expect(groupService.addMusic).not.toHaveBeenCalled();
-
-    expect(musicService.uploadFile).toHaveBeenCalledWith(
-      "https://upload.example/update-signed",
-      file
-    );
-
-    expect(musicService.confirmFileUpload).toHaveBeenCalledWith(55);
-
-    expect(toastSuccessMock).toHaveBeenCalledWith(
-      "Música atualizada com sucesso!"
-    );
-
-    expect(result).toBeInstanceOf(Response);
-    expect(result.status).toBe(302);
-    expect(result.headers.get("Location")).toBe("/groups/1/musics");
-  });
-
-  it("does not upload/confirm when file is empty", async () => {
-    const fd = new FormData();
-    fd.set("name", "Song X");
-    fd.set("description", "Album Y");
-
-    const emptyFile = new File([], "empty.mp3", { type: "audio/mpeg" });
-    fd.set("file", emptyFile);
-
-    (groupService.addMusic as any).mockResolvedValueOnce({
-      id: 99,
-      uploadUrl: "https://upload.example/signed",
-    });
-
-    const request = { formData: async () => fd } as any;
-
-    const result = await action({ request, params: { id: "10" } } as any);
-
-    expect(groupService.addMusic).toHaveBeenCalledTimes(1);
-    expect(musicService.uploadFile).not.toHaveBeenCalled();
-    expect(musicService.confirmFileUpload).not.toHaveBeenCalled();
-
-    expect(toastSuccessMock).toHaveBeenCalledWith(
-      "Música cadastrada com sucesso!"
-    );
-
-    expect(result).toBeInstanceOf(Response);
-    expect(result.status).toBe(302);
-    expect(result.headers.get("Location")).toBe("/groups/1/musics");
-  });
-
-  it("does not throw when file is missing; saves with empty file field", async () => {
-    const fd = new FormData();
-    fd.set("name", "Song X");
-    fd.set("description", "Album Y");
-
-    (groupService.addMusic as any).mockResolvedValueOnce({
-      id: 99,
-      uploadUrl: "https://upload.example/signed",
-    });
-
-    const request = { formData: async () => fd } as any;
-
-    const result = await action({ request, params: { id: "10" } } as any);
-
     expect(groupService.addMusic).toHaveBeenCalledWith(10, {
       name: "Song X",
       description: "Album Y",
@@ -336,73 +223,97 @@ describe("MusicAdd.action", () => {
       groupId: 10,
     });
 
+    expect(musicService.update).not.toHaveBeenCalled();
+
     expect(musicService.uploadFile).not.toHaveBeenCalled();
     expect(musicService.confirmFileUpload).not.toHaveBeenCalled();
 
-    expect(result).toBeInstanceOf(Response);
-    expect(result.status).toBe(302);
+    expect(toastSuccessMock).toHaveBeenCalledWith(
+      "Música cadastrada com sucesso!"
+    );
+    expect(navigateMock).toHaveBeenCalledWith("/groups/10/musics");
   });
 
-  it("returns error when create throws { status: 401 }", async () => {
-    const fd = new FormData();
-    fd.set("name", "Song X");
-    fd.set("description", "Album Y");
+  it("edit submit: calls musicService.update, uploads file, confirms upload, shows success and navigates to returnTo", async () => {
+    loaderMusicValue = {
+      id: 55,
+      name: "Old Song",
+      description: "Old Album",
+    };
+    paramsValue = { id: "10", musicId: "55" };
 
+    render(<MusicAdd />);
+
+    const user = userEvent.setup();
+
+    const fileInput = screen.getByTestId("file-input") as HTMLInputElement;
     const file = new File(["abc"], "song.mp3", { type: "audio/mpeg" });
-    fd.set("file", file);
+    await user.upload(fileInput, file);
 
+    await user.click(screen.getByRole("button", { name: "Salvar alterações" }));
+
+    expect(musicService.update).toHaveBeenCalledTimes(1);
+    expect(musicService.update).toHaveBeenCalledWith(55, {
+      name: "Song X",
+      description: "Album Y",
+      file: "",
+      groupId: 10,
+    });
+
+    expect(groupService.addMusic).not.toHaveBeenCalled();
+    
+    expect(musicService.uploadFile).not.toHaveBeenCalled();
+    expect(musicService.confirmFileUpload).not.toHaveBeenCalled();
+
+    expect(toastSuccessMock).toHaveBeenCalledWith(
+      "Música atualizada com sucesso!"
+    );
+    expect(navigateMock).toHaveBeenCalledWith("/groups/10/musics");
+  });
+
+  it("does not upload/confirm when file is empty", async () => {
+    render(<MusicAdd />);
+
+    const user = userEvent.setup();
+
+    await user.click(screen.getByRole("button", { name: "Cadastrar música" }));
+
+    expect(groupService.addMusic).toHaveBeenCalledTimes(1);
+    expect(musicService.uploadFile).not.toHaveBeenCalled();
+    expect(musicService.confirmFileUpload).not.toHaveBeenCalled();
+
+    expect(toastSuccessMock).toHaveBeenCalledWith(
+      "Música cadastrada com sucesso!"
+    );
+    expect(navigateMock).toHaveBeenCalledWith("/groups/10/musics");
+  });
+
+  it("401 error: does not show generic error toast and does not navigate", async () => {
     (groupService.addMusic as any).mockRejectedValueOnce({ status: 401 });
 
-    const request = { formData: async () => fd } as any;
+    render(<MusicAdd />);
 
-    const result = await action({ request, params: { id: "10" } } as any);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Cadastrar música" }));
 
-    expect(result).toEqual({ status: 401 });
     expect(toastSuccessMock).not.toHaveBeenCalled();
     expect(toastErrorMock).not.toHaveBeenCalled();
+    expect(navigateMock).not.toHaveBeenCalled();
   });
 
-  it("returns error when update throws { status: 401 }", async () => {
-    const fd = new FormData();
-    fd.set("name", "Song X");
-    fd.set("description", "Album Y");
-
-    const file = new File(["abc"], "song.mp3", { type: "audio/mpeg" });
-    fd.set("file", file);
-
-    (musicService.update as any).mockRejectedValueOnce({ status: 401 });
-
-    const request = { formData: async () => fd } as any;
-
-    const result = await action({
-      request,
-      params: { id: "10", musicId: "55" },
-    } as any);
-
-    expect(result).toEqual({ status: 401 });
-    expect(toastSuccessMock).not.toHaveBeenCalled();
-    expect(toastErrorMock).not.toHaveBeenCalled();
-  });
-
-  it("non-401 error: shows error toast and returns null", async () => {
-    const fd = new FormData();
-    fd.set("name", "Song X");
-    fd.set("description", "Album Y");
-
-    const file = new File(["abc"], "song.mp3", { type: "audio/mpeg" });
-    fd.set("file", file);
-
+  it("non-401 error: shows generic error toast and does not navigate", async () => {
     (groupService.addMusic as any).mockRejectedValueOnce({ status: 500 });
 
-    const request = { formData: async () => fd } as any;
+    render(<MusicAdd />);
 
-    const result = await action({ request, params: { id: "10" } } as any);
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "Cadastrar música" }));
 
-    expect(result).toBeNull();
     expect(toastSuccessMock).not.toHaveBeenCalled();
     expect(toastErrorMock).toHaveBeenCalledWith(
       "Não foi possível salvar a música."
     );
+    expect(navigateMock).not.toHaveBeenCalled();
   });
 });
 

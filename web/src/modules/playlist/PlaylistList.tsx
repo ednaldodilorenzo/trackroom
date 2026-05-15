@@ -4,6 +4,7 @@ import groupService from "../group/group.service";
 import type { Playlist } from "@/model/Playlist";
 import FallbackOverlay from "@/components/fallbackoverlay/FallBackOverlay";
 import type { Page } from "@/model/Page";
+import { useHeaderConfig } from "@/hooks/useHeaderConfig";
 
 export default function PlaylistList() {
   const [query, setQuery] = useState("");
@@ -12,9 +13,17 @@ export default function PlaylistList() {
   const { id: groupId } = useParams();
   const { playlists } = useLoaderData<{ playlists: Page<Playlist> }>();
 
+  useHeaderConfig({
+    backButtonLink: `/groups/${groupId}/home`,
+  }, false);
+
   function handleCreatePlaylist() {
     // React Router example:
-    navigate(`/groups/${groupId}/playlists/add`);
+    navigate(`/groups/${groupId}/playlists/add`, {
+      state: {
+        returnTo: `/groups/${groupId}/playlists`,
+      },
+    });
   }
 
   function handleOpenPlaylist(playlistId: number) {

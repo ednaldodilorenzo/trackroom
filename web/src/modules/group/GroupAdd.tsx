@@ -142,7 +142,7 @@ export default function GroupAdd() {
           <button
             type="button"
             onClick={handleCancel}
-            className="h-12 px-5 rounded-2xl font-bold border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition"
+            className="h-12 px-5 rounded-2xl cursor-pointer font-bold border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 transition"
           >
             Cancelar
           </button>
@@ -151,7 +151,7 @@ export default function GroupAdd() {
             type="submit"
             disabled={!isValid || isSubmitting}
             className={`flex-1 h-12 rounded-2xl font-bold transition ${isValid && !isSubmitting
-              ? "bg-violet-700 text-white shadow-md hover:bg-violet-800"
+              ? "bg-violet-700 cursor-pointer text-white shadow-md hover:bg-violet-800"
               : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
           >
@@ -169,8 +169,7 @@ export default function GroupAdd() {
 
 export async function action({ request }: ActionFunctionArgs) {
   const data = await request.formData();
-  const groupId = data.get("id")?.toString() || null;
-  console.log("groupId", typeof groupId);
+  const groupId = data.get("id")?.toString() || null;  
 
   const payload: Group = {
     id: groupId ?? undefined,

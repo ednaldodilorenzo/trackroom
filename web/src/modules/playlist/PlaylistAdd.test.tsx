@@ -6,11 +6,21 @@ import PlaylistAdd, { action } from "./PlaylistAdd";
 import groupService from "../group/group.service";
 
 // -------------------- mocks --------------------
-const submitMock = vi.fn();
+let isValidValue = true;
+let locationValue: any = {
+    state: {
+        returnTo: "/groups/10/playlists",
+    },
+};
 const toastSuccessMock = vi.fn();
 const toastErrorMock = vi.fn();
+const headerConfigMock = vi.fn();
+const submitMock = vi.fn();
 
-let isValidValue = true;
+vi.mock("@/hooks/useHeaderConfig", () => ({
+    useHeaderConfig: (...args: any[]) => headerConfigMock(...args),
+}));
+
 
 vi.mock("react-hook-form", () => ({
     useForm: () => ({
@@ -36,6 +46,7 @@ vi.mock("react-router-dom", async () => {
 
     return {
         ...actual,
+        useLocation: () => locationValue,
         useSubmit: () => submitMock,
     };
 });

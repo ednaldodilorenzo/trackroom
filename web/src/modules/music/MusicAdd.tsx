@@ -3,9 +3,9 @@ import {
   Await,
   redirect,
   useLoaderData,
+  useLocation,
   useNavigate,
   useParams,
-  useSubmit,
   type ActionFunctionArgs,
   type LoaderFunctionArgs,
 } from "react-router-dom";
@@ -18,6 +18,7 @@ import { FallbackOverlay, TextField } from "@/components";
 import type { Music } from "@/model";
 import { musicService } from "./music.service";
 import groupService from "../group/group.service";
+import { useHeaderConfig } from "@/hooks/useHeaderConfig";
 
 const schema = yup
   .object({
@@ -32,10 +33,8 @@ type MusicAddLoaderData = {
   music: Promise<Music | null>;
 };
 
-function MusicForm({ loadedMusic }: { loadedMusic: Music | null }) {
-  const submit = useSubmit();
-  const { id } = useParams();
-  const navigate = useNavigate();
+function MusicForm({ loadedMusic, handleCancel, onSubmit }: { loadedMusic: Music | null, handleCancel: () => void, onSubmit: (formPayload: FormData, event?: React.BaseSyntheticEvent) => void }) {
+  // const submit = useSubmit();
 
   const isEditing = Boolean(loadedMusic?.id);
 
@@ -56,22 +55,6 @@ function MusicForm({ loadedMusic }: { loadedMusic: Music | null }) {
         description: "",
       },
   });
-
-  function handleCancel() {
-    navigate(`/groups/${id}/musics`);
-  }
-
-  function onSubmit(_: FormData, event?: React.BaseSyntheticEvent) {
-    const form = event?.target as HTMLFormElement | undefined;
-    if (!form) return;
-
-    const formData = new FormData(form);
-
-    submit(formData, {
-      method: "post",
-      encType: "multipart/form-data",
-    });
-  }
 
   return (
     <form
@@ -137,8 +120,8 @@ function MusicForm({ loadedMusic }: { loadedMusic: Music | null }) {
             type="submit"
             disabled={!isValid || isSubmitting}
             className={`flex-1 h-12 rounded-2xl font-bold cursor-pointer transition ${isValid && !isSubmitting
-                ? "bg-violet-700 text-white shadow-md hover:bg-violet-800"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+              ? "bg-violet-700 text-white shadow-md hover:bg-violet-800"
+              : "bg-gray-200 text-gray-400 cursor-not-allowed"
               }`}
           >
             {isEditing ? "Salvar alterações" : "Cadastrar música"}
@@ -152,52 +135,104 @@ function MusicForm({ loadedMusic }: { loadedMusic: Music | null }) {
 export default function MusicAdd() {
   const { music } = useLoaderData() as MusicAddLoaderData;
 
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { id, musicId } = useParams();
+
+  const returnTo = location.state?.returnTo ?? "";
+
+  function handleCancel() {
+    navigate(returnTo);
+  }
+
+  async function handleSubmit(formPayload: FormData, event?: React.BaseSyntheticEvent) {
+    const form = event?.target as HTMLFormElement | undefined;
+    if (!form) return;
+    const formData = new FormData(form);
+
+    const payload: Music = {
+      name: formPayload.name,
+      description: formPayload.description,
+      file: formData.get("file") instanceof File ? (formData.get("file") as File).name : "",
+      groupId: Number(id),
+    };
+
+    const fileEntry = formData.get("file");
+    const hasValidFile = fileEntry instanceof File && fileEntry.size > 0;
+
+    try {
+      const musicResp = musicId
+        ? await musicService.update(Number(musicId), payload)
+        : await groupService.addMusic(Number(id), payload);
+
+      if (hasValidFile) {
+        await musicService.uploadFile(musicResp.uploadUrl, fileEntry);
+        await musicService.confirmFileUpload(musicResp.id);
+      }
+
+      toast.success(
+        musicId ? "Música atualizada com sucesso!" : "Música cadastrada com sucesso!"
+      );
+      navigate(returnTo);
+    } catch (err: any) {
+      if (err?.status === 401) {
+        return err;
+      }
+
+      toast.error("Não foi possível salvar a música.");
+    }
+  }
+
+  useHeaderConfig({
+    backButtonLink: returnTo,
+  }, false);
+
   return (
     <Suspense fallback={<FallbackOverlay />}>
-      <Await resolve={music}>{(loadedMusic) => <MusicForm loadedMusic={loadedMusic} />}</Await>
+      <Await resolve={music}>{(loadedMusic) => <MusicForm onSubmit={handleSubmit} handleCancel={handleCancel} loadedMusic={loadedMusic} />}</Await>
     </Suspense>
   );
 }
 
-export async function action({ request, params }: ActionFunctionArgs) {
-  const data = await request.formData();
-  const groupId = Number(params.id);
-  const musicId = params.musicId ? Number(params.musicId) : null;
+// export async function action({ request, params }: ActionFunctionArgs) {
+//   const data = await request.formData();
+//   const groupId = Number(params.id);
+//   const musicId = params.musicId ? Number(params.musicId) : null;
 
-  const payload: Music = {
-    name: data.get("name")?.toString() ?? "",
-    description: data.get("description")?.toString() ?? "",
-    file: data.get("file") instanceof File ? (data.get("file") as File).name : "",
-    groupId,
-  };
+//   const payload: Music = {
+//     name: data.get("name")?.toString() ?? "",
+//     description: data.get("description")?.toString() ?? "",
+//     file: data.get("file") instanceof File ? (data.get("file") as File).name : "",
+//     groupId,
+//   };
 
-  const fileEntry = data.get("file");
-  const hasValidFile = fileEntry instanceof File && fileEntry.size > 0;
+//   const fileEntry = data.get("file");
+//   const hasValidFile = fileEntry instanceof File && fileEntry.size > 0;
 
-  try {
-    const musicResp = musicId
-      ? await musicService.update(musicId, payload)
-      : await groupService.addMusic(groupId, payload);
+//   try {
+//     const musicResp = musicId
+//       ? await musicService.update(musicId, payload)
+//       : await groupService.addMusic(groupId, payload);
 
-    if (hasValidFile) {
-      await musicService.uploadFile(musicResp.uploadUrl, fileEntry);
-      await musicService.confirmFileUpload(musicResp.id);
-    }
+//     if (hasValidFile) {
+//       await musicService.uploadFile(musicResp.uploadUrl, fileEntry);
+//       await musicService.confirmFileUpload(musicResp.id);
+//     }
 
-    toast.success(
-      musicId ? "Música atualizada com sucesso!" : "Música cadastrada com sucesso!"
-    );
+//     toast.success(
+//       musicId ? "Música atualizada com sucesso!" : "Música cadastrada com sucesso!"
+//     );
 
-    return redirect("/groups/1/musics");
-  } catch (err: any) {
-    if (err?.status === 401) {
-      return err;
-    }
+//     return redirect("/groups/1/musics");
+//   } catch (err: any) {
+//     if (err?.status === 401) {
+//       return err;
+//     }
 
-    toast.error("Não foi possível salvar a música.");
-    return null;
-  }
-}
+//     toast.error("Não foi possível salvar a música.");
+//     return null;
+//   }
+// }
 
 export async function load({ params }: LoaderFunctionArgs): Promise<MusicAddLoaderData> {
   const musicId = params.musicId;

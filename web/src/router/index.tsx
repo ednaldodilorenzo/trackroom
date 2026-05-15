@@ -116,10 +116,6 @@ export const router = createBrowserRouter(
             {
               path: "musics/add",
               element: <MusicAdd />,
-              action: async (args) => {
-                const mod = await import("@/modules/music/MusicAdd");
-                return mod.action(args);
-              },
               loader: async (args) => {
                 const mod = await import("@/modules/music/MusicAdd");
                 return mod.load(args);
@@ -128,10 +124,6 @@ export const router = createBrowserRouter(
             {
               path: "musics/:musicId",
               element: <MusicAdd />,
-              action: async (args) => {
-                const mod = await import("@/modules/music/MusicAdd");
-                return mod.action(args);
-              },
               loader: async (args) => {
                 const mod = await import("@/modules/music/MusicAdd");
                 return mod.load(args);

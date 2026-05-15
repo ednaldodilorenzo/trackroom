@@ -6,9 +6,14 @@ import PlaylistList, { loader } from "./PlaylistList";
 import groupService from "../group/group.service";
 
 const navigateMock = vi.fn();
+const headerConfigMock = vi.fn();
 
 let paramsValue: any = { id: "10" };
 let loaderPlaylistsValue: any = { content: [] };
+
+vi.mock("@/hooks/useHeaderConfig", () => ({
+    useHeaderConfig: (...args: any[]) => headerConfigMock(...args),
+}));
 
 vi.mock("react-router-dom", async () => {
     const actual = await vi.importActual<typeof import("react-router-dom")>(
@@ -17,7 +22,7 @@ vi.mock("react-router-dom", async () => {
 
     return {
         ...actual,
-        useNavigate: () => navigateMock,
+        useNavigate: () => (...args: any[]) => navigateMock(...args),
         useParams: () => paramsValue,
         useLoaderData: () => ({ playlists: loaderPlaylistsValue }),
         Await: ({ resolve, children }: any) => {
@@ -66,7 +71,11 @@ describe("<PlaylistList />", () => {
         await user.click(screen.getByRole("button", { name: "+ Nova playlist" }));
 
         expect(navigateMock).toHaveBeenCalledTimes(1);
-        expect(navigateMock).toHaveBeenCalledWith("/groups/77/playlists/add");
+        expect(navigateMock).toHaveBeenCalledWith("/groups/77/playlists/add", {
+            state: {
+                returnTo: "/groups/77/playlists",
+            },
+        });
     });
 
     it("renders empty state when there are no playlists", () => {
@@ -100,7 +109,11 @@ describe("<PlaylistList />", () => {
         );
 
         expect(navigateMock).toHaveBeenCalledTimes(1);
-        expect(navigateMock).toHaveBeenCalledWith("/groups/55/playlists/add");
+        expect(navigateMock).toHaveBeenCalledWith("/groups/55/playlists/add", {
+            state: {
+                returnTo: "/groups/55/playlists",
+            },
+        });
     });
 
     it("renders playlists list when content is not empty", () => {
@@ -176,6 +189,20 @@ describe("<PlaylistList />", () => {
 
         expect(screen.queryByText("Louvor Domingo")).not.toBeInTheDocument();
         expect(screen.queryByText("Vigília")).not.toBeInTheDocument();
+    });
+
+    it("calls useHeaderConfig with backButtonLink and resetOnUnmount=false", () => {
+        paramsValue = { id: "10" };
+
+        render(<PlaylistList />);
+
+        expect(headerConfigMock).toHaveBeenCalledTimes(1);
+        expect(headerConfigMock).toHaveBeenCalledWith(
+            {
+                backButtonLink: "/groups/10/home",
+            },
+            false
+        );
     });
 });
 

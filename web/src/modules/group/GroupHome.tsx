@@ -48,11 +48,19 @@ export default function GroupHome() {
   }
 
   function goToCreatePlaylist() {
-    navigate(`/groups/${id}/playlists/add`);
+    navigate(`/groups/${id}/playlists/add`, {
+      state: {
+        returnTo: `/groups/${id}/home`,
+      },
+    });
   }
 
   function goToAddMusic() {
-    navigate(`/groups/${id}/musics/add`);
+    navigate(`/groups/${id}/musics/add`, {
+      state: {
+        returnTo: `/groups/${id}/home`,
+      },
+    });
   }
 
   function goToPlaylist(playlistId: number | string | undefined) {
@@ -226,9 +234,8 @@ function PlaylistRow({
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-center gap-3 px-4 py-4 text-left hover:bg-gray-50 transition ${
-        !isLast ? "border-b border-gray-100" : ""
-      }`}
+      className={`w-full flex items-center gap-3 px-4 py-4 text-left hover:bg-gray-50 transition ${!isLast ? "border-b border-gray-100" : ""
+        }`}
     >
       <div className="w-11 h-11 rounded-2xl bg-violet-100 text-violet-700 flex items-center justify-center text-xl shrink-0">
         ♫
@@ -260,7 +267,7 @@ function InlineAddAction({
     <button
       type="button"
       onClick={onClick}
-      className="w-full px-4 py-4 border-t border-gray-100 text-violet-700 font-semibold flex items-center justify-center gap-2 hover:bg-violet-50 transition"
+      className="w-full cursor-pointer px-4 py-4 border-t border-gray-100 text-violet-700 font-semibold flex items-center justify-center gap-2 hover:bg-violet-50 transition"
     >
       <span className="w-8 h-8 rounded-xl bg-violet-100 flex items-center justify-center">
         <BiPlus size={22} />

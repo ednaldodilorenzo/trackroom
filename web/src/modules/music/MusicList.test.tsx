@@ -9,10 +9,15 @@ import groupService from "@/modules/group/group.service";
 const navigateMock = vi.fn();
 const setCurrentTrackMock = vi.fn();
 const setIsPlayingMock = vi.fn();
+const headerConfigMock = vi.fn();
 
 let loaderMusicsValue: any = { content: [] };
 let paramsIdValue = "10";
 let currentGroupValue: any = { isAdmin: false };
+
+vi.mock("@/hooks/useHeaderConfig", () => ({
+  useHeaderConfig: (...args: any[]) => headerConfigMock(...args),
+}));
 
 vi.mock("react-router-dom", async () => {
   const actual = await vi.importActual<typeof import("react-router-dom")>(
@@ -141,7 +146,11 @@ describe("<MusicList />", () => {
     const user = userEvent.setup();
     await user.click(screen.getByRole("button", { name: /Adicionar música/i }));
 
-    expect(navigateMock).toHaveBeenCalledWith("/groups/123/musics/add");
+    expect(navigateMock).toHaveBeenCalledWith("/groups/123/musics/add", {
+      state: {
+        returnTo: "/groups/123/musics",
+      },
+    });
   });
 
   it("does not render empty-state action for non-admin", () => {
@@ -248,7 +257,11 @@ describe("<MusicList />", () => {
     await user.click(screen.getByRole("button", { name: /Adicionar/i }));
 
     expect(navigateMock).toHaveBeenCalledTimes(1);
-    expect(navigateMock).toHaveBeenCalledWith("/groups/123/musics/add");
+    expect(navigateMock).toHaveBeenCalledWith("/groups/123/musics/add", {
+      state: {
+        returnTo: "/groups/123/musics",
+      },
+    });
   });
 
   it("does not show header 'Adicionar' button for non-admin", () => {

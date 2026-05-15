@@ -22,6 +22,7 @@ import {
 import { useGroupContext } from "../group/GroupContext";
 import TrackList from "./track/TraskList";
 import "./MusicList.css";
+import { useHeaderConfig } from "@/hooks/useHeaderConfig";
 
 type MusicListLoaderData = {
   musics: Promise<Page<Music>>;
@@ -36,6 +37,10 @@ export default function MusicList() {
   const [search, setSearch] = useState("");
 
   const isAdmin = Boolean(currentGroup?.isAdmin);
+
+  useHeaderConfig({
+    backButtonLink: `/groups/${id}/home`,
+  }, false);
 
   async function handlePlay(music: Music) {
     const url = await musicService.getFileUrl(music.id!!);
@@ -52,7 +57,11 @@ export default function MusicList() {
   }
 
   function goToAddMusic() {
-    navigate(`/groups/${id}/musics/add`);
+    navigate(`/groups/${id}/musics/add`, {
+      state: {
+        returnTo: `/groups/${id}/musics`,
+      },
+    });
   }
 
   return (

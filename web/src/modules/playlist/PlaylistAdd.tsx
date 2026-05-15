@@ -1,14 +1,15 @@
 import { useForm } from "react-hook-form";
-import { redirect, useSubmit, type ActionFunctionArgs } from "react-router-dom";
+import { redirect, useLocation, useSubmit, type ActionFunctionArgs } from "react-router-dom";
 import groupService from "../group/group.service";
 import type { Playlist } from "@/model/Playlist";
 import toast from "react-hot-toast";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { TextField } from "@/components";
+import { useHeaderConfig } from "@/hooks/useHeaderConfig";
 
 const schema = yup.object().shape({
-  title: yup.string().required("Informe o nome da playlist").min(3, "Mínimo de 3 caracteres"),  
+  title: yup.string().required("Informe o nome da playlist").min(3, "Mínimo de 3 caracteres"),
 });
 
 export default function PlaylistAdd() {
@@ -18,8 +19,15 @@ export default function PlaylistAdd() {
     formState: { isValid },
   } = useForm({
     resolver: yupResolver(schema),
-    mode: "onChange",    
+    mode: "onChange",
   });
+  const location = useLocation();
+
+  const returnTo = location.state?.returnTo ?? "";
+
+  useHeaderConfig({
+    backButtonLink: returnTo,    
+  }, false);
 
   const submit = useSubmit();
 
@@ -30,7 +38,7 @@ export default function PlaylistAdd() {
           <h2 className="font-bold text-lg mb-4">Informações</h2>
 
           <div className="mb-4">
-            <TextField data-testid="field-title" name="title" label="Nome da playlist" control={control} />            
+            <TextField data-testid="field-title" name="title" label="Nome da playlist" control={control} />
           </div>
 
           <div>
@@ -41,7 +49,7 @@ export default function PlaylistAdd() {
             <textarea
               rows={3}
               placeholder="Ex: Músicas para momento de adoração"
-              className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none resize-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"              
+              className="w-full rounded-xl border border-gray-300 px-4 py-3 outline-none resize-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
             />
           </div>
         </section>
@@ -79,7 +87,7 @@ export async function action({ request, params }: ActionFunctionArgs) {
   try {
     await groupService.addPlaylist(parseInt(groupId!!), payload);
     toast.success("Playlist criada com sucesso!");
-  } catch(err: any) {
+  } catch (err: any) {
     if (err.status === 401) {
       return err;
     }
