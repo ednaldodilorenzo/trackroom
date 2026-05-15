@@ -65,6 +65,6 @@ class AzureFileStorage(
 
     override fun deleteFile(bucketName: String, fileName: String) {
         val blobClient = blobServiceClient.getBlobContainerClient(bucketName).getBlobClient(fileName)
-        blobClient.delete()
+        blobClient.deleteIfExists()
     }
 }
