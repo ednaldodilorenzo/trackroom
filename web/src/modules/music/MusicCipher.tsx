@@ -15,11 +15,13 @@ import { musicService } from "./music.service";
 import { FallbackOverlay } from "@/components";
 import type { MusicMetaData } from "@/model";
 import CipherContent from "./CipherContent";
+import { useWakeLock } from "@/hooks/useWakeLock";
 
 export default function MusicCipher() {
   const [toggleEditMode, setToggleEditMode] = useState(false);
   const { id } = useParams();
   const navigate = useNavigate();
+  useWakeLock(true);
 
   const { musicMetaData } = useLoaderData<{ musicMetaData: MusicMetaData }>();
 
