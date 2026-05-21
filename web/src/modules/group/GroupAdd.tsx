@@ -88,7 +88,8 @@ export default function GroupAdd() {
       toast.success("Grupo cadastrado com sucesso!");
       navigate("/");
     } catch (err: any) {
-      if (err?.status === 401) {
+      console.log(err);
+      if (err?.status === 500) {
         return err;
       }
 

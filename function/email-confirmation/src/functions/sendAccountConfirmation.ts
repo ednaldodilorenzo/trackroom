@@ -75,7 +75,7 @@ async function sendPasswordReset(
 }
 
 app.storageQueue("sendAccountConfirmation", {
-    queueName: "account-confirmation",
+    queueName: "email-confirmation",
     connection: "QUEUE_STORAGE_CONNECTION",
     handler: sendAccountConfirmation,
 });
