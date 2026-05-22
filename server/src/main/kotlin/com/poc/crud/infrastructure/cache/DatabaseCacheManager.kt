@@ -21,7 +21,7 @@ class DatabaseCacheManager(val otpDao: ConfirmationOtpDao) : CacheManager {
         val otp = otpDao.findById(key).orElse(null) ?: return ""
         val now = Instant.now()
 
-        if (otp.expiresAt != null && otp.expiresAt!!.isAfter(now)) {
+        if (otp.expiresAt != null && otp.expiresAt!!.isBefore(now)) {
             logger?.debug(
                 "Try to get an expired key from cache Manager, now {}, expired at {}, removing from cache...",
                 now,

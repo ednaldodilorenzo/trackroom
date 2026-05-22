@@ -13,6 +13,7 @@ import com.poc.crud.modules.auth.dto.SignupRequestDTO
 import com.poc.crud.repository.UserRepository
 import io.jsonwebtoken.JwtException
 import jakarta.transaction.Transactional
+import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
@@ -28,6 +29,9 @@ class AuthServiceImpl(
     private val passwordResetPublisher: PasswordResetPublisher,
     @param:Qualifier("database") private val cacheManager: CacheManager
 ) : AuthService {
+    companion object {
+        private val logger = LoggerFactory.getLogger(AuthServiceImpl::class.java)
+    }
 
     @Transactional
     override fun executeSignup(signupRequestDTO: SignupRequestDTO) {
@@ -73,6 +77,7 @@ class AuthServiceImpl(
         val jwt = tokenService.createValidationToken(signupRequestDTO.email.address)
         val code = (SecureRandom().nextInt(900000) + 100000).toString()
         cacheManager.putValueWithExpiration("signup:${signupRequestDTO.email}", code, 10 * 60)
+        logger.debug("Sending email to ${signupRequestDTO.email} with code $code and token $jwt")
         accountConfirmationEmailNotification.publish(
             signupRequestDTO.email.address, jwt, code
         )
