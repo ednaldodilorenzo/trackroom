@@ -23,7 +23,14 @@ spring:
 
 logging:
   level:
-    org.springframework.security: DEBUG
+    root: WARN
+    # Only log security errors (failed auths, access denied)
+    org.springframework.security: WARN
+    # Only log unhandled exceptions and 5xx errors
+    org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver: ERROR
+    org.springframework.boot.web.servlet.error.DefaultErrorAttributes: ERROR
+    # Your app at INFO so you still see business-level logs
+    com.poc.crud: INFO
 
 server:
   servlet:
