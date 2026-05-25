@@ -7,7 +7,6 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.authentication.AuthenticationManager
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider
-import org.springframework.security.config.Customizer
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
@@ -39,7 +38,7 @@ class SecurityConfig(
 
     @Bean
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
-        http.cors(Customizer.withDefaults()).csrf { it.disable() }.formLogin { it.disable() }.httpBasic { it.disable() }
+        http.cors{ }.csrf { it.disable() }.formLogin { it.disable() }.httpBasic { it.disable() }
             .logout { it.disable() }.sessionManagement { it.sessionCreationPolicy(SessionCreationPolicy.STATELESS) }
             .authorizeHttpRequests {
                 it.requestMatchers("/auth/**").permitAll().anyRequest().authenticated()
@@ -56,9 +55,9 @@ class SecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val origins = this.allowedOrigins.split(",")
         val configuration = CorsConfiguration().apply {
-            allowedOrigins = origins
+            allowedOrigins = listOf("https://gentle-pond-0c4fb600f.6.azurestaticapps.net")
             allowedMethods = listOf("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS")
-            allowedHeaders = listOf("Authorization", "Cache-Control", "Content-Type")
+            allowedHeaders = listOf("*")
             allowCredentials = true
             maxAge = 3600L
         }

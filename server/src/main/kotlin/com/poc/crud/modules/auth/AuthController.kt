@@ -8,6 +8,7 @@ import com.poc.crud.modules.auth.service.AuthService
 import com.poc.crud.modules.user.service.UserService
 import jakarta.servlet.http.HttpServletResponse
 import jakarta.validation.Valid
+import org.springframework.http.HttpHeaders
 import org.springframework.http.ResponseCookie
 import org.springframework.http.ResponseEntity
 import org.springframework.security.authentication.AuthenticationManager
@@ -38,7 +39,7 @@ class AuthController(
             ResponseCookie.from("X-Auth", token).httpOnly(true).secure(true) // Set to true in production with HTTPS
                 .path("/").maxAge(3600).sameSite("None") // 1 hour expiration
                 .build()
-        response.addHeader("Set-Cookie", cookie.toString())
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString())
         return ResponseEntity.ok(LoginResponseDTO(authentication.name, token))
     }
 
