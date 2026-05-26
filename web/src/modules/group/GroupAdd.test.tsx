@@ -238,7 +238,7 @@ describe("<GroupAdd />", () => {
     await user.click(screen.getByRole("button", { name: "Criar grupo" }));
 
     expect(toastSuccessMock).not.toHaveBeenCalled();
-    expect(toastErrorMock).not.toHaveBeenCalled();
+    expect(toastErrorMock).toHaveBeenCalled();
     expect(navigateMock).not.toHaveBeenCalled();
   });
 

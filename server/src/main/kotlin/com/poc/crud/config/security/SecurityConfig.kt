@@ -55,7 +55,7 @@ class SecurityConfig(
     fun corsConfigurationSource(): CorsConfigurationSource {
         val origins = this.allowedOrigins.split(",")
         val configuration = CorsConfiguration().apply {
-            allowedOrigins = listOf("https://gentle-pond-0c4fb600f.6.azurestaticapps.net")
+            allowedOrigins = origins
             allowedMethods = listOf("GET", "POST", "PATCH", "PUT", "DELETE", "OPTIONS")
             allowedHeaders = listOf("*")
             allowCredentials = true

@@ -88,11 +88,6 @@ export default function GroupAdd() {
       toast.success("Grupo cadastrado com sucesso!");
       navigate("/");
     } catch (err: any) {
-      console.log(err);
-      if (err?.status === 500) {
-        return err;
-      }
-
       toast.error("Não foi possível salvar o grupo.");
     }
   }
