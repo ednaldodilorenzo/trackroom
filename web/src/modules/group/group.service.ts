@@ -62,7 +62,10 @@ class GroupService extends Requester {
     this.put<void, { musicIds: number[] }>({ musicIds }, `${groupId}/playlists/${playlistId}/musics`).then(() => { });
 
   patchGroupPlaylist = (groupId: number, playlistId: number, data: Partial<Playlist>) =>
-    this.patch<Playlist, Partial<Playlist>>(data, `/${groupId}/playlists/${playlistId}`).then((resp) => resp.data);  
+    this.patch<Playlist, Partial<Playlist>>(data, `/${groupId}/playlists/${playlistId}`).then((resp) => resp.data);
+
+  deleteGroupPlaylist = (groupId: number, playlistId: number) =>
+    this.delete(`/${groupId}/playlists/${playlistId}`).then((resp) => resp.data);
 }
 
 export default new GroupService(request);

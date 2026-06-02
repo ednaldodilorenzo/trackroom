@@ -5,7 +5,7 @@ import type { Playlist } from "@/model/Playlist";
 import FallbackOverlay from "@/components/fallbackoverlay/FallBackOverlay";
 import type { Page } from "@/model/Page";
 import { useHeaderConfig } from "@/hooks/useHeaderConfig";
-import PlaylistListContent from "./PlaylistListContext";
+import PlaylistListContent from "./PlaylistListContent";
 
 export default function PlaylistList() {
   const [query, setQuery] = useState("");

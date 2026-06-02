@@ -39,7 +39,7 @@ export default function PlaylistListContent({
     function handleToggleStar(playlist: Playlist) {
         const playlistId = playlist.id!;
         const isCurrentlyStarred = Boolean(playlist.starred);
-        //const starredCount = playlistState.filter((item) => item.starred).length;
+
         if (!isCurrentlyStarred && starredCount >= MAX_STARRED_PLAYLISTS) {
             toast.error("Você pode destacar no máximo 5 playlists na tela inicial.");
             return;
@@ -67,6 +67,22 @@ export default function PlaylistListContent({
                 // Revert the optimistic update in case of an error
                 toast.error("Não foi possível atualizar o status da playlist. Tente novamente.");
             });
+    }
+
+    function handleDeletePlaylist(playlist: Playlist) {
+        if (confirm("Tem certeza que deseja excluir esta playlist?")) {
+            groupService.deleteGroupPlaylist(Number(groupId), playlist.id!)
+                .then(() => {
+                    setPlaylistState((current) =>
+                        current.filter((item) => item.id !== playlist.id!)
+                    );
+                    playlist.starred && setStarredCount((current) => current - 1);
+                    toast.success("Playlist apagada com sucesso.");
+                })
+                .catch(() => {
+                    toast.error("Não foi possível deletar a playlist. Tente novamente.");
+                });
+        }
     }
 
     const normalizedQuery = query.trim().toLowerCase();
@@ -121,7 +137,7 @@ export default function PlaylistListContent({
                             </p>
                         </button>
 
-                        <button type="button" className="text-gray-400 cursor-pointer">
+                        <button type="button" className="text-gray-400 cursor-pointer" onClick={() => handleDeletePlaylist(playlist)}>
                             <BsTrash3Fill size={18} />
                         </button>
                     </div>
