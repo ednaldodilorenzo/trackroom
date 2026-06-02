@@ -47,14 +47,6 @@ export default function GroupHome() {
     setIsPlaying(true);
   }
 
-  function goToCreatePlaylist() {
-    navigate(`/groups/${id}/playlists/add`, {
-      state: {
-        returnTo: `/groups/${id}/home`,
-      },
-    });
-  }
-
   function goToAddMusic() {
     navigate(`/groups/${id}/musics/add`, {
       state: {
@@ -72,36 +64,17 @@ export default function GroupHome() {
     <div className="space-y-8 pb-8">
       <section>
         <SectionHeader
-          title="Playlists"
+          title="Playlists em Destaque"
           description="Sequências organizadas para momentos do grupo"
         />
 
         <Suspense fallback={<FallbackOverlay />}>
           <Await resolve={playlists}>
             {(loadedPlaylists: Page<Playlist>) => {
-              const hasPlaylists = loadedPlaylists.content.length > 0;
+              
               const shouldShowViewAll =
                 Number(loadedPlaylists.totalElements ?? 0) > PREVIEW_LIMIT;
               const shouldShowAddPlaylist = isAdmin && !shouldShowViewAll;
-
-              if (!hasPlaylists) {
-                return (
-                  <EmptyState
-                    icon="♬"
-                    title="Nenhuma playlist criada"
-                    description="Crie playlists para organizar músicas por louvor, vigília, missa ou encontro."
-                    action={
-                      isAdmin ? (
-                        <Button onClick={goToCreatePlaylist}>
-                          <span className="inline-flex items-center gap-1">
-                            <BiPlus size={18} /> Criar playlist
-                          </span>
-                        </Button>
-                      ) : null
-                    }
-                  />
-                );
-              }
 
               return (
                 <div className="bg-white rounded-3xl shadow-sm overflow-hidden">
@@ -118,17 +91,10 @@ export default function GroupHome() {
                     />
                   ))}
 
-                  {shouldShowAddPlaylist && (
-                    <InlineAddAction
-                      label="Criar nova playlist"
-                      onClick={goToCreatePlaylist}
-                    />
-                  )}
-
-                  {shouldShowViewAll && (
+                  {(
                     <ViewAllLink
                       to={`/groups/${id}/playlists`}
-                      label="Ver todas as playlists"
+                      label="Gerenciar Playlists"
                     />
                   )}
                 </div>
@@ -321,6 +287,6 @@ export const loader = ({
 
   return {
     musics: groupService.getMusics(id, { page: 0, size: PREVIEW_LIMIT }),
-    playlists: groupService.getPlaylists(id, { page: 0, size: PREVIEW_LIMIT }),
+    playlists: groupService.getPlaylists(id, { page: 0, size: PREVIEW_LIMIT, starred: true }),
   };
 };

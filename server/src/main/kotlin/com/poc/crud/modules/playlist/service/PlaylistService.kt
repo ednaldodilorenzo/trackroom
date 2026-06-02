@@ -8,7 +8,7 @@ import org.springframework.data.domain.Pageable
 interface PlaylistService {
     fun save(groupId: Long, dto: CreatePlaylistReqDTO): CreatePlaylistRespDTO
 
-    fun findGroupPlaylists(groupId: Long, pageable: Pageable): Page<PlaylistMusicCountDto>
+    fun findGroupPlaylists(groupId: Long, starred: Boolean?, pageable: Pageable): Page<PlaylistMusicCountDto>
 
     fun findPlaylistMusics(groupId: Long, playlistId: Long): List<MusicDTO>
 
@@ -19,4 +19,8 @@ interface PlaylistService {
     fun updatePlaylistMusics(
         groupId: Long, playlistId: Long, dto: UpdatePlaylistMusicsDTO
     )
+
+    fun updatePlaylistData(groupId: Long, playlistId: Long, dto: UpdatePlaylistDTO)
+
+    fun deletePlaylist(groupId: Long, playlistId: Long)
 }

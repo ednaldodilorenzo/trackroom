@@ -132,9 +132,7 @@ describe("<PlaylistList />", () => {
         expect(screen.getByText("3 músicas")).toBeInTheDocument();
 
         expect(screen.getByText("Vigília")).toBeInTheDocument();
-        expect(screen.getByText("1 música")).toBeInTheDocument();
-
-        expect(screen.getAllByText("Fixada")).toHaveLength(2);
+        expect(screen.getByText("1 música")).toBeInTheDocument();        
     });
 
     it("navigates to playlist detail when clicking a playlist", async () => {

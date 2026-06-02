@@ -6,11 +6,7 @@ import com.poc.crud.model.Playlist
 import com.poc.crud.model.PlaylistMusicGroup
 import com.poc.crud.model.PlaylistMusicGroupId
 import com.poc.crud.modules.music.dto.MusicDTO
-import com.poc.crud.modules.playlist.dto.CreatePlaylistReqDTO
-import com.poc.crud.modules.playlist.dto.CreatePlaylistRespDTO
-import com.poc.crud.modules.playlist.dto.PlaylistMusicCountDto
-import com.poc.crud.modules.playlist.dto.PlaylistMusicOptionDTO
-import com.poc.crud.modules.playlist.dto.UpdatePlaylistMusicsDTO
+import com.poc.crud.modules.playlist.dto.*
 import com.poc.crud.repository.GroupMusicRepository
 import com.poc.crud.repository.GroupRepository
 import com.poc.crud.repository.MusicRepository
@@ -48,18 +44,20 @@ class PlaylistServiceImpl(
     }
 
     @PreAuthorize("@groupSecurity.hasGroupUserPrivileges(authentication, #p0)")
-    override fun findGroupPlaylists(groupId: Long, pageable: Pageable): Page<PlaylistMusicCountDto> {
+    override fun findGroupPlaylists(groupId: Long, starred: Boolean?, pageable: Pageable): Page<PlaylistMusicCountDto> {
         return if (pageable.isPaged) {
-            this.playlistRepository.findAllByGroupIdWithMusicCount(groupId, pageable)
+            this.playlistRepository.findAllByGroupIdWithMusicCount(groupId, starred, pageable)
         } else {
-            val list = this.playlistRepository.findAllByGroupIdWithMusicCount(groupId)
+            val list = this.playlistRepository.findAllByGroupIdWithMusicCount(groupId, starred)
             PageImpl(list)
         }
     }
 
+    @PreAuthorize("@groupSecurity.hasGroupUserPrivileges(authentication, #p0)")
     override fun findPlaylistMusics(groupId: Long, playlistId: Long): List<MusicDTO> =
         this.musicRepository.findAllByPlaylistIdAndGroupId(groupId, playlistId).map { MusicDTO(it) }
 
+    @PreAuthorize("@groupSecurity.hasGroupUserPrivileges(authentication, #p0)")
     override fun findById(groupId: Long, playlistId: Long): PlaylistMusicCountDto =
         this.playlistRepository.findByIdAndGroup_Id(playlistId, groupId).map { PlaylistMusicCountDto(it.id, it.title) }
             .orElseThrow {
@@ -68,17 +66,18 @@ class PlaylistServiceImpl(
                 )
             }
 
+    @PreAuthorize("@groupSecurity.hasGroupUserPrivileges(authentication, #p0)")
     override fun findPlaylistMusicOptions(
         groupId: Long, playlistId: Long
     ): List<PlaylistMusicOptionDTO> = this.musicRepository.findPlaylistMusicOptions(groupId, playlistId)
 
     @Transactional
+    @PreAuthorize("@groupSecurity.hasGroupAdminPrivileges(authentication, #p0)")
     override fun updatePlaylistMusics(
-        groupId: Long,
-        playlistId: Long,
-        dto: UpdatePlaylistMusicsDTO
+        groupId: Long, playlistId: Long, dto: UpdatePlaylistMusicsDTO
     ) {
-        val playlist = playlistRepository.findByIdAndGroupId(playlistId, groupId).orElseThrow { APIException(ExceptionType.NOT_FOUND, "Playlist") }
+        val playlist = playlistRepository.findByIdAndGroupId(playlistId, groupId)
+            .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Playlist") }
 
         val selectedMusicIds = dto.musicIds
 
@@ -87,9 +86,7 @@ class PlaylistServiceImpl(
             item.groupMusic?.music?.id !in selectedMusicIds
         }
 
-        val currentMusicIds = playlist.items
-            .mapNotNull { it.groupMusic?.music?.id }
-            .toSet()
+        val currentMusicIds = playlist.items.mapNotNull { it.groupMusic?.music?.id }.toSet()
 
         val toAddIds = selectedMusicIds - currentMusicIds
 
@@ -101,12 +98,28 @@ class PlaylistServiceImpl(
                     playlistId = playlistId,
                     musicId = groupMusic.music.id!!,
                     groupId = groupId,
-                ),
-                playlist = playlist,
-                groupMusic = groupMusic
+                ), playlist = playlist, groupMusic = groupMusic
             )
         }
 
         playlist.items.addAll(newItems)
+    }
+
+    @Transactional
+    @PreAuthorize("@groupSecurity.hasGroupAdminPrivileges(authentication, #p0)")
+    override fun updatePlaylistData(groupId: Long, playlistId: Long, dto: UpdatePlaylistDTO) {
+        val playlist = this.playlistRepository.findById(playlistId)
+            .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Playlist") }
+
+        dto.title?.let{ playlist.title = it }
+        dto.starred?.let{ playlist.starred = it }
+
+        this.playlistRepository.save(playlist)
+    }
+
+    @Transactional
+    @PreAuthorize("@groupSecurity.hasGroupAdminPrivileges(authentication, #p0)")
+    override fun deletePlaylist(groupId: Long, playlistId: Long) {
+        this.playlistRepository.deleteById(playlistId)
     }
 }

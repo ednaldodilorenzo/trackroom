@@ -94,8 +94,10 @@ class GroupController(
 
     @GetMapping("/{id}/playlists")
     fun getGroupPlaylists(
-        @PathVariable id: Long, @PageableDefault(size = 10, page = 0) pageable: Pageable
-    ): Page<PlaylistMusicCountDto> = this.playlistService.findGroupPlaylists(id, pageable)
+        @PathVariable id: Long,
+        @RequestParam(required = false) starred: Boolean? = null,
+        @PageableDefault(size = 10, page = 0) pageable: Pageable
+    ): Page<PlaylistMusicCountDto> = this.playlistService.findGroupPlaylists(id, starred, pageable)
 
     @PostMapping("/{id}/playlists")
     fun postGroupPlaylist(
@@ -125,4 +127,17 @@ class GroupController(
     fun putGroupPlaylistMusics(
         @PathVariable id: Long, @PathVariable playlistId: Long, @RequestBody dto: UpdatePlaylistMusicsDTO
     ) = playlistService.updatePlaylistMusics(id, playlistId, @RequestBody dto)
+
+    @PatchMapping("/{id}/playlists/{playlistId}")
+    fun patchGroupPlaylist(
+        @PathVariable id: Long, @PathVariable playlistId: Long, @RequestBody dto: UpdatePlaylistDTO
+    ) {
+        this.playlistService.updatePlaylistData(id, playlistId, dto)
+    }
+
+    @DeleteMapping("/{id}/playlists/{playlistId}")
+    fun deleteGroupPlaylist(@PathVariable id: Long, @PathVariable playlistId: Long): String {
+        this.playlistService.deletePlaylist(id, playlistId)
+        return "ok"
+    }
 }

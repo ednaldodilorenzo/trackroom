@@ -19,12 +19,15 @@ data class Playlist(
     val id: Long? = null,
 
     @Column(nullable = false)
-    val title: String,
+    var title: String,
 
     @ManyToOne
     @JoinColumn(name = "group_id", nullable = false)
     val group: Group,
 
     @OneToMany(mappedBy = "playlist", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val items: MutableSet<PlaylistMusicGroup> = mutableSetOf()
+    val items: MutableSet<PlaylistMusicGroup> = mutableSetOf(),
+
+    @Column(nullable = false)
+    var starred: Boolean? = false,
 ) {}

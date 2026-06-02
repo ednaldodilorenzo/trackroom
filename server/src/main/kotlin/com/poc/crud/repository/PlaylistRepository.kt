@@ -20,34 +20,38 @@ interface PlaylistRepository : JpaRepository<Playlist, Long> {
         """
         SELECT new com.poc.crud.modules.playlist.dto.PlaylistMusicCountDto(
             p.id,
-            p.title,
-            COUNT(i)
+            p.title,            
+            COUNT(i),
+            p.starred
         )
         FROM Playlist p
         LEFT JOIN p.items i
         WHERE p.group.id = :groupId
+          AND (:starred IS NULL OR p.starred = :starred)
         GROUP BY p.id, p.title
         ORDER BY p.title
     """
     )
-    fun findAllByGroupIdWithMusicCount(groupId: Long): List<PlaylistMusicCountDto>
+    fun findAllByGroupIdWithMusicCount(groupId: Long, starred: Boolean?): List<PlaylistMusicCountDto>
 
     @Query(
         """
     SELECT new com.poc.crud.modules.playlist.dto.PlaylistMusicCountDto(
         p.id,
         p.title,
-        COUNT(i)
+        COUNT(i),
+        p.starred
     )
     FROM Playlist p
     LEFT JOIN p.items i
     WHERE p.group.id = :groupId
+      AND (:starred IS NULL OR p.starred = :starred)
     GROUP BY p.id, p.title
     ORDER BY p.title
 """
     )
     fun findAllByGroupIdWithMusicCount(
-        groupId: Long, pageable: Pageable
+        groupId: Long, starred: Boolean?, pageable: Pageable
     ): Page<PlaylistMusicCountDto>
 
     @Query(

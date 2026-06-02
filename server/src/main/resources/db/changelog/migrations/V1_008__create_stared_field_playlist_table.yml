@@ -1,0 +1,18 @@
+databaseChangeLog:
+  - changeSet:
+      id: V1_008
+      author: Ednaldo Dilorenzo
+      changes:
+        - addColumn:
+            tableName: playlists
+            columns:
+              - column:
+                  name: starred
+                  type: boolean
+                  defaultValue: false
+                  constraints:
+                    nullable: false
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP

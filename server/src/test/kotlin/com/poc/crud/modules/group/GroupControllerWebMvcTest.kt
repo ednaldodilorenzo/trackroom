@@ -297,10 +297,10 @@ class GroupControllerTest {
         val page = PageImpl(playlists)
 
         // Mocking the service call. Note the .with(jwt()) to satisfy @AuthenticationPrincipal
-        every { playlistService.findGroupPlaylists(1L, any<Pageable>()) } returns page
+        every { playlistService.findGroupPlaylists(1L, false, any<Pageable>()) } returns page
 
         mockMvc.perform(
-            get("/v1/groups/1/playlists").with(jwt().jwt {
+            get("/v1/groups/1/playlists?starred=false").with(jwt().jwt {
                 it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
                     Instant.now().plusSeconds(3600)
                 )

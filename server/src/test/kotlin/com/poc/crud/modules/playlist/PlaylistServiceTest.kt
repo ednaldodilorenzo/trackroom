@@ -88,13 +88,13 @@ class PlaylistServiceTest {
         val dto2 = PlaylistMusicCountDto(2L, "Playlist 1", 2)
         val pageable = PageRequest.of(0, 10)
 
-        every { playlistRepository.findAllByGroupIdWithMusicCount(1L) } returns listOf(dto1, dto2)
-        every { playlistRepository.findAllByGroupIdWithMusicCount(1L, pageable) } returns PageImpl(listOf(dto1, dto2))
+        every { playlistRepository.findAllByGroupIdWithMusicCount(1L, false) } returns listOf(dto1, dto2)
+        every { playlistRepository.findAllByGroupIdWithMusicCount(1L, false, pageable) } returns PageImpl(listOf(dto1, dto2))
 
         var result: Page<PlaylistMusicCountDto> = PageImpl(emptyList())
 
         assertDoesNotThrow {
-            result = service.findGroupPlaylists(1L, pageable)
+            result = service.findGroupPlaylists(1L, false, pageable)
         }
         assertEquals(2, result.content.size)
     }
