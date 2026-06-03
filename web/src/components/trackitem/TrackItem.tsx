@@ -14,7 +14,6 @@ type TrackItemProps = Music & {
 export default function TrackItem({
   id,
   name,
-  description,
   active,
   cipherLink,
   onClick,
