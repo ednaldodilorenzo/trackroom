@@ -57,6 +57,7 @@ class MusicServiceImpl(
             description = dto.description,
             groupMusics = mutableSetOf(),
             file = dto.file,
+            category = dto.category,
         )
 
         val savedMusic = musicRepository.save(music)
@@ -109,6 +110,7 @@ class MusicServiceImpl(
 
         dto.name?.let { music.name = it }
         dto.description?.let { music.description = it }
+        dto.category?.let { music.category = it }
 
         val uploadUrl = musicFileStorage.getMusicUploadUrl(id, "audio/mpeg")
 

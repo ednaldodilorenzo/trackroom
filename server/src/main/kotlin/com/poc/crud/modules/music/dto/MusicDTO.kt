@@ -9,12 +9,13 @@ data class MusicDTO(
     val description: String,
     val file: String,
     var uploaded: Boolean = false,
+    val category: String? = null,
 ) {
     constructor(music: Music) : this(
         music.id,
         music.name,
         music.description,
         music.file,
-        music.uploadStatus == MusicUploadStatus.COMPLETED
-    )
+        music.uploadStatus == MusicUploadStatus.COMPLETED,
+        music.category,)
 }

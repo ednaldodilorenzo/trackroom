@@ -1,0 +1,15 @@
+databaseChangeLog:
+  - changeSet:
+      id: V1_009
+      author: Ednaldo Dilorenzo
+      changes:
+        - addColumn:
+            tableName: musics
+            columns:
+              - column:
+                  name: category
+                  type: VARCHAR(50)
+              - column:
+                  name: created_at
+                  type: datetime
+                  defaultValueComputed: CURRENT_TIMESTAMP

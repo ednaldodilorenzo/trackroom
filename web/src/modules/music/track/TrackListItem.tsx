@@ -35,7 +35,11 @@ export default function TrackListItem({ music, handlePlay }: TrackListItemProps)
                 {currentGroup.isAdmin && (<SuspendedMenu>
                     <SuspendedMenu.Item
                         label="Editar"
-                        onClick={() => navigate(`/groups/${currentGroup.id}/musics/${music.id}`)}
+                        onClick={() => navigate(`/groups/${currentGroup.id}/musics/${music.id}`, {
+                            state: {
+                                returnTo: `/groups/${currentGroup.id}/musics`,
+                            },
+                        })}
                     />
                     <SuspendedMenu.Item
                         label="Excluir"

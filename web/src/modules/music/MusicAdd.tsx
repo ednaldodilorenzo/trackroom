@@ -1,4 +1,4 @@
-import { Suspense } from "react";
+import { Suspense, useState } from "react";
 import {
   Await,
   useLoaderData,
@@ -22,6 +22,7 @@ const schema = yup
   .object({
     name: yup.string().trim().required("Nome é obrigatório"),
     description: yup.string().trim().required("Álbum é obrigatório"),
+    category: yup.string().trim().optional().default(""),
   })
   .required();
 
@@ -35,6 +36,7 @@ function MusicForm({ loadedMusic, handleCancel, onSubmit }: { loadedMusic: Music
   // const submit = useSubmit();
 
   const isEditing = Boolean(loadedMusic?.id);
+  const [fileName, setFileName] = useState<string | null>(null);
 
   const {
     control,
@@ -47,10 +49,12 @@ function MusicForm({ loadedMusic, handleCancel, onSubmit }: { loadedMusic: Music
       ? {
         name: loadedMusic.name,
         description: loadedMusic.description,
+        category: loadedMusic.category ?? "",
       }
       : {
         name: "",
         description: "",
+        category: "",
       },
   });
 
@@ -66,7 +70,8 @@ function MusicForm({ loadedMusic, handleCancel, onSubmit }: { loadedMusic: Music
 
           <div className="space-y-4">
             <TextField label="Nome" name="name" control={control} />
-            <TextField label="Álbum" name="description" control={control} />
+            <TextField label="Categoria" name="category" control={control} />
+            <TextField label="Álbum" name="description" control={control} />            
           </div>
         </section>
 
@@ -83,8 +88,8 @@ function MusicForm({ loadedMusic, handleCancel, onSubmit }: { loadedMusic: Music
             <span className="w-14 h-14 rounded-full bg-violet-100 text-violet-700 flex items-center justify-center text-3xl">
               ♪
             </span>
-            <span className="font-bold text-violet-700">Escolher arquivo</span>
-            <span className="text-xs text-gray-500">MP3, WAV ou outro formato de áudio</span>
+            <span className="font-bold text-violet-700">{fileName ?? "Escolher arquivo"}</span>
+            {!fileName && <span className="text-xs text-gray-500">MP3, WAV ou outro formato de áudio</span>}
           </label>
 
           <input
@@ -94,6 +99,7 @@ function MusicForm({ loadedMusic, handleCancel, onSubmit }: { loadedMusic: Music
             type="file"
             data-testid="file-input"
             className="sr-only"
+            onChange={(e) => setFileName(e.target.files?.[0]?.name ?? null)}
           />
 
           {isEditing && (
@@ -153,6 +159,7 @@ export default function MusicAdd() {
       description: formPayload.description,
       file: formData.get("file") instanceof File ? (formData.get("file") as File).name : "",
       groupId: Number(id),
+      category: formPayload.category || undefined,
     };
 
     const fileEntry = formData.get("file");
@@ -191,46 +198,6 @@ export default function MusicAdd() {
     </Suspense>
   );
 }
-
-// export async function action({ request, params }: ActionFunctionArgs) {
-//   const data = await request.formData();
-//   const groupId = Number(params.id);
-//   const musicId = params.musicId ? Number(params.musicId) : null;
-
-//   const payload: Music = {
-//     name: data.get("name")?.toString() ?? "",
-//     description: data.get("description")?.toString() ?? "",
-//     file: data.get("file") instanceof File ? (data.get("file") as File).name : "",
-//     groupId,
-//   };
-
-//   const fileEntry = data.get("file");
-//   const hasValidFile = fileEntry instanceof File && fileEntry.size > 0;
-
-//   try {
-//     const musicResp = musicId
-//       ? await musicService.update(musicId, payload)
-//       : await groupService.addMusic(groupId, payload);
-
-//     if (hasValidFile) {
-//       await musicService.uploadFile(musicResp.uploadUrl, fileEntry);
-//       await musicService.confirmFileUpload(musicResp.id);
-//     }
-
-//     toast.success(
-//       musicId ? "Música atualizada com sucesso!" : "Música cadastrada com sucesso!"
-//     );
-
-//     return redirect("/groups/1/musics");
-//   } catch (err: any) {
-//     if (err?.status === 401) {
-//       return err;
-//     }
-
-//     toast.error("Não foi possível salvar a música.");
-//     return null;
-//   }
-// }
 
 export async function load({ params }: LoaderFunctionArgs): Promise<MusicAddLoaderData> {
   const musicId = params.musicId;

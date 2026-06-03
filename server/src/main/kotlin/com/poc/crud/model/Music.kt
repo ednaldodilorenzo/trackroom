@@ -10,11 +10,12 @@ enum class MusicUploadStatus(val code: String) {
 
 @Entity
 @Table(name = "musics")
-data class Music(
+class Music(
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
+    @Column(nullable = false)
     var name: String,
     var description: String,
     val file: String,
@@ -27,4 +28,5 @@ data class Music(
 
     @Enumerated(EnumType.STRING)
     var uploadStatus: MusicUploadStatus = MusicUploadStatus.PENDING,
+    var category: String? = null,
 )

@@ -6,6 +6,7 @@ interface Music {
   groupId: number;
   selected?: boolean;
   uploaded?: boolean;
+  category?: string;
 }
 
 interface MusicMetaData {

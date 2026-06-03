@@ -20,6 +20,7 @@ export default function TrackItem({
   onClick,
   children,
   canPlay = true,
+  category,
 }: TrackItemProps) {
   return (
     <div className={`track-item ${active ? "active" : ""}`}>
@@ -30,7 +31,7 @@ export default function TrackItem({
       )}
       <div className="track-meta">
         <div className="track-title">{name}</div>
-        <div className="track-sub">{description}</div>
+        {category && <div className="track-sub">{category}</div>}
       </div>
       {cipherLink && (
         <Link to={cipherLink} className="track-duration">
