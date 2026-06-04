@@ -4,7 +4,7 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "user_group")
-data class UserGroup(
+class UserGroup(
     @EmbeddedId
     val userGroupId: UserGroupId,
 

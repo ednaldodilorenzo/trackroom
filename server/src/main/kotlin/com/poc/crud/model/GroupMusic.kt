@@ -4,7 +4,7 @@ import jakarta.persistence.*
 
 @Entity
 @Table(name = "group_music")
-data class GroupMusic(
+class GroupMusic(
 
     @EmbeddedId
     var id: GroupMusicId = GroupMusicId(),

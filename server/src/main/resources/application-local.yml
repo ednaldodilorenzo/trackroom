@@ -18,8 +18,12 @@ spring:
       mail:
         smtp:
           auth: true
+          from: no-reply@trackroom.cloud
+          ssl:
+            enable: true  # Instructs JavaMail to use implicit SSL/TLS
+          # Remove or set starttls properties to false
           starttls:
-            enable: true
+            enable: false
   threads:
     virtual:
       enabled: true

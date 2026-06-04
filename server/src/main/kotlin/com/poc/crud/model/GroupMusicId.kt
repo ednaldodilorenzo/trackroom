@@ -4,7 +4,7 @@ import jakarta.persistence.Column
 import jakarta.persistence.Embeddable
 
 @Embeddable
-data class GroupMusicId(
+class GroupMusicId(
 
     @Column(name = "group_id")
     var groupId: Long? = null,

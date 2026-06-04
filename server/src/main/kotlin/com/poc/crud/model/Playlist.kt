@@ -13,7 +13,7 @@ import jakarta.persistence.Table
 
 @Entity
 @Table(name = "playlists")
-data class Playlist(
+class Playlist(
     @Id
     @GeneratedValue(GenerationType.IDENTITY)
     val id: Long? = null,

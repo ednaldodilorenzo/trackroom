@@ -22,6 +22,7 @@ const PlaylistAdd = lazy(() => import("@/modules/playlist/PlaylistAdd"));
 const PlayListList = lazy(() => import("@/modules/playlist/PlaylistList"));
 const PlaylistDetail = lazy(() => import("@/modules/playlist/PlaylistDetail"));
 const PlayListAddSong = lazy(() => import("@/modules/playlist/PlayListAddSong"));
+const SignupConfirm = lazy(() => import("@/modules/auth/signup/SignupConfirm"));
 
 export const router = createBrowserRouter(
   [
@@ -36,10 +37,14 @@ export const router = createBrowserRouter(
     {
       path: "/signup",
       element: <Signup />,
-      action: async (args) => {
-        const mod = await import("@/modules/auth/signup/Signup");
-        return mod.action(args);
-      }
+      // action: async (args) => {
+      //   const mod = await import("@/modules/auth/signup/Signup");
+      //   return mod.action(args);
+      // }
+    },
+    {
+      path: "/signup-confirm",
+      element: <SignupConfirm />,
     },
     {
       path: "/forgot-password",

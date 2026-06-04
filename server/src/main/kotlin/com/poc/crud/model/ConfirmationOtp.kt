@@ -7,7 +7,7 @@ import jakarta.persistence.Entity
 import java.time.Instant
 
 @Entity
-data class ConfirmationOtp(
+class ConfirmationOtp(
     @Id
     val key: String,
     @Column(nullable = false)

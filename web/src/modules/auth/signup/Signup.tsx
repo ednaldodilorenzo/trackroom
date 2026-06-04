@@ -4,10 +4,11 @@ import { validateCPF } from "@/utils/validation";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Form, TextField } from "@/components";
 import { useForm } from "react-hook-form";
-import { Link, redirect, useSubmit, useNavigation, type ActionFunctionArgs } from "react-router-dom";
+import { Link, redirect, useSubmit, useNavigation, type ActionFunctionArgs, useNavigate } from "react-router-dom";
 import { authService, type SignupRequest } from "../authSevice";
 import toast from "react-hot-toast";
 import { useLoading } from "@/hooks/useLoading";
+import { useEffect } from "react";
 
 const schema = yup.object({
     name: yup.string().required("Nome obrigatório"),
@@ -38,23 +39,31 @@ const schema = yup.object({
 type FormData = yup.InferType<typeof schema>;
 
 export default function Signup() {
-    
+
     const { control, handleSubmit } = useForm<FormData>({
         resolver: yupResolver(schema),
         mode: "onBlur",
     });
 
     const { show, hide } = useLoading();
+    const navigate = useNavigate();
 
-    const navigation = useNavigation();
+    async function onSubmit(formData: FormData) {
+        show();
+        const payload: SignupRequest = { ...formData, phoneNumber: formData.phone };
+        const result = await authService.signup(payload);
+        if (result) {
+            toast.success("Cadastro realizado com sucesso!");            
+            navigate("/signup-confirm", { state: { email: formData.email } });
+        }
+        hide();
 
-    navigation.state === "submitting" ? show() : hide();
-
-    const submit = useSubmit();
+        return { error: "Signup failed", status: 400 };
+    }
 
     return (
         <main className="min-h-100vh grid w-full grow grid-cols-1 place-items-center"><div className="w-full max-w-[26rem] p-4 sm:px-5">
-            <div className="text-center">                
+            <div className="text-center">
                 <div className="mt-4">
                     <h2 className="text-2xl font-semibold text-gray-600 dark:text-dark-100">Bem Vindo ao Trackroom</h2>
                     <p className="text-gray-400 dark:text-dark-300">Por favor registre-se para continuar</p>
@@ -62,7 +71,7 @@ export default function Signup() {
             </div>
             <div className="relative break-words print:border bg-white card rounded-lg border border-gray-200 dark:border-dark-600 print:border-0 mt-5 rounded-lg p-5 lg:p-7">
                 <Form
-                    onSubmit={handleSubmit((data: FormData) => submit(data, { method: "post" }))}
+                    onSubmit={handleSubmit(onSubmit)}
 
                 >
                     <h2 style={{ marginBottom: "20px" }}>Novo Usuário</h2>
@@ -107,22 +116,22 @@ export default function Signup() {
     );
 }
 
-export async function action({ request }: ActionFunctionArgs) {
-    const formData = await request.formData();
-    const payload: SignupRequest = {
-        name: formData.get("name")?.toString() || "",
-        cpf: formData.get("cpf")?.toString() || "",
-        username: formData.get("username")?.toString() || "",
-        phoneNumber: formData.get("phone")?.toString() || "",
-        email: formData.get("email")?.toString() || "",
-        password: formData.get("password")?.toString() || "",
-        confirmPassword: formData.get("confirmPassword")?.toString() || "",
-    };
-    const result = await authService.signup(payload);
-    if (result) {
-        toast.success("Cadastro realizado com sucesso!");
-        return redirect("/login");
-    }
+// export async function action({ request }: ActionFunctionArgs) {
+//     const formData = await request.formData();
+//     const payload: SignupRequest = {
+//         name: formData.get("name")?.toString() || "",
+//         cpf: formData.get("cpf")?.toString() || "",
+//         username: formData.get("username")?.toString() || "",
+//         phoneNumber: formData.get("phone")?.toString() || "",
+//         email: formData.get("email")?.toString() || "",
+//         password: formData.get("password")?.toString() || "",
+//         confirmPassword: formData.get("confirmPassword")?.toString() || "",
+//     };
+//     const result = await authService.signup(payload);
+//     if (result) {
+//         toast.success("Cadastro realizado com sucesso!");
+//         return redirect("/signup-confirm");
+//     }
 
-    return { error: "Signup failed", status: 400 };
-}
+//     return { error: "Signup failed", status: 400 };
+// }
