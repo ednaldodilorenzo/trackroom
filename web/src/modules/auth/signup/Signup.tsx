@@ -4,11 +4,10 @@ import { validateCPF } from "@/utils/validation";
 import { yupResolver } from "@hookform/resolvers/yup";
 import { Button, Form, TextField } from "@/components";
 import { useForm } from "react-hook-form";
-import { Link, redirect, useSubmit, useNavigation, type ActionFunctionArgs, useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { authService, type SignupRequest } from "../authSevice";
 import toast from "react-hot-toast";
 import { useLoading } from "@/hooks/useLoading";
-import { useEffect } from "react";
 
 const schema = yup.object({
     name: yup.string().required("Nome obrigatório"),
