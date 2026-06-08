@@ -8,6 +8,10 @@ spring:
       minimum-idle: 1
       connection-timeout: 20000
       idle-timeout: 300000
+      data-source-properties:
+        cachePrepStmts: true
+        prepStmtCacheSize: 500
+        prepStmtCacheSqlLimit: 2048
   liquibase:
     enabled: true
   mail:
@@ -20,6 +24,14 @@ spring:
   threads:
     virtual:
       enabled: true
+  mvc:
+    converters:
+      preferred-json-mapper: jackson
+  jackson:
+    parser:
+      allow-non-numeric-numbers: true
+  main:
+    lazy-initialization: true
 
 logging:
   level:
@@ -40,12 +52,16 @@ server:
       max-request-size: 10MB
   http2:
     enabled: true
+  compression:
+    enabled: true
+    min-response-size: 1KB
+    mime-types: application/json
 
 management:
   endpoints:
     web:
       exposure:
-        include: "*"
+        exclude: "*"
   endpoint:
     health:
       show-details: always
@@ -58,4 +74,5 @@ queue:
   ids:
     email-account-confirmation-id: email-confirmation
     email-password-reset-id: password-reset
+
 

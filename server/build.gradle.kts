@@ -39,6 +39,7 @@ dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-validation")
 	implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
 	implementation("org.liquibase:liquibase-core")
+	implementation("com.fasterxml.jackson.module:jackson-module-blackbird")
 	implementation(project(":core"))
 	when (cloud.lowercase()) {
 		"oci" -> {

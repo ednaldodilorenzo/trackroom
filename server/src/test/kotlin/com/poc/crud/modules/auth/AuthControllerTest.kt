@@ -54,9 +54,8 @@ class AuthControllerTest {
 
         val result = controller.login(request, response)
 
-        assertEquals(200, result.statusCode.value())
-        assertNotNull(result.body)
-        assertEquals("jwt-token-123", result.body?.token)
+        assertNotNull(result)
+        assertEquals("jwt-token-123", result.token)
 
         val cookie = (response as MockHttpServletResponse).getHeader("Set-Cookie")
         assertNotNull(cookie)

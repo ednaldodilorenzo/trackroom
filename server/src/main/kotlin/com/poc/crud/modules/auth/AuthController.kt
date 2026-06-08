@@ -27,7 +27,7 @@ class AuthController(
     @PostMapping("/login")
     fun login(
         @Valid @RequestBody loginRequestDTO: LoginRequestDTO, response: HttpServletResponse
-    ): ResponseEntity<LoginResponseDTO> {
+    ): LoginResponseDTO {
         val authentication = authenticationManager.authenticate(
             UsernamePasswordAuthenticationToken(
                 loginRequestDTO.email, loginRequestDTO.senha
@@ -40,45 +40,39 @@ class AuthController(
                 .path("/").maxAge(3600).sameSite("None") // 1 hour expiration
                 .build()
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString())
-        return ResponseEntity.ok(LoginResponseDTO(authentication.name, token))
+        return LoginResponseDTO(authentication.name, token)
     }
 
     @PostMapping("/logout")
-    fun logout(response: HttpServletResponse): ResponseEntity<String> {
+    fun logout(response: HttpServletResponse): String {
         val cookie =
             ResponseCookie.from("X-Auth", "").httpOnly(true).secure(false) // Set to true in production with HTTPS
                 .path("/").maxAge(0) // Expire immediately
                 .build()
         response.addHeader("Set-Cookie", cookie.toString())
-        return ResponseEntity.ok("Logged out successfully.")
+        return "Logged out successfully."
     }
 
     @PostMapping("/signup")
-    fun signup(@RequestBody @Valid signupRequestDTO: SignupRequestDTO): ResponseEntity<String> {
+    fun signup(@RequestBody @Valid signupRequestDTO: SignupRequestDTO): String {
         authService.executeSignup(signupRequestDTO)
-        return ResponseEntity.ok("Signed up.")
+        return "Signed up."
     }
 
     @PostMapping("/confirm/{token}")
-    fun confirm(@PathVariable token: String, @RequestBody code: String): ResponseEntity<String> {
+    fun confirm(@PathVariable token: String, @RequestBody code: String): String {
         authService.activateSignUp(token, code)
-        return ResponseEntity.ok("Confirmed user.")
+        return "Confirmed user."
     }
 
     @GetMapping("/availability/email/{email}")
-    fun availabilityEmail(@PathVariable email: Email): ResponseEntity<Boolean> {
-        return ResponseEntity.ok(userService.findEmailAvailability(email))
-    }
+    fun availabilityEmail(@PathVariable email: Email) = userService.findEmailAvailability(email)
 
     @GetMapping("/availability/cpf/{cpf}")
-    fun availabilityCpf(@PathVariable cpf: CPF): ResponseEntity<Boolean> {
-        return ResponseEntity.ok(userService.findCPFAvailability(cpf))
-    }
+    fun availabilityCpf(@PathVariable cpf: CPF) = userService.findCPFAvailability(cpf)
 
     @GetMapping("/availability/username/{username}")
-    fun availabilityUsername(@PathVariable username: String): ResponseEntity<Boolean> {
-        return ResponseEntity.ok(userService.findUsernameAvailability(username))
-    }
+    fun availabilityUsername(@PathVariable username: String) = userService.findUsernameAvailability(username)
 
     @PostMapping("/forgot-password")
     fun startPasswordRecoverProcess(@RequestBody dto: ForgotPasswordReqDTO): ResponseEntity<String> {

@@ -16,7 +16,7 @@ import java.time.temporal.ChronoUnit
 class DatabaseCacheManager(val otpDao: ConfirmationOtpDao) : CacheManager {
     val logger: Logger? = LoggerFactory.getLogger(DatabaseCacheManager::class.java)
 
-    @Transactional
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
     override fun getValue(key: String): String {
         val otp = otpDao.findById(key).orElse(null) ?: return ""
         val now = Instant.now()
@@ -27,7 +27,7 @@ class DatabaseCacheManager(val otpDao: ConfirmationOtpDao) : CacheManager {
                 now,
                 otp.expiresAt
             )
-            otpDao.deleteById(key)
+            otpDao.delete(otp)
             return ""
         }
 

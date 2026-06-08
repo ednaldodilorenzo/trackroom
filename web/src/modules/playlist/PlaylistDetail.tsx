@@ -13,6 +13,7 @@ import type { Playlist } from "@/model/Playlist";
 import { FallbackOverlay } from "@/components";
 import { useGroupContext } from "../group/GroupContext";
 import type { Group, Music } from "@/model";
+import { BsCheck2, BsPencilFill } from "react-icons/bs";
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -48,10 +49,34 @@ function PlaylistHeader({
   onPlayAll: () => void;
   onAddSongs: () => void;
 }) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [editedTitle, setEditedTitle] = useState(playlist.title);
+  const { currentGroup } = useGroupContext();
+
+  function handleSaveTitle() {
+    groupService.patchGroupPlaylist(Number(currentGroup.id!), Number(playlist.id!), { title: editedTitle }).catch(() => {
+      alert("Erro ao atualizar o título da playlist. Tente novamente.");
+      setEditedTitle(playlist.title);
+    }).finally(() => {
+      setIsEditing(false);
+    });  
+  }
+
   return (
     <section className="rounded-3xl bg-violet-700 text-white p-5 shadow-md">
       <p className="text-sm text-white/75">Playlist</p>
-      <h2 className="text-2xl font-bold mt-1">{playlist.title}</h2>
+      {isEditing ? (
+        <div className="flex items-center gap-3 mt-1">
+          <input className="text-2xl font-bold mt-1 border border-gray-300 px-4 pr-11 outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500" value={editedTitle} onChange={(e) => setEditedTitle(e.target.value)} />
+          <button className="cursor-pointer" onClick={handleSaveTitle}>
+            <BsCheck2 />
+          </button>
+        </div>) : (<div className="flex items-center gap-3 mt-1">
+          <h2 className="text-2xl font-bold mt-1">{editedTitle}</h2>
+          <button className="cursor-pointer" onClick={() => setIsEditing(true)}>
+            <BsPencilFill />
+          </button>
+        </div>)}
       <p className="text-sm text-white/80 mt-2">Playlist selecionada</p>
 
       <div className="flex items-center gap-2 mt-4 text-sm text-white/80">
