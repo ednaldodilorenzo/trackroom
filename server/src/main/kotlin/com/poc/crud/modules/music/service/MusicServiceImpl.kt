@@ -100,6 +100,7 @@ class MusicServiceImpl(
             )
         }
         uploadedMusic.uploadStatus = MusicUploadStatus.COMPLETED
+        uploadedMusic.fileVersion = (uploadedMusic.fileVersion ?: 0) + 1
     }
 
     @Transactional

@@ -88,12 +88,12 @@ class MusicServiceTest {
         val capturedMusic = slot<Music>()
         val savedMusic = mockk<Music>(relaxed = true)
 
-        every { groupRepository.findById(99L) } returns Optional.of(group)
+        every { groupRepository.findById(1L) } returns Optional.of(group)
         every { musicRepository.save(capture(capturedMusic)) } returns savedMusic
         every { savedMusic.id } returns 123L
         every { musicFileStorage.getMusicUploadUrl(123L, "audio/mpeg") } returns "https://upload/url"
 
-        val result = service.insertMusic(99L, dto)
+        val result = service.insertMusic(1L, dto)
 
         assertEquals(123L, result.id)
         assertEquals("https://upload/url", result.uploadUrl)
@@ -103,7 +103,7 @@ class MusicServiceTest {
         assertTrue(group.groupMusics
             .contains(GroupMusic(GroupMusicId(group.id, savedMusic.id), group, savedMusic)))
 
-        verify(exactly = 1) { groupRepository.findById(99L) }
+        verify(exactly = 1) { groupRepository.findById(1L) }
         verify(exactly = 1) { musicRepository.save(any()) }
         verify(exactly = 1) { musicFileStorage.getMusicUploadUrl(123L, "audio/mpeg") }
         confirmVerified(musicRepository, groupRepository, musicFileStorage, cipherFileStorage)

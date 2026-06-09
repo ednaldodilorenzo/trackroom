@@ -1,11 +1,12 @@
 import { Requester, request } from "@/utils/requester";
 import { type AxiosInstance } from "axios";
 import type { Music, MusicMetaData } from "@/model";
+import { localDB } from "@/store/localdb";
 
 class MusicService extends Requester {
   constructor(instance: AxiosInstance) {
     super(instance, "/v1/musics");
-  }  
+  }
 
   getById = (id: number): Promise<Music> =>
     this.get<Music>(`/${id}`).then((resp) => resp.data);
@@ -31,8 +32,24 @@ class MusicService extends Requester {
       (resp) => resp.data
     );
 
-  getFileUrl = (id: number): Promise<string> =>
-    this.get<string>(`/${id}/url`).then((resp) => resp.data);
+  getFileUrl = async (id: number, fileVersion?: number): Promise<string> => {
+    const localMusic = await localDB.musics.get(id);    
+    if (localMusic && localMusic.blob && localMusic.version === fileVersion) {
+      const url = URL.createObjectURL(localMusic.blob);
+      return url;
+    }    
+    const fileUrl = await this.get<string>(`/${id}/url`);
+    const response = await fetch(fileUrl.data);
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    await localDB.musics.put({
+      id,
+      version: fileVersion || 0,
+      downloadedAt: new Date().toISOString(),
+      blob,
+    });
+    return url;
+  }
 
   getMusicCipher = (url: string): Promise<string> =>
     this.get<string>("", {}, url).then((resp) => resp.data);

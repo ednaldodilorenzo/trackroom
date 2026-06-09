@@ -1,0 +1,13 @@
+databaseChangeLog:
+  - changeSet:
+      id: V1_010
+      author: Ednaldo Dilorenzo
+      changes:
+        - addColumn:
+            tableName: musics
+            columns:
+              - column:
+                  name: file_version
+                  type: INT
+        - sql:
+            sql: UPDATE musics SET file_version = 1 WHERE upload_status = 'COMPLETED';

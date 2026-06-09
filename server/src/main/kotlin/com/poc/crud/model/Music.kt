@@ -19,14 +19,13 @@ class Music(
     var name: String,
     var description: String,
     val file: String,
-
     @OneToMany(
         mappedBy = "music",
         cascade = [CascadeType.ALL],
         orphanRemoval = true
     ) val groupMusics: MutableSet<GroupMusic> = mutableSetOf(),
-
     @Enumerated(EnumType.STRING)
     var uploadStatus: MusicUploadStatus = MusicUploadStatus.PENDING,
     var category: String? = null,
+    var fileVersion: Int? = null,
 )

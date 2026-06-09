@@ -34,7 +34,7 @@ export default function GroupHome() {
   const isAdmin = Boolean(currentGroup?.isAdmin);
 
   async function handlePlay(music: Music) {
-    const url = await musicService.getFileUrl(music.id!!);
+    const url = await musicService.getFileUrl(music.id!!, music.fileVersion!!);
 
     const track: Track = {
       id: music.id,

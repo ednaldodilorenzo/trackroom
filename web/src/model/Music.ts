@@ -7,6 +7,7 @@ interface Music {
   selected?: boolean;
   uploaded?: boolean;
   category?: string;
+  fileVersion?: number;
 }
 
 interface MusicMetaData {
@@ -17,4 +18,11 @@ interface MusicMetaData {
   cipher?: string;
 }
 
-export type { Music, MusicMetaData };
+interface MusicLocalDBMetadata {
+    id: number;
+    version: number;
+    downloadedAt: string;
+    blob: Blob;
+}
+
+export type { Music, MusicMetaData, MusicLocalDBMetadata };

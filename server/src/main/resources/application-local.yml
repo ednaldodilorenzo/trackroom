@@ -39,7 +39,7 @@ spring:
     parser:
       allow-non-numeric-numbers: true
   main:
-    lazy-initialization: true
+    lazy-initialization: false
 
 logging:
   level:

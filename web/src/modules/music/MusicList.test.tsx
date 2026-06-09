@@ -219,7 +219,7 @@ describe("<MusicList />", () => {
 
   it("plays a track on click: fetches file url, sets current track and starts playing", async () => {
     loaderMusicsValue = {
-      content: [{ id: 5, name: "Play Me", description: "Singer" }],
+      content: [{ id: 5, name: "Play Me", description: "Singer", fileVersion: 2 }],
     };
 
     (musicService.getFileUrl as any).mockResolvedValueOnce(
@@ -232,7 +232,7 @@ describe("<MusicList />", () => {
     await user.click(screen.getByTestId("track-Play Me"));
 
     expect(musicService.getFileUrl).toHaveBeenCalledTimes(1);
-    expect(musicService.getFileUrl).toHaveBeenCalledWith(5);
+    expect(musicService.getFileUrl).toHaveBeenCalledWith(5, 2);
 
     expect(setCurrentTrackMock).toHaveBeenCalledWith({
       id: 5,
