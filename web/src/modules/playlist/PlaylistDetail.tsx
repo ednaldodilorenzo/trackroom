@@ -59,7 +59,7 @@ function PlaylistHeader({
       setEditedTitle(playlist.title);
     }).finally(() => {
       setIsEditing(false);
-    });  
+    });
   }
 
   return (
@@ -67,7 +67,7 @@ function PlaylistHeader({
       <p className="text-sm text-white/75">Playlist</p>
       {isEditing ? (
         <div className="flex items-center gap-3 mt-1">
-          <input className="text-2xl font-bold mt-1 border border-gray-300 px-4 pr-11 outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500" value={editedTitle} onChange={(e) => setEditedTitle(e.target.value)} />
+          <input name="title" className="flex-grow text-2xl font-bold mt-1 border border-gray-300 px-4 pr-11 outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500" value={editedTitle} onChange={(e) => setEditedTitle(e.target.value)} />
           <button className="cursor-pointer" onClick={handleSaveTitle}>
             <BsCheck2 />
           </button>
