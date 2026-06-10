@@ -32,29 +32,56 @@ class MusicService extends Requester {
       (resp) => resp.data
     );
 
-  getFileUrl = (id: number, fileVersion?: number): Promise<string> => 
-    localDB.musics.get(id).then((music) => {
-      if (music && music.blob && music.version === fileVersion) {
-        const url = URL.createObjectURL(music.blob);        
-        return url;
-      }    
-      
-      return this.get<string>(`/${id}/url`).then((resp) => {
-        const fileUrl = resp.data;
-        fetch(fileUrl)
-          .then((response) => response.blob())
-          .then((blob) => {            
-            localDB.musics.put({
-              id,
-              version: fileVersion || 0,
-              downloadedAt: new Date().toISOString(),
-              blob,
-            });            
-          });        
-        return fileUrl;
+  private downloadingMusics = new Set<number>();
+
+  getFileUrl = async (id: number, fileVersion?: number): Promise<string> => {
+    const version = fileVersion ?? 0;
+
+    const localMusic = await localDB.musics.get(id);
+
+    if (localMusic?.blob && localMusic.version === version) {
+      return URL.createObjectURL(localMusic.blob);
+    }
+
+    const resp = await this.get<string>(`/${id}/url`);
+    const fileUrl = resp.data;
+
+    this.downloadMusicInBackground(id, version, fileUrl);
+
+    return fileUrl;
+  };
+
+  private downloadMusicInBackground = async (
+    id: number,
+    version: number,
+    fileUrl: string
+  ) => {
+    if (this.downloadingMusics.has(id)) return;
+
+    this.downloadingMusics.add(id);
+
+    try {
+      const response = await fetch(fileUrl);
+
+      if (!response.ok) {
+        throw new Error(`Erro ao baixar música: ${response.status}`);
+      }
+
+      const blob = await response.blob();
+
+      await localDB.musics.put({
+        id,
+        version,
+        downloadedAt: new Date().toISOString(),
+        blob,
       });
-    });    
-  
+    } catch (err) {
+      console.error("Erro ao salvar música offline", err);
+    } finally {
+      this.downloadingMusics.delete(id);
+    }
+  };
+
 
   getMusicCipher = (url: string): Promise<string> =>
     this.get<string>("", {}, url).then((resp) => resp.data);

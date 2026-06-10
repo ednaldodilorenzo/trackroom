@@ -38,6 +38,17 @@ export const AudioPlayerProvider = ({ children }: { children: ReactNode }) => {
       src: url,
       author: music.description,
     };
+    
+    const previousSrc = currentTrack?.src;    
+
+    if (
+      previousSrc &&
+      previousSrc !== track.src &&
+      previousSrc.startsWith("blob:")
+    ) {    
+      URL.revokeObjectURL(previousSrc);
+    }
+
     setCurrentTrack(track);
     setIsPlaying(true);
   }

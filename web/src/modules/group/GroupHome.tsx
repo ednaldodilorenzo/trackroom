@@ -8,11 +8,9 @@ import Button from "@/components/button/Button";
 import TrackList from "@/modules/music/track/TraskList";
 import type { Music, Playlist } from "@/model";
 import type { Page } from "@/model/Page";
-import { musicService } from "@/modules/music/music.service";
 import groupService from "@/modules/group/group.service";
 import {
   useAudioPlayerContext,
-  type Track,
 } from "@/components/player/AudioPlayerContext";
 import { useGroupContext } from "../group/GroupContext";
 import "@/modules/music/MusicList.css";
@@ -26,26 +24,13 @@ const PREVIEW_LIMIT = 5;
 
 export default function GroupHome() {
   const { musics, playlists } = useLoaderData() as GroupHomeLoaderData;
-  const { setCurrentTrack, setIsPlaying } = useAudioPlayerContext();
+  const { handlePlay } = useAudioPlayerContext();
   const navigate = useNavigate();
   const { id } = useParams();
   const { currentGroup } = useGroupContext();
 
   const isAdmin = Boolean(currentGroup?.isAdmin);
-
-  async function handlePlay(music: Music) {
-    const url = await musicService.getFileUrl(music.id!!, music.fileVersion!!);
-
-    const track: Track = {
-      id: music.id,
-      title: music.name,
-      src: url,
-      author: music.description,
-    };
-
-    setCurrentTrack(track);
-    setIsPlaying(true);
-  }
+  
 
   function goToAddMusic() {
     navigate(`/groups/${id}/musics/add`, {

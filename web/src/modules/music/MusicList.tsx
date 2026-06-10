@@ -13,11 +13,9 @@ import { TextField, Button } from "@/components";
 import FallbackOverlay from "@/components/fallbackoverlay/FallBackOverlay";
 import type { Music } from "@/model";
 import type { Page } from "@/model/Page";
-import { musicService } from "./music.service";
 import groupService from "@/modules/group/group.service";
 import {
   useAudioPlayerContext,
-  type Track,
 } from "@/components/player/AudioPlayerContext";
 import { useGroupContext } from "../group/GroupContext";
 import TrackList from "./track/TraskList";
@@ -30,7 +28,7 @@ type MusicListLoaderData = {
 
 export default function MusicList() {
   const { musics } = useLoaderData() as MusicListLoaderData;
-  const { setCurrentTrack, setIsPlaying } = useAudioPlayerContext();
+  const { handlePlay } = useAudioPlayerContext();
   const navigate = useNavigate();
   const { id } = useParams();
   const { currentGroup } = useGroupContext();
@@ -41,20 +39,6 @@ export default function MusicList() {
   useHeaderConfig({
     backButtonLink: `/groups/${id}/home`,
   }, false);
-
-  async function handlePlay(music: Music) {
-    const url = await musicService.getFileUrl(music.id!!, music.fileVersion!!);
-
-    const track: Track = {
-      id: music.id,
-      title: music.name,
-      src: url,
-      author: music.description,
-    };
-
-    setCurrentTrack(track);
-    setIsPlaying(true);
-  }
 
   function goToAddMusic() {
     navigate(`/groups/${id}/musics/add`, {
