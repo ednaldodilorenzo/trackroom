@@ -32,24 +32,29 @@ class MusicService extends Requester {
       (resp) => resp.data
     );
 
-  getFileUrl = async (id: number, fileVersion?: number): Promise<string> => {
-    const localMusic = await localDB.musics.get(id);    
-    if (localMusic && localMusic.blob && localMusic.version === fileVersion) {
-      const url = URL.createObjectURL(localMusic.blob);
-      return url;
-    }    
-    const fileUrl = await this.get<string>(`/${id}/url`);
-    const response = await fetch(fileUrl.data);
-    const blob = await response.blob();
-    const url = URL.createObjectURL(blob);
-    await localDB.musics.put({
-      id,
-      version: fileVersion || 0,
-      downloadedAt: new Date().toISOString(),
-      blob,
-    });
-    return url;
-  }
+  getFileUrl = (id: number, fileVersion?: number): Promise<string> => 
+    localDB.musics.get(id).then((music) => {
+      if (music && music.blob && music.version === fileVersion) {
+        const url = URL.createObjectURL(music.blob);        
+        return url;
+      }    
+      
+      return this.get<string>(`/${id}/url`).then((resp) => {
+        const fileUrl = resp.data;
+        fetch(fileUrl)
+          .then((response) => response.blob())
+          .then((blob) => {            
+            localDB.musics.put({
+              id,
+              version: fileVersion || 0,
+              downloadedAt: new Date().toISOString(),
+              blob,
+            });            
+          });        
+        return fileUrl;
+      });
+    });    
+  
 
   getMusicCipher = (url: string): Promise<string> =>
     this.get<string>("", {}, url).then((resp) => resp.data);
