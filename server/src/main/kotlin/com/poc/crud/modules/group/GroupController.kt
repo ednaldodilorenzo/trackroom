@@ -1,12 +1,10 @@
 package com.poc.crud.modules.group
 
 import com.poc.crud.core.pagination.toResponse
-import com.poc.crud.core.security.JwtConstants
 import com.poc.crud.modules.group.dto.PostGroupDTO
 import com.poc.crud.modules.group.dto.PutGroupDTO
 import com.poc.crud.modules.group.dto.UserDTO
 import com.poc.crud.modules.group.service.GroupService
-import com.poc.crud.modules.music.dto.MusicDTO
 import com.poc.crud.modules.music.dto.PostMusicReqDTO
 import com.poc.crud.modules.music.dto.PostMusicRespDTO
 import com.poc.crud.modules.music.service.MusicService
@@ -15,6 +13,7 @@ import com.poc.crud.modules.playlist.service.PlaylistService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
 import org.springframework.data.web.PageableDefault
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.security.oauth2.jwt.Jwt
@@ -30,7 +29,7 @@ class GroupController(
 ) {
     @GetMapping("")
     fun getAllByUser(@AuthenticationPrincipal jwt: Jwt) =
-        groupService.findGroupsByUserId(jwt.getClaim<Number>(JwtConstants.Claims.USER_ID).toLong())
+        groupService.findGroupsByUserId(jwt.subject.toLong())
 
     @GetMapping("/{id}")
     fun getById(
@@ -38,24 +37,20 @@ class GroupController(
         @PathVariable id: Long,
         @RequestParam(required = false, defaultValue = "false") withDependencies: Boolean
     ) = groupService.findById(
-        id, withDependencies, jwt.getClaim<Number>(JwtConstants.Claims.USER_ID).toLong()
+        id, withDependencies, jwt.subject.toLong()
     )
 
     @PostMapping("")
-    fun post(@AuthenticationPrincipal jwt: Jwt, @RequestBody @Valid groupData: PostGroupDTO): ResponseEntity<Long> =
-        ResponseEntity.created(
-            URI(
-                "/v1/groups/${
-                    groupService.insertGroup(
-                        jwt.getClaim<Number>(JwtConstants.Claims.USER_ID).toLong(), groupData
-                    )
-                }"
-            )
-        ).build()
+    @ResponseStatus(HttpStatus.CREATED)
+    fun post(@AuthenticationPrincipal jwt: Jwt, @RequestBody @Valid groupData: PostGroupDTO) {
+        groupService.insertGroup(
+            jwt.subject.toLong(), groupData
+        )
+    }
 
     @PostMapping("/{id}/members")
     fun addMembers(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long, @RequestBody memberList: List<UserDTO>) =
-        groupService.addGroupMembers(jwt.getClaim<Number>(JwtConstants.Claims.USER_ID).toLong(), id, memberList)
+        groupService.addGroupMembers(jwt.subject.toLong(), id, memberList)
 
     @GetMapping("/{id}/users")
     fun getUserByGroup(@PathVariable id: Long) = groupService.findUsersByGroupId(id)
@@ -65,11 +60,11 @@ class GroupController(
 
     @PostMapping("/{id}/users/{userId}/member")
     fun removeAdmin(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long, @PathVariable userId: Long) =
-        groupService.demoteMemberFromAdmin(jwt.getClaim<Number>(JwtConstants.Claims.USER_ID).toLong(), id, userId)
+        groupService.demoteMemberFromAdmin(jwt.subject.toLong(), id, userId)
 
     @DeleteMapping("/{id}/members/{userId}")
     fun deleteMember(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long, @PathVariable userId: Long) =
-        groupService.deleteMemberFromGroup(jwt.getClaim<Number>(JwtConstants.Claims.USER_ID).toLong(), id, userId)
+        groupService.deleteMemberFromGroup(jwt.subject.toLong(), id, userId)
 
     @PutMapping("/{id}")
     fun put(

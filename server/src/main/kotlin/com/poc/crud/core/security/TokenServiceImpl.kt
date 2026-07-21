@@ -26,7 +26,7 @@ class TokenServiceImpl(
         val principal = authentication.principal as UserPrincipal
 
         return Jwts.builder()
-            .subject(authentication.name)
+            .subject(principal.id.toString())
             .claim(JwtConstants.Claims.USER_ID, principal.id)
             .issuedAt(Date())
             .expiration(Date(System.currentTimeMillis() + 60 * 60 * 1000))
