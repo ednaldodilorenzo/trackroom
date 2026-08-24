@@ -8,7 +8,10 @@ import com.poc.crud.modules.group.service.GroupService
 import com.poc.crud.modules.music.dto.PostMusicReqDTO
 import com.poc.crud.modules.music.dto.PostMusicRespDTO
 import com.poc.crud.modules.music.service.MusicService
-import com.poc.crud.modules.playlist.dto.*
+import com.poc.crud.modules.playlist.dto.CreatePlaylistReqDTO
+import com.poc.crud.modules.playlist.dto.CreatePlaylistRespDTO
+import com.poc.crud.modules.playlist.dto.UpdatePlaylistDTO
+import com.poc.crud.modules.playlist.dto.UpdatePlaylistMusicsDTO
 import com.poc.crud.modules.playlist.service.PlaylistService
 import jakarta.validation.Valid
 import org.springframework.data.domain.Pageable
@@ -28,8 +31,14 @@ class GroupController(
     val playlistService: PlaylistService,
 ) {
     @GetMapping("")
-    fun getAllByUser(@AuthenticationPrincipal jwt: Jwt) =
-        groupService.findGroupsByUserId(jwt.subject.toLong())
+    fun getAllByUser(@AuthenticationPrincipal jwt: Jwt) = groupService.findGroupsByUserId(jwt.subject.toLong())
+
+    @GetMapping("/search")
+    fun filterGroups(
+        @AuthenticationPrincipal jwt: Jwt,
+        @PageableDefault pageable: Pageable,
+        @RequestParam("name") name: String
+    ) = groupService.findGroupsByNameWithMembershipInfo(jwt.subject.toLong(), name, pageable)
 
     @GetMapping("/{id}")
     fun getById(
@@ -134,4 +143,20 @@ class GroupController(
         this.playlistService.deletePlaylist(id, playlistId)
         return "ok"
     }
+
+    @PostMapping("/{id}/access-requests")
+    fun requestGroupAccess(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long) {
+        groupService.requestGroupAccess(jwt.subject.toLong(), id)
+    }
+
+    @PatchMapping("/{id}/access-requests/{requestId}")
+    fun grantRequestGroupAccess(
+        @AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long, @PathVariable requestId: Long
+    ) {
+        groupService.grantRequestGroupAccess(jwt.subject.toLong(), id, requestId)
+    }
+
+    @GetMapping("/{id}/access-requests")
+    fun getGroupAccessRequests(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long) =
+        groupService.getPendingJoinGroupRequests(jwt.subject.toLong(), id)
 }

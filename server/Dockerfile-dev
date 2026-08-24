@@ -1,16 +1,23 @@
-FROM eclipse-temurin:21-jdk-jammy AS development
+FROM eclipse-temurin:21-jdk-jammy
 
 WORKDIR /app
-
-COPY . /app
-
-EXPOSE 8080
 
 ARG CLOUD=local
 ENV SPRING_PROFILES_ACTIVE=$CLOUD
 
-# Fetch project dependencies
-RUN chmod +x start.sh && ./gradlew getDependencies
+COPY gradlew build.gradle.kts settings.gradle.kts start.sh ./
+COPY gradle/ gradle/
 
-# script which watches source file changes in background and executes bootRun
+COPY core/ core/
+COPY queue/ queue/
+COPY storage/ storage/
+
+RUN chmod +x gradlew start.sh \
+    && ./gradlew dependencies \
+        --configuration runtimeClasspath \
+        -Pcloud=$CLOUD \
+        --no-daemon
+
+EXPOSE 8080 5005
+
 CMD ["sh", "start.sh"]

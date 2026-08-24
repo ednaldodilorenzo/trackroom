@@ -7,7 +7,6 @@ plugins {
 	id("org.springframework.boot") version "4.0.5"
 	id("io.spring.dependency-management") version "1.1.7"
 	kotlin("plugin.jpa") version "2.3.21"
-	id("org.graalvm.buildtools.native") version "1.1.1"
 }
 
 group = "com.poc.crud"
@@ -94,20 +93,6 @@ tasks.withType<Test> {
 	useJUnitPlatform()
 }
 
-tasks.register<Copy>("getDependencies") {
-	from(sourceSets.main.get().runtimeClasspath)
-	into("runtime/")
-
-	doFirst {
-		val runtimeDir = File("runtime")
-		runtimeDir.deleteRecursively()
-		runtimeDir.mkdir()
-	}
-
-	doLast {
-		File("runtime").deleteRecursively()
-	}
-}
 val compileKotlin: KotlinCompile by tasks
 compileKotlin.compilerOptions {
 	freeCompilerArgs.set(listOf("-Xannotation-default-target=param-property=param-property"))

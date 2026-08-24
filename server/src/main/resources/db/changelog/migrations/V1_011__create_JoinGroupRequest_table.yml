@@ -1,0 +1,41 @@
+databaseChangeLog:
+  - changeSet:
+      id: V1_011
+      author: Ednaldo Dilorenzo
+      changes:
+        - createTable:
+            tableName: join_group_request
+            columns:
+              - column:
+                  name: id
+                  type: int
+                  autoIncrement: true
+                  constraints:
+                    primaryKey: true
+              - column:
+                  name: status
+                  type: varchar(15)
+                  constraints:
+                    nullable: false
+              - column:
+                  name: user_id
+                  type: int
+                  constraints:
+                    nullable: false
+              - column:
+                  name: group_id
+                  type: int
+                  constraints:
+                    nullable: false
+        - addForeignKeyConstraint:
+            baseTableName: join_group_request
+            baseColumnNames: group_id
+            constraintName: fk_join_group_request_group_id
+            referencedTableName: groups
+            referencedColumnNames: id
+        - addForeignKeyConstraint:
+            baseTableName: join_group_request
+            baseColumnNames: user_id
+            constraintName: fk_join_group_request_user_id
+            referencedTableName: users
+            referencedColumnNames: id

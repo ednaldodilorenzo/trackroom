@@ -17,3 +17,5 @@ open class GroupDTO(
         isAdmin = isAdmin
     )
 }
+
+data class GroupRelatedDto(val id: Long, val name: String)

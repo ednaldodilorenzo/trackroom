@@ -2,14 +2,16 @@ package com.poc.crud.modules.group.service
 
 import com.poc.crud.core.exception.APIException
 import com.poc.crud.core.exception.ExceptionType
-import com.poc.crud.model.Group
-import com.poc.crud.model.UserGroup
-import com.poc.crud.model.UserGroupId
+import com.poc.crud.core.pagination.PageResponse
+import com.poc.crud.core.pagination.toResponse
+import com.poc.crud.model.*
 import com.poc.crud.modules.group.dto.*
 import com.poc.crud.repository.GroupRepository
+import com.poc.crud.repository.JoinGroupRequestDao
 import com.poc.crud.repository.UserGroupRepository
 import com.poc.crud.repository.UserRepository
 import jakarta.transaction.Transactional
+import org.springframework.data.domain.Pageable
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.stereotype.Service
 import kotlin.jvm.optionals.getOrElse
@@ -19,10 +21,15 @@ class GroupServiceImpl(
     private val groupRepository: GroupRepository,
     private val userRepository: UserRepository,
     private val userGroupRepository: UserGroupRepository,
+    private val joinGroupRequestDao: JoinGroupRequestDao,
 ) : GroupService {
     override fun findGroupsByUserId(userId: Long): List<GroupDTO> {
         return groupRepository.findGroupsByUserId(userId).map { GroupDTO(it, false) }
     }
+
+    override fun findGroupsByNameWithMembershipInfo(
+        userId: Long, name: String, pageable: Pageable
+    ): PageResponse<GroupMembershipDTO> = groupRepository.findGroupsWithMembership(name, userId, pageable).toResponse()
 
     @Transactional
     override fun insertGroup(
@@ -158,4 +165,57 @@ class GroupServiceImpl(
 
         userGroupRepository.delete(userGroup)
     }
+
+    @Transactional
+    override fun requestGroupAccess(principalId: Long, groupId: Long) {
+        joinGroupRequestDao.findByUser_IdAndStatus(principalId, JoinGroupRequestStatus.PENDING).ifPresent {
+            throw APIException(
+                ExceptionType.BUSINESS_ERROR, "Usuário já possui requisição de acesso pendente."
+            )
+        }
+
+        val user = userRepository.findById(principalId).orElseThrow {
+            APIException(
+                ExceptionType.NOT_FOUND, "User not found"
+            )
+        }
+
+        val group = groupRepository.findById(groupId).orElseThrow {
+            APIException(ExceptionType.NOT_FOUND, "Group not found")
+        }
+
+        joinGroupRequestDao.save(JoinGroupRequest(null, user, group, JoinGroupRequestStatus.PENDING))
+    }
+
+    @Transactional
+    @PreAuthorize("@groupSecurity.hasGroupAdminPrivileges(authentication, #p1)")
+    override fun grantRequestGroupAccess(principalId: Long, groupId: Long, requestId: Long) {
+        val joinGroupRequest = joinGroupRequestDao.findById(requestId)
+            .orElseThrow { APIException(ExceptionType.NOT_FOUND, "Join group request not found") }
+
+        joinGroupRequest.status = JoinGroupRequestStatus.ACCEPTED
+
+        groupRepository.findById(groupId).orElseThrow { APIException(ExceptionType.NOT_FOUND, "Group not found") }
+
+        val userGroupId = UserGroupId(joinGroupRequest.user.id!!, groupId)
+
+        userGroupRepository.findById(userGroupId)
+            .ifPresent { throw APIException(ExceptionType.BUSINESS_ERROR, "User already exists joined the group") }
+
+        val newUserGroup = UserGroup(userGroupId, false, joinGroupRequest.user, joinGroupRequest.group)
+
+        userGroupRepository.save(newUserGroup)
+    }
+
+    @PreAuthorize("@groupSecurity.hasGroupAdminPrivileges(authentication, #p1)")
+    override fun getPendingJoinGroupRequests(principalId: Long, groupId: Long) =
+        joinGroupRequestDao.findByStatusAndGroup_Id(JoinGroupRequestStatus.PENDING, groupId).map {
+            JoinGroupDto.Response(
+                it.id!!,
+                UserRelatedDto(it.user.id!!, it.user.name),
+                GroupRelatedDto(it.group.id!!, it.group.name),
+                it.status
+            )
+        }
+
 }
