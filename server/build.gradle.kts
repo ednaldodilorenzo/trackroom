@@ -7,6 +7,8 @@ plugins {
 	id("org.springframework.boot") version "4.0.5"
 	id("io.spring.dependency-management") version "1.1.7"
 	kotlin("plugin.jpa") version "2.3.21"
+	id("org.jlleitschuh.gradle.ktlint") version "14.2.0"
+	id("io.gitlab.arturbosch.detekt") version "1.23.8"
 }
 
 group = "com.poc.crud"
@@ -20,6 +22,17 @@ java {
 
 repositories {
 	mavenCentral()
+}
+
+ktlint {
+	verbose.set(true)
+	outputToConsole.set(true)
+}
+
+detekt {
+	buildUponDefaultConfig = true
+	allRules = false
+	config.setFrom(files("$rootDir/config/detekt/detekt.yml"))
 }
 
 val cloud = project.findProperty("cloud") as String? ?: "local"

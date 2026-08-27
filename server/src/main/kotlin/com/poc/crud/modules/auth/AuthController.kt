@@ -3,7 +3,11 @@ package com.poc.crud.modules.auth
 import com.poc.crud.core.security.TokenService
 import com.poc.crud.core.type.CPF
 import com.poc.crud.core.type.Email
-import com.poc.crud.modules.auth.dto.*
+import com.poc.crud.modules.auth.dto.ForgotPasswordReqDTO
+import com.poc.crud.modules.auth.dto.LoginRequestDTO
+import com.poc.crud.modules.auth.dto.LoginResponseDTO
+import com.poc.crud.modules.auth.dto.PasswordRecoverReqDTO
+import com.poc.crud.modules.auth.dto.SignupRequestDTO
 import com.poc.crud.modules.auth.service.AuthService
 import com.poc.crud.modules.user.service.UserService
 import jakarta.servlet.http.HttpServletResponse

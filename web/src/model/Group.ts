@@ -8,7 +8,7 @@ interface Group {
   active: boolean;
   musics?: Music[];
   isAdmin?: boolean;
-  isMember?: boolean;
+  membershipStatus?: "MEMBER" | "PENDING" | "NOT_MEMBER";
 }
 
 export type { Group };

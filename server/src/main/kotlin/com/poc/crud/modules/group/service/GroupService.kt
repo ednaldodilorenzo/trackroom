@@ -2,6 +2,7 @@ package com.poc.crud.modules.group.service
 
 import com.poc.crud.core.pagination.PageResponse
 import com.poc.crud.modules.group.dto.*
+import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 
 
@@ -30,5 +31,5 @@ interface GroupService {
 
     fun grantRequestGroupAccess(principalId: Long, groupId: Long, requestId: Long)
 
-    fun getPendingJoinGroupRequests(principalId: Long, groupId: Long): List<JoinGroupDto.Response>
+    fun getPendingJoinGroupRequests(principalId: Long, groupId: Long, pageable: Pageable): PageResponse<JoinGroupDto.Response>
 }

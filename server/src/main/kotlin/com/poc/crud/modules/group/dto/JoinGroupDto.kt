@@ -1,7 +1,6 @@
 package com.poc.crud.modules.group.dto
 
 import com.poc.crud.model.JoinGroupRequestStatus
-import org.jetbrains.annotations.NotNull
 
 class JoinGroupDto {
     data class Response(

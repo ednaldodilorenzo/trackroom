@@ -23,6 +23,7 @@ const PlayListList = lazy(() => import("@/modules/playlist/PlaylistList"));
 const PlaylistDetail = lazy(() => import("@/modules/playlist/PlaylistDetail"));
 const PlayListAddSong = lazy(() => import("@/modules/playlist/PlayListAddSong"));
 const SignupConfirm = lazy(() => import("@/modules/auth/signup/SignupConfirm"));
+const GroupSearch = lazy(() => import("@/modules/group/GroupSearch"));
 
 export const router = createBrowserRouter(
   [
@@ -73,6 +74,10 @@ export const router = createBrowserRouter(
             const mod = await import("@/modules/home/Home");
             return mod.groupsLoader();
           },
+        },
+        {
+          path: "groups/search",
+          element: <GroupSearch />,
         },
         {
           path: "groups/add",

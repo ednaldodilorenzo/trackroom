@@ -38,7 +38,7 @@ class AuthServiceImpl(
         var user = userRepository.findByEmail(signupRequestDTO.email).map { value ->
             if (value.active) {
                 throw APIException(
-                    ExceptionType.BUSINESS_ERROR, "User email already exists!", RuntimeException()
+                    ExceptionType.BUSINESS_ERROR, "User email already exists!"
                 )
             }
             value
@@ -47,7 +47,7 @@ class AuthServiceImpl(
         user = user ?: userRepository.findByCpf(signupRequestDTO.cpf).map { value ->
             if (value.active) {
                 throw APIException(
-                    ExceptionType.BUSINESS_ERROR, "User cpf already exists!", RuntimeException()
+                    ExceptionType.BUSINESS_ERROR, "User cpf already exists!"
                 )
             }
             value
@@ -56,7 +56,7 @@ class AuthServiceImpl(
         user = user ?: userRepository.findByUsername(signupRequestDTO.username).map { value ->
             if (value.active) {
                 throw APIException(
-                    ExceptionType.BUSINESS_ERROR, "User username already exists!", RuntimeException()
+                    ExceptionType.BUSINESS_ERROR, "User username already exists!"
                 )
             }
             value
@@ -89,9 +89,12 @@ class AuthServiceImpl(
         try {
             val claims = tokenService.validateJwt(token)
             email = claims.payload.subject ?: ""
-        } catch (exception: Exception) {
+        } catch (exception: JwtException) {
             throw APIException(ExceptionType.BAD_REQUEST, "Invalid token", exception)
+        } catch(iaex: IllegalArgumentException) {
+            throw APIException(ExceptionType.BAD_REQUEST, "Invalid token", iaex)
         }
+
 
         email.isBlank() && throw APIException(
             ExceptionType.BUSINESS_ERROR, "User email not found!", RuntimeException("")
@@ -103,7 +106,7 @@ class AuthServiceImpl(
 
         if (user.active) {
             throw APIException(
-                ExceptionType.BUSINESS_ERROR, "Usuário já cadastrado!", RuntimeException()
+                ExceptionType.BUSINESS_ERROR, "Usuário já cadastrado!"
             )
         }
 

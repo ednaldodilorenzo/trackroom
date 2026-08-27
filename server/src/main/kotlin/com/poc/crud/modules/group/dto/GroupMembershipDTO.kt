@@ -6,6 +6,6 @@ data class GroupMembershipDTO(
     val description: String,
     val cover: String,
     val active: Boolean,
-    val isMember: Boolean,
+    val membershipStatus: String,
     val isAdmin: Boolean?
 )

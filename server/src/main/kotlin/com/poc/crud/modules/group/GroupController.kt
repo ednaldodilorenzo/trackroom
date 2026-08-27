@@ -35,9 +35,7 @@ class GroupController(
 
     @GetMapping("/search")
     fun filterGroups(
-        @AuthenticationPrincipal jwt: Jwt,
-        @PageableDefault pageable: Pageable,
-        @RequestParam("name") name: String
+        @AuthenticationPrincipal jwt: Jwt, @PageableDefault pageable: Pageable, @RequestParam("name") name: String
     ) = groupService.findGroupsByNameWithMembershipInfo(jwt.subject.toLong(), name, pageable)
 
     @GetMapping("/{id}")
@@ -149,7 +147,7 @@ class GroupController(
         groupService.requestGroupAccess(jwt.subject.toLong(), id)
     }
 
-    @PatchMapping("/{id}/access-requests/{requestId}")
+    @PostMapping("/{id}/access-requests/{requestId}/accept")
     fun grantRequestGroupAccess(
         @AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long, @PathVariable requestId: Long
     ) {
@@ -157,6 +155,9 @@ class GroupController(
     }
 
     @GetMapping("/{id}/access-requests")
-    fun getGroupAccessRequests(@AuthenticationPrincipal jwt: Jwt, @PathVariable id: Long) =
-        groupService.getPendingJoinGroupRequests(jwt.subject.toLong(), id)
+    fun getGroupAccessRequests(
+        @AuthenticationPrincipal jwt: Jwt,
+        @PathVariable id: Long,
+        @PageableDefault pageable: Pageable
+    ) = groupService.getPendingJoinGroupRequests(jwt.subject.toLong(), id, pageable)
 }

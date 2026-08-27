@@ -208,8 +208,12 @@ class GroupServiceImpl(
     }
 
     @PreAuthorize("@groupSecurity.hasGroupAdminPrivileges(authentication, #p1)")
-    override fun getPendingJoinGroupRequests(principalId: Long, groupId: Long) =
-        joinGroupRequestDao.findByStatusAndGroup_Id(JoinGroupRequestStatus.PENDING, groupId).map {
+    override fun getPendingJoinGroupRequests(
+        principalId: Long,
+        groupId: Long,
+        pageable: Pageable
+    ): PageResponse<JoinGroupDto.Response> {
+        val page = joinGroupRequestDao.findByStatusAndGroup_Id(JoinGroupRequestStatus.PENDING, groupId, pageable).map {
             JoinGroupDto.Response(
                 it.id!!,
                 UserRelatedDto(it.user.id!!, it.user.name),
@@ -217,5 +221,8 @@ class GroupServiceImpl(
                 it.status
             )
         }
+        return page.toResponse()
+    }
+
 
 }

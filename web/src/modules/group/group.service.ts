@@ -1,4 +1,4 @@
-import type { Group, Music, Playlist, User } from "@/model";
+import type { Group, Music, Playlist, User, JoinGroupRequest } from "@/model";
 import type { Page } from "@/model/Page";
 import { Requester, request, type Params } from "@/utils/requester";
 import { type AxiosInstance } from "axios";
@@ -14,6 +14,9 @@ class GroupService extends Requester {
     this.get<Group>(`/${id}`, { withDependencies: true }).then(
       (resp) => resp.data
     );
+
+  searchGroups = (term: string, params?: Params) =>
+    this.get<Page<Group>>(`/search`, { name: term, ...params }).then((resp) => resp.data);
 
   findById = (id: string) =>
     this.get<Group>(`/${id}`).then((resp) => resp.data);
@@ -66,6 +69,18 @@ class GroupService extends Requester {
 
   deleteGroupPlaylist = (groupId: number, playlistId: number) =>
     this.delete(`/${groupId}/playlists/${playlistId}`).then((resp) => resp.data);
+
+  requestMembership = (groupId: number) =>
+    this.post<void, any>({}, {}, "/v1/groups", `/${groupId}/access-requests`).then((resp) => resp.data);
+
+  getGroupAccessRequests = (groupId: number, params?: Params): Promise<Page<JoinGroupRequest>> =>
+    this.get<Page<JoinGroupRequest>>(`/${groupId}/access-requests`, params).then((resp) => resp.data);
+
+  grantGroupAccessRequest = (groupId: number, requestId: number) =>
+    this.post<void, any>({}, {}, "/v1/groups", `/${groupId}/access-requests/${requestId}/accept`).then((resp) => resp.data);
+
+  rejectGroupAccessRequest = (groupId: number, requestId: number) =>
+    this.post<void, any>({}, {}, "/v1/groups", `/${groupId}/access-requests/${requestId}/reject`).then((resp) => resp.data);
 }
 
 export default new GroupService(request);

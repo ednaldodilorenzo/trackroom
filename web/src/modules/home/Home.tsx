@@ -1,4 +1,4 @@
-import { Suspense, useMemo, useState } from "react";
+import { Suspense } from "react";
 import {
   Await,
   useLoaderData,
@@ -19,7 +19,6 @@ type HomeLoaderData = {
 export default function Home() {
   const navigate = useNavigate();
   const { groups } = useLoaderData() as HomeLoaderData;
-  const [search, setSearch] = useState("");
 
   useHeaderConfig({
     title: "Minha Biblioteca",
@@ -28,6 +27,10 @@ export default function Home() {
 
   function goToCreateGroup() {
     navigate("/groups/add");
+  }
+
+  function goToSearchGroups() {
+    navigate("/groups/search");
   }
 
   function goToGroup(groupId: number | string | undefined) {
@@ -39,23 +42,24 @@ export default function Home() {
     <div className="space-y-6 pb-8">
       <section className="bg-white rounded-3xl shadow-sm p-5">
         <h2 className="section-title mb-0">Meus grupos</h2>
+
         <p className="text-sm text-gray-500 mt-1 mb-4">
           Acesse músicas, playlists e cifras organizadas por grupo.
         </p>
 
-        <div className="relative">
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => setSearch(event.target.value)}
-            placeholder="Buscar grupo"
-            className="w-full h-12 rounded-xl border border-gray-300 bg-white px-4 pr-11 outline-none focus:ring-2 focus:ring-violet-500 focus:border-violet-500"
-          />
-          <BiSearch
-            size={22}
-            className="absolute right-3 top-3 text-gray-500 pointer-events-none"
-          />
-        </div>
+        <button
+          type="button"
+          onClick={goToSearchGroups}
+          className="w-full h-12 rounded-xl border border-gray-300 bg-white px-4 flex items-center gap-3 text-left hover:border-violet-400 hover:bg-violet-50/30 transition"
+        >
+          <BiSearch size={22} className="text-gray-500 shrink-0" />
+
+          <span className="text-gray-500 flex-1">
+            Buscar ou encontrar grupos
+          </span>
+
+          <span className="text-gray-400 text-xl">›</span>
+        </button>
       </section>
 
       <Suspense fallback={<FallbackOverlay />}>
@@ -63,7 +67,6 @@ export default function Home() {
           {(loadedGroups: Group[]) => (
             <GroupsContent
               groups={loadedGroups}
-              search={search}
               onCreateGroup={goToCreateGroup}
               onOpenGroup={goToGroup}
             />
@@ -76,25 +79,13 @@ export default function Home() {
 
 function GroupsContent({
   groups,
-  search,
   onCreateGroup,
   onOpenGroup,
 }: {
   groups: Group[];
-  search: string;
   onCreateGroup: () => void;
   onOpenGroup: (groupId: number | string | undefined) => void;
 }) {
-  const filteredGroups = useMemo(() => {
-    const normalizedSearch = search.trim().toLowerCase();
-
-    if (!normalizedSearch) return groups;
-
-    return groups.filter((group) =>
-      group.name?.toLowerCase().includes(normalizedSearch)
-    );
-  }, [groups, search]);
-
   if (groups.length === 0) {
     return (
       <section className="grid grid-cols-1 gap-4">
@@ -104,21 +95,9 @@ function GroupsContent({
     );
   }
 
-  if (filteredGroups.length === 0) {
-    return (
-      <section className="space-y-4">
-        <EmptySearchState search={search} />
-
-        <div className="grid grid-cols-2 gap-4">
-          <CreateGroupCard onClick={onCreateGroup} />
-        </div>
-      </section>
-    );
-  }
-
   return (
     <section className="grid grid-cols-2 gap-4">
-      {filteredGroups.map((group) => (
+      {groups.map((group) => (
         <GroupCard
           key={group.id}
           group={group}

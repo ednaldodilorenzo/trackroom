@@ -28,7 +28,10 @@ interface GroupRepository : JpaRepository<Group, Long> {
         g.description,
         g.cover,
         g.active,
-        case when ug is not null then true else false end,
+        case 
+            when ug is not null then "MEMBER"            
+            else "NONE"
+        end,
         ug.isAdmin
     )
     from Group g
@@ -51,12 +54,18 @@ interface GroupRepository : JpaRepository<Group, Long> {
         g.description,
         g.cover,
         g.active,
-        case when ug is not null then true else false end,
+        case 
+            when ug is not null then "MEMBER" 
+            when jg is not null and jg.status = JoinGroupRequestStatus.PENDING then "PENDING"
+            else "NONE"
+        end,
         ug.isAdmin
     )
     from Group g
     left join UserGroup ug
         on ug.group = g and ug.user.id = :userId
+    left join JoinGroupRequest jg 
+        on jg.group = g and jg.user.id = :userId
     where lower(g.name) like lower(concat('%', :groupName, '%'))
     """
     )
