@@ -1,20 +1,12 @@
 import { Suspense } from "react";
-import {
-  Await,
-  useLoaderData,
-  useNavigate,
-} from "react-router-dom";
+import { Await, useLoaderData, useNavigate } from "react-router-dom";
 import { BiPlus, BiSearch } from "react-icons/bi";
 
 import { Button, FallbackOverlay } from "@/components";
 import type { Group } from "@/model";
-import homeService from "./home.service";
 import { useHeaderConfig } from "@/hooks/useHeaderConfig";
 import "./Home.css";
-
-type HomeLoaderData = {
-  groups: Promise<Group[]>;
-};
+import { type HomeLoaderData } from "./home.loader";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -110,13 +102,7 @@ function GroupsContent({
   );
 }
 
-function GroupCard({
-  group,
-  onClick,
-}: {
-  group: Group;
-  onClick: () => void;
-}) {
+function GroupCard({ group, onClick }: { group: Group; onClick: () => void }) {
   return (
     <button
       type="button"
@@ -170,7 +156,9 @@ function EmptyGroupsState({ onCreateGroup }: { onCreateGroup: () => void }) {
         ♫
       </div>
 
-      <h3 className="font-bold text-lg text-gray-900">Nenhum grupo cadastrado</h3>
+      <h3 className="font-bold text-lg text-gray-900">
+        Nenhum grupo cadastrado
+      </h3>
       <p className="text-sm text-gray-500 mt-2 mb-5">
         Crie seu primeiro grupo para organizar músicas, playlists e cifras.
       </p>
@@ -184,21 +172,6 @@ function EmptyGroupsState({ onCreateGroup }: { onCreateGroup: () => void }) {
   );
 }
 
-function EmptySearchState({ search }: { search: string }) {
-  return (
-    <section className="bg-white rounded-3xl shadow-sm px-6 py-8 text-center">
-      <div className="w-14 h-14 rounded-full bg-gray-100 text-gray-400 mx-auto flex items-center justify-center text-3xl mb-4">
-        <BiSearch size={28} />
-      </div>
-
-      <h3 className="font-bold text-lg text-gray-900">Nenhum grupo encontrado</h3>
-      <p className="text-sm text-gray-500 mt-2">
-        Não encontramos grupos com o nome “{search}”.
-      </p>
-    </section>
-  );
-}
-
 function getGroupInitial(group: Group) {
   const name = group.name?.trim();
 
@@ -206,7 +179,3 @@ function getGroupInitial(group: Group) {
 
   return name.charAt(0).toUpperCase();
 }
-
-export const groupsLoader = (): HomeLoaderData => ({
-  groups: homeService.getGroups(),
-});

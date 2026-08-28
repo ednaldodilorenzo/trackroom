@@ -1,7 +1,10 @@
+import type { Group } from "@/model";
 import homeService from "./home.service";
 
-const groupsLoader = () => ({
+export const groupsLoader = () => ({
   groups: homeService.getGroups(),
 });
 
-export default groupsLoader;
+export type HomeLoaderData = {
+  groups: Promise<Group[]>;
+};

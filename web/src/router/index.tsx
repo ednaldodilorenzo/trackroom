@@ -71,7 +71,7 @@ export const router = createBrowserRouter(
             </Suspense>
           ),
           loader: async () => {
-            const mod = await import("@/modules/home/Home");
+            const mod = await import("@/modules/home/home.loader");
             return mod.groupsLoader();
           },
         },
