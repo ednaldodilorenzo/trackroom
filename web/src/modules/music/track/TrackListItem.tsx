@@ -46,7 +46,7 @@ export default function TrackListItem({ music, handlePlay }: TrackListItemProps)
                         onClick={() => {
                             if (confirm("Tem certeza que deseja excluir esta música?")) {
                                 show();
-                                groupService.deleteGroupMusic(parseInt(currentGroup.id!!), music.id!!).then(() => {
+                                groupService.deleteGroupMusic(parseInt(currentGroup.id!), music.id!).then(() => {
                                     toast.success("Música excluída com sucesso!");
                                     revalidate();
                                 }).finally(() => {

@@ -28,9 +28,9 @@ class GroupService extends Requester {
 
   addGroupMembers = (id: number, users: User[]) => this.post<void, User[]>(users, {}, "/v1/groups", `/${id}/members`);
 
-  promoteToAdmin = (groupId: number, userId: number) => this.post<void, any>({}, {}, "/v1/groups", `/${groupId}/users/${userId}/admin`);
+  promoteToAdmin = (groupId: number, userId: number) => this.post<void, void>(void 0, {}, "/v1/groups", `/${groupId}/users/${userId}/admin`);
 
-  demoteFromAdmin = (groupId: number, userId: number) => this.post<void, any>({}, {}, "/v1/groups", `/${groupId}/users/${userId}/member`);
+  demoteFromAdmin = (groupId: number, userId: number) => this.post<void, void>(void 0, {}, "/v1/groups", `/${groupId}/users/${userId}/member`);
 
   removeMemberFromGroup = (groupId: number, userId: number) => this.delete(`/${groupId}/members/${userId}`);
 
@@ -71,16 +71,16 @@ class GroupService extends Requester {
     this.delete(`/${groupId}/playlists/${playlistId}`).then((resp) => resp.data);
 
   requestMembership = (groupId: number) =>
-    this.post<void, any>({}, {}, "/v1/groups", `/${groupId}/access-requests`).then((resp) => resp.data);
+    this.post<void, void>(void 0, {}, "/v1/groups", `/${groupId}/access-requests`).then((resp) => resp.data);
 
   getGroupAccessRequests = (groupId: number, params?: Params): Promise<Page<JoinGroupRequest>> =>
     this.get<Page<JoinGroupRequest>>(`/${groupId}/access-requests`, params).then((resp) => resp.data);
 
   grantGroupAccessRequest = (groupId: number, requestId: number) =>
-    this.post<void, any>({}, {}, "/v1/groups", `/${groupId}/access-requests/${requestId}/accept`).then((resp) => resp.data);
+    this.post<void, void>(void 0, {}, "/v1/groups", `/${groupId}/access-requests/${requestId}/accept`).then((resp) => resp.data);
 
   rejectGroupAccessRequest = (groupId: number, requestId: number) =>
-    this.post<void, any>({}, {}, "/v1/groups", `/${groupId}/access-requests/${requestId}/reject`).then((resp) => resp.data);
+    this.post<void, void>(void 0, {}, "/v1/groups", `/${groupId}/access-requests/${requestId}/reject`).then((resp) => resp.data);
 }
 
 export default new GroupService(request);

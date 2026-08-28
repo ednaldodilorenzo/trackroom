@@ -5,11 +5,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import MusicList, { musicsLoader } from "./MusicList";
 import { musicService } from "./music.service";
 import groupService from "@/modules/group/group.service";
+import type { Music } from "@/model/Music";
 
 const navigateMock = vi.fn();
 const setCurrentTrackMock = vi.fn();
 const setIsPlayingMock = vi.fn();
 const headerConfigMock = vi.fn();
+const handlePlayMock = vi.fn();
 
 let loaderMusicsValue: any = { content: [] };
 let paramsIdValue = "10";
@@ -20,9 +22,10 @@ vi.mock("@/hooks/useHeaderConfig", () => ({
 }));
 
 vi.mock("react-router-dom", async () => {
-  const actual = await vi.importActual<typeof import("react-router-dom")>(
-    "react-router-dom"
-  );
+  const actual =
+    await vi.importActual<typeof import("react-router-dom")>(
+      "react-router-dom",
+    );
 
   return {
     ...actual,
@@ -40,6 +43,7 @@ vi.mock("@/components/player/AudioPlayerContext", () => ({
   useAudioPlayerContext: () => ({
     setCurrentTrack: setCurrentTrackMock,
     setIsPlaying: setIsPlayingMock,
+    handlePlay: handlePlayMock,
   }),
 }));
 
@@ -72,7 +76,13 @@ vi.mock("./track/TraskList", () => {
     <div data-testid="track-list">{children}</div>
   );
 
-  TrackList.Item = ({ music, handlePlay }: any) => (
+  TrackList.Item = ({
+    music,
+    handlePlay,
+  }: {
+    music: Music;
+    handlePlay: (music: Music) => void;
+  }) => (
     <button
       type="button"
       data-testid={`track-${music.name}`}
@@ -118,7 +128,7 @@ describe("<MusicList />", () => {
 
     expect(screen.getByText("Músicas")).toBeInTheDocument();
     expect(
-      screen.getByText("Todas as músicas disponíveis neste grupo")
+      screen.getByText("Todas as músicas disponíveis neste grupo"),
     ).toBeInTheDocument();
     expect(screen.getByPlaceholderText("Buscar música")).toBeInTheDocument();
   });
@@ -131,8 +141,8 @@ describe("<MusicList />", () => {
     expect(screen.getByText("Nenhuma música adicionada")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "Adicione músicas ao grupo para que os membros possam solicitar ou visualizar cifras."
-      )
+        "Adicione músicas ao grupo para que os membros possam solicitar ou visualizar cifras.",
+      ),
     ).toBeInTheDocument();
   });
 
@@ -160,7 +170,7 @@ describe("<MusicList />", () => {
     render(<MusicList />);
 
     expect(
-      screen.queryByRole("button", { name: /Adicionar música/i })
+      screen.queryByRole("button", { name: /Adicionar música/i }),
     ).not.toBeInTheDocument();
   });
 
@@ -211,19 +221,30 @@ describe("<MusicList />", () => {
 
     expect(screen.getByText("Nenhuma música encontrada")).toBeInTheDocument();
     expect(
-      screen.getByText("Tente buscar por outro nome ou limpe o campo de pesquisa.")
+      screen.getByText(
+        "Tente buscar por outro nome ou limpe o campo de pesquisa.",
+      ),
     ).toBeInTheDocument();
     expect(screen.queryByTestId("track-Hello World")).not.toBeInTheDocument();
     expect(screen.queryByTestId("track-Bye Now")).not.toBeInTheDocument();
   });
 
   it("plays a track on click: fetches file url, sets current track and starts playing", async () => {
+    const music = {
+      id: 5,
+      name: "Play Me",
+      description: "Singer",
+      fileVersion: 2,
+    };
+
     loaderMusicsValue = {
-      content: [{ id: 5, name: "Play Me", description: "Singer", fileVersion: 2 }],
+      content: [
+        music,
+      ],
     };
 
     (musicService.getFileUrl as any).mockResolvedValueOnce(
-      "https://file.url/x.mp3"
+      "https://file.url/x.mp3",
     );
 
     render(<MusicList />);
@@ -231,17 +252,8 @@ describe("<MusicList />", () => {
     const user = userEvent.setup();
     await user.click(screen.getByTestId("track-Play Me"));
 
-    expect(musicService.getFileUrl).toHaveBeenCalledTimes(1);
-    expect(musicService.getFileUrl).toHaveBeenCalledWith(5, 2);
-
-    expect(setCurrentTrackMock).toHaveBeenCalledWith({
-      id: 5,
-      title: "Play Me",
-      src: "https://file.url/x.mp3",
-      author: "Singer",
-    });
-
-    expect(setIsPlayingMock).toHaveBeenCalledWith(true);
+    expect(handlePlayMock).toHaveBeenCalledTimes(1);
+    expect(handlePlayMock).toHaveBeenCalledWith(music);
   });
 
   it("shows header 'Adicionar' button only for admin and navigates on click", async () => {
@@ -273,7 +285,7 @@ describe("<MusicList />", () => {
     render(<MusicList />);
 
     expect(
-      screen.queryByRole("button", { name: /Adicionar/i })
+      screen.queryByRole("button", { name: /Adicionar/i }),
     ).not.toBeInTheDocument();
   });
 });

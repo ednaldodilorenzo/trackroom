@@ -25,7 +25,7 @@ export default function TrackItem({
     <div className={`track-item ${active ? "active" : ""}`}>
       {id && (
         <button disabled={!canPlay}>
-          <BsPlayCircle onClick={onClick} size="2em" />
+          <BsPlayCircle onClick={onClick} size="2em" data-testid={`play-button-${id}`}/>
         </button>
       )}
       <div className="track-meta">

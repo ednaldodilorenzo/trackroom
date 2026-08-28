@@ -14,6 +14,7 @@ import com.poc.crud.modules.group.dto.UserDTO
 import com.poc.crud.modules.group.service.GroupService
 import com.poc.crud.modules.group.service.GroupServiceImpl
 import com.poc.crud.repository.GroupRepository
+import com.poc.crud.repository.JoinGroupRequestDao
 import com.poc.crud.repository.UserGroupRepository
 import com.poc.crud.repository.UserRepository
 import io.mockk.Runs
@@ -37,6 +38,7 @@ class GroupServiceImplTest {
     private lateinit var groupRepository: GroupRepository
     private lateinit var userRepository: UserRepository
     private lateinit var userGroupRepository: UserGroupRepository
+    private lateinit var joinRequestAccessRepository: JoinGroupRequestDao
     private lateinit var service: GroupService
 
     @BeforeEach
@@ -44,7 +46,8 @@ class GroupServiceImplTest {
         groupRepository = mockk()
         userRepository = mockk()
         userGroupRepository = mockk()
-        service = GroupServiceImpl(groupRepository, userRepository, userGroupRepository)
+        joinRequestAccessRepository = mockk()
+        service = GroupServiceImpl(groupRepository, userRepository, userGroupRepository, joinRequestAccessRepository)
     }
 
     @Test

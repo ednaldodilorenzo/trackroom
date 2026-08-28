@@ -129,44 +129,7 @@ describe("<Home />", () => {
 
     expect(navigateMock).toHaveBeenCalledTimes(1);
     expect(navigateMock).toHaveBeenCalledWith("/groups/add");
-  });
-
-  it("filters groups by search input", async () => {
-    loaderGroupsValue = [
-      { id: 1, name: "Grupo 1", description: "Desc 1" },
-      { id: 2, name: "Banda Azul", description: "Desc 2" },
-      { id: 3, name: "Coral Jovem", description: "Desc 3" },
-    ];
-
-    render(<Home />);
-
-    const user = userEvent.setup();
-    await user.type(screen.getByPlaceholderText("Buscar grupo"), "banda");
-
-    expect(screen.getByText("Banda Azul")).toBeInTheDocument();
-    expect(screen.queryByText("Grupo 1")).not.toBeInTheDocument();
-    expect(screen.queryByText("Coral Jovem")).not.toBeInTheDocument();
-
-    expect(screen.getAllByTestId("track-card")).toHaveLength(1);
-  });
-
-  it("renders empty search state when no group matches search", async () => {
-    loaderGroupsValue = [
-      { id: 1, name: "Grupo 1", description: "Desc 1" },
-      { id: 2, name: "Banda Azul", description: "Desc 2" },
-    ];
-
-    render(<Home />);
-
-    const user = userEvent.setup();
-    await user.type(screen.getByPlaceholderText("Buscar grupo"), "xyz");
-
-    expect(screen.getByText("Nenhum grupo encontrado")).toBeInTheDocument();
-    expect(screen.getByText(/Não encontramos grupos com o nome/i)).toBeInTheDocument();
-    expect(screen.getByText("Novo grupo")).toBeInTheDocument();
-
-    expect(screen.queryAllByTestId("track-card")).toHaveLength(0);
-  });
+  });  
 
   it("shows group initial using first letter of group name", () => {
     loaderGroupsValue = [

@@ -103,7 +103,7 @@ export const router = createBrowserRouter(
               path: "home",
               element: <GroupHome />,
               loader: async (args) => {
-                const mod = await import("@/modules/group/GroupHome");
+                const mod = await import("@/modules/group/GroupHome.loader");
                 return mod.loader(args);
               },
             },

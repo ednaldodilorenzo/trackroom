@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useState } from "react";
-import { Link, type LoaderFunctionArgs } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { Await, useLoaderData, useNavigate, useParams } from "react-router-dom";
 import { BiChevronRight, BiPlus } from "react-icons/bi";
 
@@ -15,14 +15,10 @@ import {
 import { useGroupContext } from "../group/GroupContext";
 import "@/modules/music/MusicList.css";
 import toast from "react-hot-toast";
+import { PREVIEW_LIMIT, type GroupHomeLoaderData } from "./GroupHome.loader";
 
-type GroupHomeLoaderData = {
-  musics: Promise<Page<Music>>;
-  playlists: Promise<Page<Playlist>>;
-};
 
-const PREVIEW_LIMIT = 5;
-const ACCESS_REQUEST_PREVIEW_LIMIT = 3;
+const ACCESS_REQUEST_PREVIEW_LIMIT = 5;
 
 export default function GroupHome() {
   const { musics, playlists } = useLoaderData() as GroupHomeLoaderData;
@@ -492,14 +488,3 @@ function AccessRequestRow({
     </div>
   );
 }
-
-export const loader = ({
-  params,
-}: LoaderFunctionArgs): GroupHomeLoaderData => {
-  const id = Number(params.id);
-
-  return {
-    musics: groupService.getMusics(id, { page: 0, size: PREVIEW_LIMIT }),
-    playlists: groupService.getPlaylists(id, { page: 0, size: PREVIEW_LIMIT, starred: true }),
-  };
-};
