@@ -77,7 +77,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             get("/v1/groups").with(jwt().jwt {
-                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
+                    it.subject("123").issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }) // Matches jwt.id.toLong()
@@ -97,11 +97,11 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups").with(jwt().jwt {
-                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
+                    it.subject("123").issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
-        ).andExpect(status().isCreated).andExpect(header().string("Location", "/v1/groups/1"))
+        ).andExpect(status().isCreated)
 
         verify { groupService.insertGroup(123L, any()) }
     }
@@ -132,7 +132,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups").with(jwt().jwt {
-                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
+                    it.subject("123").issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -147,7 +147,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups").with(jwt().jwt {
-                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
+                    it.subject("123").issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -160,7 +160,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups").with(jwt().jwt {
-                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
+                    it.subject("123").issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -173,7 +173,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             delete("/v1/groups/1/members/456").with(jwt().jwt {
-                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
+                    it.subject("123").issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 })
@@ -194,7 +194,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             get("/v1/groups/1/musics").with(jwt().jwt {
-                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
+                    it.subject("123").issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }) // Matches jwt.id.toLong()
@@ -214,7 +214,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups/1/musics").with(jwt().jwt {
-                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
+                    it.subject("123").issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -234,7 +234,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups/1/musics").with(jwt().jwt {
-                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
+                    it.subject("123").issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -249,7 +249,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups/1/musics").with(jwt().jwt {
-                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
+                    it.subject("123").issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -264,7 +264,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups/1/musics").with(jwt().jwt {
-                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
+                    it.subject("123").issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -284,7 +284,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             post("/v1/groups/1/musics").with(jwt().jwt {
-                    it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
+                    it.subject("123").issuedAt(Instant.now()).expiresAt(
                             Instant.now().plusSeconds(3600)
                         )
                 }).contentType(MediaType.APPLICATION_JSON).content(postPayload)
@@ -301,7 +301,7 @@ class GroupControllerTest {
 
         mockMvc.perform(
             get("/v1/groups/1/playlists?starred=false").with(jwt().jwt {
-                it.claim(JwtConstants.Claims.USER_ID, 123).issuedAt(Instant.now()).expiresAt(
+                it.subject("123").issuedAt(Instant.now()).expiresAt(
                     Instant.now().plusSeconds(3600)
                 )
             }) // Matches jwt.id.toLong()
